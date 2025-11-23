@@ -1243,7 +1243,7 @@
                 }
                 
                 // 使用重试机制获取时间
-                fetchWithRetry('https://worldtimeapi.org/api/ip', 3, 500)
+                fetchWithRetry('https://worldtimeapi.org/api/ip', 10, 500)
                     .then(response => {
                         if (!response.ok) {
                             throw new Error('网络响应不正常');
