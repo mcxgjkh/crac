@@ -1581,42 +1581,7 @@
             });
         });
 
-        document.addEventListener('DOMContentLoaded', function() {
-            // 检查是否有存储的时间同步选择
-            function checkStoredTimeSyncChoice() {
-                // 方法1: 检查URL参数
-                const urlParams = new URLSearchParams(window.location.search);
-                const urlTimeSync = urlParams.get('timeSync');
-                
-                if (urlTimeSync === 'agree') {
-                    handleTimeSyncChoice('agree');
-                    return true;
-                } else if (urlTimeSync === 'decline') {
-                    handleTimeSyncChoice('decline');
-                    return true;
-                }
-                
-                // 方法2: 检查sessionStorage
-                const storedTimeSync = sessionStorage.getItem('timeSyncChoice');
-                if (storedTimeSync === 'agree') {
-                    handleTimeSyncChoice('agree');
-                    return true;
-                } else if (storedTimeSync === 'decline') {
-                    handleTimeSyncChoice('decline');
-                    return true;
-                }
-                
-                return false;
-            }
-            
-            // 如果没有存储的选择，显示时间同步弹窗
-            const hasStoredChoice = checkStoredTimeSyncChoice();
-            if (!hasStoredChoice) {
-                showTimeSyncOverlay();
-            }
-        });
-
-        // 完整的时间同步功能
+        // 完整的时间同步功能，修复手动切换被覆盖的问题
         document.addEventListener('DOMContentLoaded', function() {
             const themeSwitch = document.querySelector('.theme-switch__checkbox');
             const timeSyncOverlay = document.getElementById('timeSyncOverlay');
@@ -1626,6 +1591,10 @@
             
             // 是否启用时间同步
             let enableTimeSync = false;
+            // 是否用户手动切换了主题
+            let userManuallySwitched = false;
+            // 时间同步定时器ID
+            let timeSyncIntervalId = null;
             
             // 检查是否有存储的时间同步选择
             function checkStoredTimeSyncChoice() {
@@ -1675,7 +1644,12 @@
                     // 立即使用在线时间设置主题
                     setThemeByOnlineTime();
                     // 每分钟检查一次时间，自动切换主题
-                    setInterval(setThemeByOnlineTime, 60 * 1000);
+                    timeSyncIntervalId = setInterval(() => {
+                        // 只有在用户没有手动切换时才自动更新
+                        if (!userManuallySwitched) {
+                            setThemeByOnlineTime();
+                        }
+                    }, 60 * 1000);
                     console.log('用户同意时间同步，启用每分钟同步');
                 } else {
                     enableTimeSync = false;
@@ -1685,6 +1659,11 @@
                     updateDownloadLink('decline');
                     // 使用本地时间设置主题
                     useLocalTime();
+                    // 清除定时器
+                    if (timeSyncIntervalId) {
+                        clearInterval(timeSyncIntervalId);
+                        timeSyncIntervalId = null;
+                    }
                     console.log('用户拒绝时间同步，使用本地时间');
                 }
                 
@@ -1702,8 +1681,14 @@
             
             // 获取在线时间并设置主题
             function setThemeByOnlineTime() {
+                // 只有在用户没有手动切换时才自动更新
+                if (userManuallySwitched) {
+                    console.log('用户已手动切换主题，跳过自动更新');
+                    return;
+                }
+                
                 // 使用重试机制获取时间
-                fetchWithRetry('https://worldtimeapi.org/api/ip', 10, 500)
+                fetchWithRetry('https://worldtimeapi.org/api/ip', 3, 500)
                     .then(response => {
                         if (!response.ok) {
                             throw new Error('网络响应不正常');
@@ -1717,12 +1702,20 @@
                         // 6-18时为白天模式，18-6时为夜晚模式
                         if (currentHour >= 6 && currentHour < 18) {
                             // 白天模式
-                            if (themeSwitch) themeSwitch.checked = false;
+                            if (themeSwitch) {
+                                themeSwitch.checked = false;
+                                // 重置手动切换标志
+                                userManuallySwitched = false;
+                            }
                             switchToLightTheme();
                             console.log(`在线时间: ${onlineTime.toLocaleString('zh-CN')}, 设置为白天模式`);
                         } else {
                             // 夜晚模式
-                            if (themeSwitch) themeSwitch.checked = true;
+                            if (themeSwitch) {
+                                themeSwitch.checked = true;
+                                // 重置手动切换标志
+                                userManuallySwitched = false;
+                            }
                             switchToDarkTheme();
                             console.log(`在线时间: ${onlineTime.toLocaleString('zh-CN')}, 设置为夜晚模式`);
                         }
@@ -1772,15 +1765,29 @@
             
             // 使用本地时间作为备选方案
             function useLocalTime() {
+                // 只有在用户没有手动切换时才自动更新
+                if (userManuallySwitched) {
+                    console.log('用户已手动切换主题，跳过本地时间更新');
+                    return;
+                }
+                
                 const localTime = new Date();
                 const currentHour = localTime.getHours();
                 
                 if (currentHour >= 6 && currentHour < 18) {
-                    if (themeSwitch) themeSwitch.checked = false;
+                    if (themeSwitch) {
+                        themeSwitch.checked = false;
+                        // 重置手动切换标志
+                        userManuallySwitched = false;
+                    }
                     switchToLightTheme();
                     console.log(`本地时间: ${localTime.toLocaleString('zh-CN')}, 设置为白天模式`);
                 } else {
-                    if (themeSwitch) themeSwitch.checked = true;
+                    if (themeSwitch) {
+                        themeSwitch.checked = true;
+                        // 重置手动切换标志
+                        userManuallySwitched = false;
+                    }
                     switchToDarkTheme();
                     console.log(`本地时间: ${localTime.toLocaleString('zh-CN')}, 设置为夜晚模式`);
                 }
@@ -1847,6 +1854,10 @@
             // 监听手动切换事件
             if (themeSwitch) {
                 themeSwitch.addEventListener('change', function() {
+                    // 设置手动切换标志
+                    userManuallySwitched = true;
+                    console.log('用户手动切换主题，设置手动切换标志');
+                    
                     if (this.checked) {
                         switchToDarkTheme();
                     } else {
