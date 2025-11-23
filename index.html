@@ -7,6 +7,16 @@
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <style>
+        @font-face {
+        font-family: "HarmonyOS";
+        src: url("data/HarmonyOS_Sans_SC_Medium.ttf");
+        }
+
+        @font-face {
+        font-family: "方正小标宋简体";
+        src: url("data/方正小标宋简.TTF");
+        }
+
         :root {
             --primary-blue: #1a5faf;
             --secondary-blue: #0d4a8d;
@@ -26,6 +36,7 @@
             background-color: #f8f9fa;
             font-size: 0.9rem;
             padding: 5px 0;
+            position: relative;
         }
         
         .top-bar a {
@@ -41,7 +52,7 @@
             padding: 15px 0;
         }
         
-        .navbar-brand img {
+        .navbar-brand{
             height: 50px;
         }
         
@@ -180,15 +191,734 @@
             text-decoration: none;
             color: inherit;
         }
+
+        .button_BH6RKW {
+            position: relative;
+            border: none;
+            background: transparent;
+            --stroke-color: #0000007c;
+            --ani-color: rgba(95, 3, 244, 0);
+            --color-gar: linear-gradient(90deg,#03a9f4,#f441a5,#ffeb3b,#03a9f4);
+            letter-spacing: 3px;
+            font-size: 2em;
+            font-family: "Arial";
+            text-transform: uppercase;
+            color: transparent;
+            -webkit-text-stroke: 1px var(--stroke-color);
+            cursor: pointer;
+            font-family: 'HarmonyOS', medium;
+            padding: 10px 20px;
+        }
+
+        .actual-text_BH6RKW {
+            display: inline-block;
+        }
+
+        .front-text_BH6RKW {
+            position: absolute;
+            top: 10px;
+            left: 0;
+            width: 100%;
+            background: var(--color-gar);
+            -webkit-background-clip: text;
+            background-clip: text;
+            background-size: 200%;
+            overflow: hidden;
+            transition: all 1s;
+            animation: 8s ani linear infinite;
+            border-bottom: 2px solid transparent;
+            font-family: 'HarmonyOS';
+            clip-path: polygon(0 0, 0% 0, 0% 100%, 0 100%);
+        }
+
+        .button_BH6RKW:hover .front-text_BH6RKW {
+            clip-path: polygon(0 0, 100% 0, 100% 100%, 0 100%);
+            border-bottom: 2px solid #03a9f4;
+            -webkit-text-stroke: 1px var(--ani-color);
+        }
+
+        /* Cookies 遮罩层 */
+        .cookies-overlay_cookies {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.8);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 9999;
+        }
+
+        /* Cookies 卡片样式 */
+        .card_cookies {
+            width: 300px;
+            height: 220px;
+            background-color: rgb(255, 255, 255);
+            border-radius: 8px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: 20px 30px;
+            gap: 13px;
+            position: relative;
+            overflow: hidden;
+            box-shadow: 2px 2px 20px rgba(0, 0, 0, 0.062);
+        }
+
+        #cookieSvg_cookies {
+            width: 50px;
+        }
+
+        #cookieSvg_cookies g path {
+            fill: rgb(97, 81, 81);
+        }
+
+        .cookieHeading_cookies {
+            font-size: 1.2em;
+            font-weight: 800;
+            color: rgb(26, 26, 26);
+        }
+
+        .cookieDescription_cookies {
+            text-align: center;
+            font-size: 0.7em;
+            font-weight: 600;
+            color: rgb(99, 99, 99);
+        }
+
+        .cookieDescription_cookies a {
+            --tw-text-opacity: 1;
+            color: rgb(59 130 246);
+        }
+
+        .cookieDescription_cookies a:hover {
+            -webkit-text-decoration-line: underline;
+            text-decoration-line: underline;
+        }
+
+        .buttonContainer_cookies {
+            display: flex;
+            gap: 20px;
+            flex-direction: row;
+        }
+
+        .acceptButton_cookies {
+            width: 80px;
+            height: 30px;
+            background-color: #7b57ff;
+            transition-duration: .2s;
+            border: none;
+            color: rgb(241, 241, 241);
+            cursor: pointer;
+            font-weight: 600;
+            border-radius: 20px;
+            box-shadow: 0 4px 6px -1px #977ef3, 0 2px 4px -1px #977ef3;
+            transition: all .6s ease;
+        }
+
+        .declineButton_cookies {
+            width: 80px;
+            height: 30px;
+            background-color: #dadada;
+            transition-duration: .2s;
+            color: rgb(46, 46, 46);
+            border: none;
+            cursor: not-allowed;
+            font-weight: 600;
+            border-radius: 20px;
+            box-shadow: 0 4px 6px -1px #bebdbd, 0 2px 4px -1px #bebdbd;
+            transition: all .6s ease;
+        }
+
+        .declineButton_cookies:hover {
+            background-color: #ebebeb;
+            box-shadow: 0 10px 15px -3px #bebdbd, 0 4px 6px -2px #bebdbd;
+            transition-duration: .2s;
+        }
+
+        .acceptButton_cookies:hover {
+            background-color: #9173ff;
+            box-shadow: 0 10px 15px -3px #977ef3, 0 4px 6px -2px #977ef3;
+            transition-duration: .2s;
+        }
+
+        @keyframes ani {
+            0% {
+                background-position: 0%;
+            }
+            50% {
+                background-position: 400%;
+            }
+            100% {
+                background-position: 0%;
+            }
+        }
+
+        .theme-switch {
+            position: absolute;
+            right: 65px;
+            --toggle-size: 10px;
+            /* the size is adjusted using font-size,
+                this is not transform scale,
+                so you can choose any size */
+            --container-width: 5.625em;
+            --container-height: 2.5em;
+            --container-radius: 6.25em;
+            /* radius 0 - minecraft mode :) */
+            --container-light-bg: #3D7EAE;
+            --container-night-bg: #1D1F2C;
+            --circle-container-diameter: 3.375em;
+            --sun-moon-diameter: 2.125em;
+            --sun-bg: #ECCA2F;
+            --moon-bg: #C4C9D1;
+            --spot-color: #959DB1;
+            --circle-container-offset: calc((var(--circle-container-diameter) - var(--container-height)) / 2 * -1);
+            --stars-color: #fff;
+            --clouds-color: #F3FDFF;
+            --back-clouds-color: #AACADF;
+            --transition: .5s cubic-bezier(0, -0.02, 0.4, 1.25);
+            --circle-transition: .3s cubic-bezier(0, -0.02, 0.35, 1.17);
+        }
+
+        .theme-switch, .theme-switch *, .theme-switch *::before, .theme-switch *::after {
+            -webkit-box-sizing: border-box;
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-size: var(--toggle-size);
+        }
+
+        .theme-switch__container {
+            width: var(--container-width);
+            height: var(--container-height);
+            background-color: var(--container-light-bg);
+            border-radius: var(--container-radius);
+            overflow: hidden;
+            cursor: pointer;
+            -webkit-box-shadow: 0em -0.062em 0.062em rgba(0, 0, 0, 0.25), 0em 0.062em 0.125em rgba(255, 255, 255, 0.94);
+            box-shadow: 0em -0.062em 0.062em rgba(0, 0, 0, 0.25), 0em 0.062em 0.125em rgba(255, 255, 255, 0.94);
+            -webkit-transition: var(--transition);
+            -o-transition: var(--transition);
+            transition: var(--transition);
+            position: relative;
+        }
+
+        .theme-switch__container::before {
+            content: "";
+            position: absolute;
+            z-index: 1;
+            inset: 0;
+            -webkit-box-shadow: 0em 0.05em 0.187em rgba(0, 0, 0, 0.25) inset, 0em 0.05em 0.187em rgba(0, 0, 0, 0.25) inset;
+            box-shadow: 0em 0.05em 0.187em rgba(0, 0, 0, 0.25) inset, 0em 0.05em 0.187em rgba(0, 0, 0, 0.25) inset;
+            border-radius: var(--container-radius)
+        }
+
+        .theme-switch__checkbox {
+            display: none;
+        }
+
+        .theme-switch__circle-container {
+            width: var(--circle-container-diameter);
+            height: var(--circle-container-diameter);
+            background-color: rgba(255, 255, 255, 0.1);
+            position: absolute;
+            left: var(--circle-container-offset);
+            top: var(--circle-container-offset);
+            border-radius: var(--container-radius);
+            -webkit-box-shadow: inset 0 0 0 3.375em rgba(255, 255, 255, 0.1), inset 0 0 0 3.375em rgba(255, 255, 255, 0.1), 0 0 0 0.625em rgba(255, 255, 255, 0.1), 0 0 0 1.25em rgba(255, 255, 255, 0.1);
+            box-shadow: inset 0 0 0 3.375em rgba(255, 255, 255, 0.1), inset 0 0 0 3.375em rgba(255, 255, 255, 0.1), 0 0 0 0.625em rgba(255, 255, 255, 0.1), 0 0 0 1.25em rgba(255, 255, 255, 0.1);
+            display: -webkit-box;
+            display: -ms-flexbox;
+            display: flex;
+            -webkit-transition: var(--circle-transition);
+            -o-transition: var(--circle-transition);
+            transition: var(--circle-transition);
+            pointer-events: none;
+        }
+
+        .theme-switch__sun-moon-container {
+            pointer-events: auto;
+            position: relative;
+            z-index: 2;
+            width: var(--sun-moon-diameter);
+            height: var(--sun-moon-diameter);
+            margin: auto;
+            border-radius: var(--container-radius);
+            background-color: var(--sun-bg);
+            -webkit-box-shadow: 0.062em 0.062em 0.062em 0em rgba(254, 255, 239, 0.61) inset, 0em -0.062em 0.062em 0em #a1872a inset;
+            box-shadow: 0.062em 0.062em 0.062em 0em rgba(254, 255, 239, 0.61) inset, 0em -0.062em 0.062em 0em #a1872a inset;
+            -webkit-filter: drop-shadow(0.062em 0.125em 0.125em rgba(0, 0, 0, 0.25)) drop-shadow(0em 0.062em 0.125em rgba(0, 0, 0, 0.25));
+            filter: drop-shadow(0.062em 0.125em 0.125em rgba(0, 0, 0, 0.25)) drop-shadow(0em 0.062em 0.125em rgba(0, 0, 0, 0.25));
+            overflow: hidden;
+            -webkit-transition: var(--transition);
+            -o-transition: var(--transition);
+            transition: var(--transition);
+        }
+
+        .theme-switch__moon {
+            -webkit-transform: translateX(100%);
+            -ms-transform: translateX(100%);
+            transform: translateX(100%);
+            width: 100%;
+            height: 100%;
+            background-color: var(--moon-bg);
+            border-radius: inherit;
+            -webkit-box-shadow: 0.062em 0.062em 0.062em 0em rgba(254, 255, 239, 0.61) inset, 0em -0.062em 0.062em 0em #969696 inset;
+            box-shadow: 0.062em 0.062em 0.062em 0em rgba(254, 255, 239, 0.61) inset, 0em -0.062em 0.062em 0em #969696 inset;
+            -webkit-transition: var(--transition);
+            -o-transition: var(--transition);
+            transition: var(--transition);
+            position: relative;
+        }
+
+        .theme-switch__spot {
+            position: absolute;
+            top: 0.75em;
+            left: 0.312em;
+            width: 0.75em;
+            height: 0.75em;
+            border-radius: var(--container-radius);
+            background-color: var(--spot-color);
+            -webkit-box-shadow: 0em 0.0312em 0.062em rgba(0, 0, 0, 0.25) inset;
+            box-shadow: 0em 0.0312em 0.062em rgba(0, 0, 0, 0.25) inset;
+        }
+
+        .theme-switch__spot:nth-of-type(2) {
+            width: 0.375em;
+            height: 0.375em;
+            top: 0.937em;
+            left: 1.375em;
+        }
+
+        .theme-switch__spot:nth-last-of-type(3) {
+            width: 0.25em;
+            height: 0.25em;
+            top: 0.312em;
+            left: 0.812em;
+        }
+
+        .theme-switch__clouds {
+            width: 1.25em;
+            height: 1.25em;
+            background-color: var(--clouds-color);
+            border-radius: var(--container-radius);
+            position: absolute;
+            bottom: -0.625em;
+            left: 0.312em;
+            -webkit-box-shadow: 0.937em 0.312em var(--clouds-color), -0.312em -0.312em var(--back-clouds-color), 1.437em 0.375em var(--clouds-color), 0.5em -0.125em var(--back-clouds-color), 2.187em 0 var(--clouds-color), 1.25em -0.062em var(--back-clouds-color), 2.937em 0.312em var(--clouds-color), 2em -0.312em var(--back-clouds-color), 3.625em -0.062em var(--clouds-color), 2.625em 0em var(--back-clouds-color), 4.5em -0.312em var(--clouds-color), 3.375em -0.437em var(--back-clouds-color), 4.625em -1.75em 0 0.437em var(--clouds-color), 4em -0.625em var(--back-clouds-color), 4.125em -2.125em 0 0.437em var(--back-clouds-color);
+            box-shadow: 0.937em 0.312em var(--clouds-color), -0.312em -0.312em var(--back-clouds-color), 1.437em 0.375em var(--clouds-color), 0.5em -0.125em var(--back-clouds-color), 2.187em 0 var(--clouds-color), 1.25em -0.062em var(--back-clouds-color), 2.937em 0.312em var(--clouds-color), 2em -0.312em var(--back-clouds-color), 3.625em -0.062em var(--clouds-color), 2.625em 0em var(--back-clouds-color), 4.5em -0.312em var(--clouds-color), 3.375em -0.437em var(--back-clouds-color), 4.625em -1.75em 0 0.437em var(--clouds-color), 4em -0.625em var(--back-clouds-color), 4.125em -2.125em 0 0.437em var(--back-clouds-color);
+            -webkit-transition: 0.5s cubic-bezier(0, -0.02, 0.4, 1.25);
+            -o-transition: 0.5s cubic-bezier(0, -0.02, 0.4, 1.25);
+            transition: 0.5s cubic-bezier(0, -0.02, 0.4, 1.25);
+        }
+
+        .theme-switch__stars-container {
+            position: absolute;
+            color: var(--stars-color);
+            top: -100%;
+            left: 0.312em;
+            width: 2.75em;
+            height: auto;
+            -webkit-transition: var(--transition);
+            -o-transition: var(--transition);
+            transition: var(--transition);
+        }
+
+        /* actions */
+
+        .theme-switch__checkbox:checked + .theme-switch__container {
+            background-color: var(--container-night-bg);
+        }
+
+        .theme-switch__checkbox:checked + .theme-switch__container .theme-switch__circle-container {
+            left: calc(100% - var(--circle-container-offset) - var(--circle-container-diameter));
+        }
+
+        .theme-switch__checkbox:checked + .theme-switch__container .theme-switch__circle-container:hover {
+            left: calc(100% - var(--circle-container-offset) - var(--circle-container-diameter) - 0.187em)
+        }
+
+        .theme-switch__circle-container:hover {
+            left: calc(var(--circle-container-offset) + 0.187em);
+        }
+
+        .theme-switch__checkbox:checked + .theme-switch__container .theme-switch__moon {
+            -webkit-transform: translate(0);
+            -ms-transform: translate(0);
+            transform: translate(0);
+        }
+
+        .theme-switch__checkbox:checked + .theme-switch__container .theme-switch__clouds {
+            bottom: -4.062em;
+        }
+
+        .theme-switch__checkbox:checked + .theme-switch__container .theme-switch__stars-container {
+            top: 50%;
+            -webkit-transform: translateY(-50%);
+            -ms-transform: translateY(-50%);
+            transform: translateY(-50%);
+        }
+
+        .day_mode {
+            position: absolute;
+            right: 125px;
+        }
+
+        .night_mode {
+            position: absolute;
+            right: 5px;
+        }
+
+        /* 暗色模式样式 */
+        .dark-theme {
+            background-color: #121212;
+            color: #e0e0e0;
+        }
+
+        .dark-theme .top-bar {
+            background-color: #1e1e1e;
+            color: #e0e0e0;
+        }
+
+        .dark-theme .top-bar a {
+            color: #b0b0b0;
+        }
+
+        .dark-theme .navbar {
+            background-color: #1e1e1e;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.3);
+        }
+
+        .dark-theme .nav-link {
+            color: #e0e0e0 !important;
+        }
+
+        .dark-theme .nav-link:hover {
+            color: #64b5f6 !important;
+        }
+
+        .dark-theme .nav-link:hover::after {
+            background-color: #64b5f6;
+        }
+
+        .dark-theme .carousel-caption {
+            background-color: rgba(0, 0, 0, 0.7);
+        }
+
+        .dark-theme .section-title {
+            color: #64b5f6;
+        }
+
+        .dark-theme .section-title::after {
+            background-color: #64b5f6;
+        }
+
+        .dark-theme .news-list li {
+            border-bottom: 1px dashed #444;
+        }
+
+        .dark-theme .news-list .date {
+            color: #aaa;
+        }
+
+        .dark-theme .service-card {
+            background: #1e1e1e;
+            color: #e0e0e0;
+            box-shadow: 0 3px 10px rgba(0, 0, 0, 0.3);
+        }
+
+        .dark-theme .service-card .icon {
+            color: #64b5f6;
+        }
+
+        .dark-theme footer {
+            background-color: #0a0a0a;
+        }
+
+        .dark-theme footer h5 {
+            color: #fff;
+        }
+
+        .dark-theme footer a {
+            color: #aaa;
+        }
+
+        .dark-theme footer a:hover {
+            color: #fff;
+        }
+
+        .dark-theme .footer-bottom {
+            border-top: 1px solid #333;
+        }
+
+        .dark-theme .button_BH6RKW {
+            --stroke-color: #ffffff7c;
+        }
+
+        .dark-theme .card {
+            background-color: #1e1e1e;
+            color: #e0e0e0;
+            border: 1px solid #333;
+        }
+
+        .dark-theme .card .card-title {
+            color: #64b5f6;
+        }
+
+        .dark-theme .btn-outline-primary {
+            color: #64b5f6;
+            border-color: #64b5f6;
+        }
+
+        .dark-theme .btn-outline-primary:hover {
+            background-color: #64b5f6;
+            color: #121212;
+        }
+
+        .dark-theme .carousel-control-prev-icon,
+        .dark-theme .carousel-control-next-icon {
+            filter: invert(1);
+        }
+
+        /* Cookies 弹窗暗色模式 */
+        .dark-theme .card_cookies {
+            background-color: #1e1e1e;
+            color: #e0e0e0;
+        }
+
+        .dark-theme .cookieHeading_cookies {
+            color: #e0e0e0;
+        }
+
+        .dark-theme .cookieDescription_cookies {
+            color: #b0b0b0;
+        }
+
+        .dark-theme .declineButton_cookies {
+            background-color: #333;
+            color: #e0e0e0;
+        }
+
+        .dark-theme .declineButton_cookies:hover {
+            background-color: #444;
+        }
+
+        /* 白天/黑夜模式标签 */
+        .dark-theme .day_mode {
+            color: #aaa;
+        }
+
+        .dark-theme .night_mode {
+            color: #64b5f6;
+            font-weight: bold;
+        }
+
+        .day_mode {
+            color: #64b5f6;
+            font-weight: bold;
+        }
+
+        /* 时间同步弹窗样式 */
+        .time-sync-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.85);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 10000;
+            font-family: "Microsoft YaHei", sans-serif;
+        }
+        
+        .time-sync-card {
+            width: 400px;
+            max-width: 90%;
+            background-color: white;
+            border-radius: 12px;
+            padding: 30px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+            text-align: center;
+        }
+        
+        .time-sync-icon {
+            font-size: 3rem;
+            color: #4a90e2;
+            margin-bottom: 20px;
+        }
+        
+        .time-sync-title {
+            font-size: 1.5rem;
+            font-weight: bold;
+            color: #333;
+            margin-bottom: 15px;
+        }
+        
+        .time-sync-description {
+            color: #666;
+            line-height: 1.6;
+            margin-bottom: 25px;
+            text-align: left;
+        }
+        
+        .time-sync-features {
+            background-color: #f8f9fa;
+            border-radius: 8px;
+            padding: 15px;
+            margin-bottom: 25px;
+            text-align: left;
+        }
+        
+        .time-sync-feature {
+            display: flex;
+            align-items: center;
+            margin-bottom: 10px;
+        }
+        
+        .time-sync-feature:last-child {
+            margin-bottom: 0;
+        }
+        
+        .feature-icon {
+            color: #4a90e2;
+            margin-right: 10px;
+            font-size: 1.2rem;
+        }
+        
+        .time-sync-buttons {
+            display: flex;
+            gap: 15px;
+        }
+        
+        .time-sync-btn {
+            flex: 1;
+            padding: 12px 20px;
+            border: none;
+            border-radius: 6px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+        
+        .time-sync-agree {
+            background-color: #4a90e2;
+            color: white;
+        }
+        
+        .time-sync-agree:hover {
+            background-color: #3a80d2;
+        }
+        
+        .time-sync-decline {
+            background-color: #f1f1f1;
+            color: #333;
+        }
+        
+        .time-sync-decline:hover {
+            background-color: #e1e1e1;
+        }
+        
+        .time-sync-note {
+            font-size: 0.85rem;
+            color: #888;
+            margin-top: 15px;
+        }
+
+        @font-face {
+            font-family: "HarmonyOS";
+            src: url("data/HarmonyOS_Sans_SC_Medium.ttf");
+        }
+
+        @font-face {
+            font-family: "方正小标宋简体";
+            src: url("data/方正小标宋简.ttf");
+        }
     </style>
 </head>
 <body>
+    <!-- 时间同步同意弹窗 -->
+    <div class="time-sync-overlay" id="timeSyncOverlay" style="display: none;">
+        <div class="time-sync-card">
+            <div class="time-sync-icon">
+                <i class="fas fa-sync-alt"></i>
+            </div>
+            <h2 class="time-sync-title">时间同步设置</h2>
+            <p class="time-sync-description">
+                为了确保网站主题能根据准确的时间自动切换，我们需要获取准确的当前时间。
+            </p>
+            
+            <div class="time-sync-features">
+                <div class="time-sync-feature">
+                    <i class="fas fa-check-circle feature-icon"></i>
+                    <span>每分钟自动同步时间</span>
+                </div>
+                <div class="time-sync-feature">
+                    <i class="fas fa-check-circle feature-icon"></i>
+                    <span>根据时间自动切换白天/夜晚模式</span>
+                </div>
+                <div class="time-sync-feature">
+                    <i class="fas fa-exclamation-triangle feature-icon"></i>
+                    <span>会消耗少量数据流量</span>
+                </div>
+            </div>
+            
+            <div class="time-sync-buttons">
+                <button class="time-sync-btn time-sync-decline" id="declineTimeSync">使用本地时间</button>
+                <button class="time-sync-btn time-sync-agree" id="agreeTimeSync">同步在线时间</button>
+            </div>
+            
+            <p class="time-sync-note">
+                您可以在下次访问网站时重新选择此设置
+            </p>
+        </div>
+    </div>
+
+    <div class="cookies-overlay_cookies" id="cookiesOverlay">
+        <div class="card_cookies">
+            <svg xml:space="preserve" viewBox="0 0 122.88 122.25" y="0px" x="0px" id="cookieSvg_cookies" version="1.1"><g><path d="M101.77,49.38c2.09,3.1,4.37,5.11,6.86,5.78c2.45,0.66,5.32,0.06,8.7-2.01c1.36-0.84,3.14-0.41,3.97,0.95 c0.28,0.46,0.42,0.96,0.43,1.47c0.13,1.4,0.21,2.82,0.24,4.26c0.03,1.46,0.02,2.91-0.05,4.35h0v0c0,0.13-0.01,0.26-0.03,0.38 c-0.91,16.72-8.47,31.51-20,41.93c-11.55,10.44-27.06,16.49-43.82,15.69v0.01h0c-0.13,0-0.26-0.01-0.38-0.03 c-16.72-0.91-31.51-8.47-41.93-20C5.31, 90.61-0.73,75.1,0.07,58.34H0.07v0c0-0.13,0.01-0.26,0.03-0.38 C1,41.22,8.81,26.35,20.57,15.87C32.34,5.37,48.09-0.73,64.85,0.07V0.07h0c1.6,0,2.89,1.29,2.89,2.89c0,0.4-0.08,0.78-0.23,1.12 c-1.17,3.81-1.25,7.34-0.27,10.14c0.89,2.54,2.7,4.51,5.41,5.52c1.44,0.54,2.2,2.1,1.74,3.55l0.01,0 c-1.83,5.89-1.87,11.08-0.52,15.26c0.82,2.53,2.14,4.69,3.88,6.4c1.74,1.72,3.9,3,6.39,3.78c4.04,1.26,8.94,1.18,14.31-0.55 C99.73,47.78,101.08,48.3,101.77,49.38L101.77,49.38z M59.28,57.86c2.77,0,5.01,2.24,5.01,5.01c0,2.77-2.24,5.01-5.01,5.01 c-2.77,0-5.01-2.24-5.01-5.01C54.27,60.1,56.52,57.86,59.28,57.86L59.28,57.86z M37.56,78.49c3.37,0,6.11,2.73,6.11,6.11 s-2.73,6.11-6.11,6.11s-6.11-2.73-6.11-6.11S34.18,78.49,37.56,78.49L37.56,78.49z M50.72,31.75c2.65,0,4.79,2.14,4.79,4.79 c0,2.65-2.14,4.79-4.79,4.79c-2.65,0-4.79-2.14-4.79-4.79C45.93,33.89,48.08,31.75,50.72,31.75L50.72,31.75z M119.3,32.4 c1.98,0,3.58,1.6,3.58,3.58c0,1.98-1.6,3.58-3.58,3.58s-3.58-1.6-3.58-3.58C115.71,34.01,117.32,32.4,119.3,32.4L119.3,32.4z M93.62,22.91c2.98,0,5.39,2.41,5.39,5.39c0,2.98-2.41,5.39-5.39,5.39c-2.98,0-5.39-2.41-5.39-5.39 C88.23,25.33,90.64,22.91,93.62,22.91L93.62,22.91z M97.79,0.59c3.19,0,5.78,2.59,5.78,5.78c0,3.19-2.59,5.78-5.78,5.78 c-3.19,0-5.78-2.59-5.78-5.78C92.02,3.17,94.6,0.59,97.79,0.59L97.79,0.59z M76.73,80.63c4.43,0,8.03,3.59,8.03,8.03 c0,4.43-3.59,8.03-8.03,8.03s-8.03-3.59-8.03-8.03C68.7,84.22,72.29,80.63,76.73,80.63L76.73,80.63z M31.91,46.78 c4.8, 0,8.69,3.89,8.69,8.69c0,4.8-3.89,8.69-8.69,8.69s-8.69-3.89-8.69-8.69C23.22,50.68,27.11,46.78,31.91,46.78L31.91,46.78z M107.13,60.74c-3.39-0.91-6.35-3.14-8.95-6.48c-5.78,1.52-11.16,1.41-15.76-0.02c-3.37-1.05-6.32-2.81-8.71-5.18 c-2.39-2.37-4.21-5.32-5.32-8.75c-1.51-4.66-1.69-10.2-0.18-16.32c-3.1-1.8-5.25-4.53-6.42-7.88c-1.06-3.05-1.28-6.59-0.61-10.35 C47.27,5.95,34.3,11.36,24.41,20.18C13.74,29.69,6.66,43.15,5.84,58.29l0,0.05v0h0l-0.01,0.13v0C5.07,73.72,10.55,87.82,20.02,98.3 c9.44,10.44,22.84,17.29,38,18.1l0.05,0h0v0l0.13,0.01h0c15.24,0.77,29.35-4.71,39.83-14.19c10.44-9.44,17.29-22.84,18.1-38l0-0.05 v0h0l0.01-0.13v0c0.07-1.34,0.09-2.64,0.06-3.91C112.98,61.34,109.96,61.51,107.13,60.74L107.13,60.74z M116.15,64.04L116.15,64.04 L116.15,64.04L116.15,64.04z M58.21,116.42L58.21,116.42L58.21,116.42L58.21,116.42z"></path></g></svg>
+            <p class="cookieHeading_cookies">我们使用Cookie</p>
+            <p class="cookieDescription_cookies">我们使用Cookie以确保为您提供最佳的网站体验。<br><a href="#">阅读Cookie政策</a>。</p>
+
+            <div class="buttonContainer_cookies">
+                <button class="acceptButton_cookies" id="acceptCookies">允许</button>
+                <button class="declineButton_cookies" id="declineCookies">拒绝</button>
+            </div>
+        </div>
+    </div>
+
     <!-- 顶部信息栏 -->
     <div class="top-bar">
         <div class="container">
             <div class="d-flex justify-content-between">
                 <div>
                     <span>欢迎访问中国无线电爱好者BH6RKW的网页</span>
+                    <span class="day_mode">白天模式</span>
+                    <label class="theme-switch">
+                        <input type="checkbox" class="theme-switch__checkbox">
+                        <div class="theme-switch__container">
+                            <div class="theme-switch__clouds"></div>
+                                <div class="theme-switch__stars-container">
+                                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 144 55" fill="none">
+                                    <path fill-rule="evenodd" clip-rule="evenodd" d="M135.831 3.00688C135.055 3.85027 134.111 4.29946 133 4.35447C134.111 4.40947 135.055 4.85867 135.831 5.71123C136.607 6.55462 136.996 7.56303 136.996 8.72727C136.996 7.95722 137.172 7.25134 137.525 6.59129C137.886 5.93124 138.372 5.39954 138.98 5.00535C139.598 4.60199 140.268 4.39114 141 4.35447C139.88 4.2903 138.936 3.85027 138.16 3.00688C137.384 2.16348 136.996 1.16425 136.996 0C136.996 1.16425 136.607 2.16348 135.831 3.00688ZM31 23.3545C32.1114 23.2995 33.0551 22.8503 33.8313 22.0069C34.6075 21.1635 34.9956 20.1642 34.9956 19C34.9956 20.1642 35.3837 21.1635 36.1599 22.0069C36.9361 22.8503 37.8798 23.2903 39 23.3545C38.2679 23.3911 37.5976 23.602 36.9802 24.0053C36.3716 24.3995 35.8864 24.9312 35.5248 25.5913C35.172 26.2513 34.9956 26.9572 34.9956 27.7273C34.9956 26.563 34.6075 25.5546 33.8313 24.7112C33.0551 23.8587 32.1114 23.4095 31 23.3545ZM0 36.3545C1.11136 36.2995 2.05513 35.8503 2.83131 35.0069C3.6075 34.1635 3.99559 33.1642 3.99559 32C3.99559 33.1642 4.38368 34.1635 5.15987 35.0069C5.93605 35.8503 6.87982 36.2903 8 36.3545C7.26792 36.3911 6.59757 36.602 5.98015 37.0053C5.37155 37.3995 4.88644 37.9312 4.52481 38.5913C4.172 39.2513 3.99559 39.9572 3.99559 40.7273C3.99559 39.563 3.6075 38.5546 2.83131 37.7112C2.05513 36.8587 1.11136 36.4095 0 36.3545ZM56.8313 24.0069C56.0551 24.8503 55.1114 25.2995 54 25.3545C55.1114 25.4095 56.0551 25.8587 56.8313 26.7112C57.6075 27.5546 57.9956 28.563 57.9956 29.7273C57.9956 28.9572 58.172 28.2513 58.5248 27.5913C58.8864 26.9312 59.3716 26.3995 59.9802 26.0053C60.5976 25.602 61.2679 25.3911 62 25.3545C60.8798 25.2903 59.9361 24.8503 59.1599 24.0069C58.3837 23.1635 57.9956 22.1642 57.9956 21C57.9956 22.1642 57.6075 23.1635 56.8313 24.0069ZM81 25.3545C82.1114 25.2995 83.0551 24.8503 83.8313 24.0069C84.6075 23.1635 84.9956 22.1642 84.9956 21C84.9956 22.1642 85.3837 23.1635 86.1599 24.0069C86.9361 24.8503 87.8798 25.2903 89 25.3545C88.2679 25.3911 87.5976 25.602 86.9802 26.0053C86.3716 26.3995 85.8864 26.9312 85.5248 27.5913C85.172 28.2513 84.9956 28.9572 84.9956 29.7273C84.9956 28.563 84.6075 27.5546 83.8313 26.7112C83.0551 25.8587 82.1114 25.4095 81 25.3545ZM136 36.3545C137.111 36.2995 138.055 35.8503 138.831 35.0069C139.607 34.1635 139.996 33.1642 139.996 32C139.996 33.1642 140.384 34.1635 141.16 35.0069C141.936 35.8503 142.88 36.2903 144 36.3545C143.268 36.3911 142.598 36.602 141.98 37.0053C141.372 37.3995 140.886 37.9312 140.525 38.5913C140.172 39.2513 139.996 39.9572 139.996 40.7273C139.996 39.563 139.607 38.5546 138.831 37.7112C138.055 36.8587 137.111 36.4095 136 36.3545ZM101.831 49.0069C101.055 49.8503 100.111 50.2995 99 50.3545C100.111 50.4095 101.055 50.8587 101.831 51.7112C102.607 52.5546 102.996 53.563 102.996 54.7273C102.996 53.9572 103.172 53.2513 103.525 52.5913C103.886 51.9312 104.372 51.3995 104.98 51.0053C105.598 50.602 106.268 50.3911 107 50.3545C105.88 50.2903 104.936 49.8503 104.16 49.0069C103.384 48.1635 102.996 47.1642 102.996 46C102.996 47.1642 102.607 48.1635 101.831 49.0069Z" fill="currentColor"></path>
+                                </svg>
+                            </div>
+                            <div class="theme-switch__circle-container">
+                                <div class="theme-switch__sun-moon-container">
+                                    <div class="theme-switch__moon">
+                                    <div class="theme-switch__spot"></div>
+                                    <div class="theme-switch__spot"></div>
+                                    <div class="theme-switch__spot"></div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </label>
+                    <span class="night_mode">夜晚模式</span>
                 </div>
             </div>
         </div>
@@ -197,9 +927,10 @@
     <!-- 主导航 -->
     <nav class="navbar navbar-expand-lg sticky-top">
         <div class="container">
-            <a class="navbar-brand" href="#">
-                <img src="https://cdn4.winhlb.com/2025/09/07/68bd4a8da96c2.png" alt="CRAC Logo">
-            </a>
+            <button class="button_BH6RKW" data-text="Awesome">
+                <span class="actual-text_BH6RKW">&nbsp;BH6RKW&nbsp;</span>
+                <span aria-hidden="true" class="front-text_BH6RKW">&nbsp;BH6RKW&nbsp;</span>
+            </button>
             <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
                 <span class="navbar-toggler-icon"></span>
             </button>
@@ -232,7 +963,7 @@
     <div id="mainCarousel" class="carousel slide" data-bs-ride="carousel">
         <div class="carousel-inner">
             <div class="carousel-item active">
-                <div class="d-flex align-items-center justify-content-center h-100" style="background: linear-gradient(rgba(0,0,0,0.3), rgba(0,0,0,0.3)), url('https://bh6rkw.dpdns.org/images/QSL卡片1.0正面.png') center/cover;">
+                <div class="d-flex align-items-center justify-content-center h-100" style="background: linear-gradient(rgba(0,0,0,0.3), rgba(0,0,0,0.3)), center/cover;">
                     <div class="carousel-caption text-center">
                         <h2>中国武汉·光谷星河</h2>
                         <p>第一代QSL卡片（完整图请至下载页）</p>
@@ -240,7 +971,7 @@
                 </div>
             </div>
             <div class="carousel-item active">
-                <div class="d-flex align-items-center justify-content-center h-100" style="background: linear-gradient(rgba(0,0,0,0.3), rgba(0,0,0,0.3)), url('https://bh6rkw.dpdns.org/images/QSL卡片2.0正面.png') center/cover;">
+                <div class="d-flex align-items-center justify-content-center h-100" style="background: linear-gradient(rgba(0,0,0,0.3), rgba(0,0,0,0.3)), center/cover;">
                     <div class="carousel-caption text-center">
                         <h2>中国武汉·江汉关</h2>
                         <p>第二代QSL卡片（完整图请至下载页）</p>
@@ -248,7 +979,7 @@
                 </div>
             </div>
             <div class="carousel-item">
-                <div class="d-flex align-items-center justify-content-center h-100" style="background: linear-gradient(rgba(0,0,0,0.3), rgba(0,0,0,0.3)), url('https://bh6rkw.dpdns.org/images/CRAC-圆形-无底-带边线.png') center/cover;">
+                <div class="d-flex align-items-center justify-content-center h-100" style="background: linear-gradient(rgba(0,0,0,0.3), rgba(0,0,0,0.3)), center/cover;">
                     <div class="carousel-caption text-center">
                         <h2>业余无线电操作证书模拟考试2025</h2>
                         <p>最新题库，10月1日启用，支持A,B,C类（请前往“模拟考试”页面）</p>
@@ -435,5 +1166,284 @@
     </footer>
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <!-- Font Awesome 图标 -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/js/all.min.js"></script>
+</body>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const cookiesOverlay = document.getElementById('cookiesOverlay');
+            const siteContent = document.getElementById('siteContent');
+            const acceptButton = document.getElementById('acceptCookies');
+            const declineButton = document.getElementById('declineCookies');
+            
+            // 检查是否已经同意过cookies
+            if (!localStorage.getItem('cookiesAccepted')) {
+                // 显示cookies请求，隐藏网站内容
+                cookiesOverlay.style.display = 'flex';
+                siteContent.style.display = 'none';
+                document.body.style.overflow = 'hidden';
+            } else {
+                // 已经同意过，直接显示网站内容
+                cookiesOverlay.style.display = 'none';
+                siteContent.style.display = 'block';
+                document.body.style.overflow = 'auto';
+            }
+            
+            // 同意cookies
+            acceptButton.addEventListener('click', function() {
+                localStorage.setItem('cookiesAccepted', 'true');
+                cookiesOverlay.style.display = 'none';
+                siteContent.style.display = 'block';
+                document.body.style.overflow = 'auto';
+            });
+            
+            // 拒绝cookies
+            declineButton.addEventListener('click', function() {
+                alert('您需要同意Cookie政策才能访问本网站。');
+            });
+        });
+
+        // 完整的时间同步功能
+        document.addEventListener('DOMContentLoaded', function() {
+            const themeSwitch = document.querySelector('.theme-switch__checkbox');
+            const timeSyncOverlay = document.getElementById('timeSyncOverlay');
+            const agreeTimeSyncBtn = document.getElementById('agreeTimeSync');
+            const declineTimeSyncBtn = document.getElementById('declineTimeSync');
+            const downloadLink = document.getElementById('downloadLink');
+            
+            // 是否启用时间同步
+            let enableTimeSync = false;
+            
+            // 检查是否有存储的时间同步选择
+            function checkStoredTimeSyncChoice() {
+                // 方法1: 检查URL参数
+                const urlParams = new URLSearchParams(window.location.search);
+                const urlTimeSync = urlParams.get('timeSync');
+                
+                if (urlTimeSync === 'agree') {
+                    handleTimeSyncChoice('agree');
+                    return true;
+                } else if (urlTimeSync === 'decline') {
+                    handleTimeSyncChoice('decline');
+                    return true;
+                }
+                
+                // 方法2: 检查sessionStorage
+                const storedTimeSync = sessionStorage.getItem('timeSyncChoice');
+                if (storedTimeSync === 'agree') {
+                    handleTimeSyncChoice('agree');
+                    return true;
+                } else if (storedTimeSync === 'decline') {
+                    handleTimeSyncChoice('decline');
+                    return true;
+                }
+                
+                return false;
+            }
+            
+            // 显示时间同步弹窗
+            function showTimeSyncOverlay() {
+                timeSyncOverlay.style.display = 'flex';
+            }
+            
+            // 隐藏时间同步弹窗
+            function hideTimeSyncOverlay() {
+                timeSyncOverlay.style.display = 'none';
+            }
+            
+            // 处理时间同步选择
+            function handleTimeSyncChoice(choice) {
+                if (choice === 'agree') {
+                    enableTimeSync = true;
+                    // 存储选择到sessionStorage
+                    sessionStorage.setItem('timeSyncChoice', 'agree');
+                    // 更新下载链接
+                    updateDownloadLink('agree');
+                    // 立即使用在线时间设置主题
+                    setThemeByOnlineTime();
+                    // 每分钟检查一次时间，自动切换主题
+                    setInterval(setThemeByOnlineTime, 60 * 1000);
+                    console.log('用户同意时间同步，启用每分钟同步');
+                } else {
+                    enableTimeSync = false;
+                    // 存储选择到sessionStorage
+                    sessionStorage.setItem('timeSyncChoice', 'decline');
+                    // 更新下载链接
+                    updateDownloadLink('decline');
+                    // 使用本地时间设置主题
+                    useLocalTime();
+                    console.log('用户拒绝时间同步，使用本地时间');
+                }
+                
+                hideTimeSyncOverlay();
+            }
+            
+            // 更新下载链接，添加时间同步参数
+            function updateDownloadLink(timeSyncChoice) {
+                if (downloadLink) {
+                    const url = new URL(downloadLink.href, window.location.origin);
+                    url.searchParams.set('timeSync', timeSyncChoice);
+                    downloadLink.href = url.toString();
+                }
+            }
+            
+            // 获取在线时间并设置主题
+            function setThemeByOnlineTime() {
+                // 使用重试机制获取时间
+                fetchWithRetry('https://worldtimeapi.org/api/ip', 10, 500)
+                    .then(response => {
+                        if (!response.ok) {
+                            throw new Error('网络响应不正常');
+                        }
+                        return response.json();
+                    })
+                    .then(data => {
+                        const onlineTime = new Date(data.datetime);
+                        const currentHour = onlineTime.getHours();
+                        
+                        // 6-18时为白天模式，18-6时为夜晚模式
+                        if (currentHour >= 6 && currentHour < 18) {
+                            // 白天模式
+                            if (themeSwitch) themeSwitch.checked = false;
+                            switchToLightTheme();
+                            console.log(`在线时间: ${onlineTime.toLocaleString('zh-CN')}, 设置为白天模式`);
+                        } else {
+                            // 夜晚模式
+                            if (themeSwitch) themeSwitch.checked = true;
+                            switchToDarkTheme();
+                            console.log(`在线时间: ${onlineTime.toLocaleString('zh-CN')}, 设置为夜晚模式`);
+                        }
+                    })
+                    .catch(error => {
+                        console.log('所有在线时间API请求失败，使用本地时间:', error);
+                        // 使用本地时间作为备选
+                        useLocalTime();
+                    });
+            }
+            
+            // 带重试机制的fetch函数
+            function fetchWithRetry(url, maxRetries, timeout) {
+                return new Promise((resolve, reject) => {
+                    let retries = 0;
+                    
+                    function attemptFetch() {
+                        console.log(`尝试获取时间 (${retries + 1}/${maxRetries})...`);
+                        
+                        // 设置超时
+                        const timeoutPromise = new Promise((_, reject) => {
+                            setTimeout(() => reject(new Error('请求超时')), timeout);
+                        });
+                        
+                        // 发起请求
+                        const fetchPromise = fetch(url);
+                        
+                        // 竞速：请求 vs 超时
+                        Promise.race([fetchPromise, timeoutPromise])
+                            .then(response => {
+                                resolve(response);
+                            })
+                            .catch(error => {
+                                retries++;
+                                if (retries < maxRetries) {
+                                    console.log(`第${retries}次尝试失败，${timeout}ms后重试...`);
+                                    setTimeout(attemptFetch, timeout);
+                                } else {
+                                    reject(new Error(`所有${maxRetries}次尝试均失败`));
+                                }
+                            });
+                    }
+                    
+                    attemptFetch();
+                });
+            }
+            
+            // 使用本地时间作为备选方案
+            function useLocalTime() {
+                const localTime = new Date();
+                const currentHour = localTime.getHours();
+                
+                if (currentHour >= 6 && currentHour < 18) {
+                    if (themeSwitch) themeSwitch.checked = false;
+                    switchToLightTheme();
+                    console.log(`本地时间: ${localTime.toLocaleString('zh-CN')}, 设置为白天模式`);
+                } else {
+                    if (themeSwitch) themeSwitch.checked = true;
+                    switchToDarkTheme();
+                    console.log(`本地时间: ${localTime.toLocaleString('zh-CN')}, 设置为夜晚模式`);
+                }
+            }
+            
+            // 主题切换函数
+            function switchToDarkTheme() {
+                document.body.classList.add('dark-theme');
+                // 更新模式标签
+                updateModeLabels('night');
+            }
+            
+            function switchToLightTheme() {
+                document.body.classList.remove('dark-theme');
+                // 更新模式标签
+                updateModeLabels('day');
+            }
+            
+            // 更新白天/夜晚模式标签
+            function updateModeLabels(mode) {
+                const dayModeLabel = document.querySelector('.day_mode');
+                const nightModeLabel = document.querySelector('.night_mode');
+                
+                if (mode === 'day') {
+                    if (dayModeLabel) {
+                        dayModeLabel.style.color = '#64b5f6';
+                        dayModeLabel.style.fontWeight = 'bold';
+                    }
+                    if (nightModeLabel) {
+                        nightModeLabel.style.color = '#aaa';
+                        nightModeLabel.style.fontWeight = 'normal';
+                    }
+                } else {
+                    if (dayModeLabel) {
+                        dayModeLabel.style.color = '#aaa';
+                        dayModeLabel.style.fontWeight = 'normal';
+                    }
+                    if (nightModeLabel) {
+                        nightModeLabel.style.color = '#64b5f6';
+                        nightModeLabel.style.fontWeight = 'bold';
+                    }
+                }
+            }
+            
+            // 同意时间同步
+            agreeTimeSyncBtn.addEventListener('click', function() {
+                handleTimeSyncChoice('agree');
+            });
+            
+            // 拒绝时间同步
+            declineTimeSyncBtn.addEventListener('click', function() {
+                handleTimeSyncChoice('decline');
+            });
+            
+            // 初始化
+            // 检查是否有存储的时间同步选择
+            const hasStoredChoice = checkStoredTimeSyncChoice();
+            
+            // 如果没有存储的选择，显示时间同步弹窗
+            if (!hasStoredChoice) {
+                showTimeSyncOverlay();
+            }
+            
+            // 监听手动切换事件
+            if (themeSwitch) {
+                themeSwitch.addEventListener('change', function() {
+                    if (this.checked) {
+                        switchToDarkTheme();
+                    } else {
+                        switchToLightTheme();
+                    }
+                });
+            }
+        });
+    </script>
 </body>
 </html>
