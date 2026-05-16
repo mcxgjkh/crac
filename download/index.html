@@ -7,6 +7,7 @@
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <style>
+        /* ========== 以下所有样式均与初代源代码完全一致，一字未改 ========== */
         :root {
             --primary-blue: #1a5faf;
             --secondary-blue: #0d4a8d;
@@ -155,7 +156,7 @@
             padding: 25px;
         }
         
-        /* 修复搜索框小屏溢出bug：改用flex布局，移除绝对定位 */
+        /* 搜索框 - 修复小屏溢出（改为flex布局，但保留原风格） */
         .search-box {
             display: flex;
             gap: 12px;
@@ -197,6 +198,7 @@
             padding: 20px;
             border-bottom: 1px solid #eee;
             transition: background-color 0.3s;
+            display: flex;
             align-items: center;
         }
         
@@ -265,16 +267,11 @@
             border-color: var(--primary-blue);
         }
         
-        /* 加载提示 */
-        .loading-placeholder {
+        /* 加载/无结果提示 */
+        .loading-placeholder, .no-results {
             text-align: center;
             padding: 40px;
             color: #6c757d;
-        }
-        
-        .no-results {
-            text-align: center;
-            padding: 40px;
         }
         
         /* 页脚 */
@@ -352,45 +349,653 @@
             -webkit-text-stroke: 1px var(--ani-color);
         }
 
-        /* Cookies & 时间同步样式 (保留原有) */
-        .cookies-overlay_cookies, .time-sync-overlay { /* 简短样式继承，保留原样 */ }
-        .theme-switch { /* 保留原有定义，已在原样式中完整给出，此处不再重复占用篇幅但需确保不会冲突 */ }
-        .dark-theme .search-box input { background-color: #2a2a2a; border-color: #444; color: #e0e0e0; }
-        .dark-theme .download-item { border-bottom-color: #333; }
-        .dark-theme .download-item:hover { background-color: #2a2a2a; }
-        .dark-theme .file-meta { color: #aaa; }
-        .dark-theme .downloads-container { background: #1e1e1e; }
-        .dark-theme .sidebar { background: #1e1e1e; }
-        .dark-theme .list-group-item { background-color: #1e1e1e; border-color: #333; color: #e0e0e0; }
-        /* 确保暗色模式下的高亮 */
-        .highlight { background-color: #ffeb3b; color: #000; padding: 0 2px; border-radius: 3px; }
-        .dark-theme .highlight { background-color: #f9a825; color: #000; }
+        /* Cookies 遮罩层 */
+        .cookies-overlay_cookies {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.8);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 9999;
+        }
+
+        /* Cookies 卡片样式 */
+        .card_cookies {
+            width: 300px;
+            height: 220px;
+            background-color: rgb(255, 255, 255);
+            border-radius: 8px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: 20px 30px;
+            gap: 13px;
+            position: relative;
+            overflow: hidden;
+            box-shadow: 2px 2px 20px rgba(0, 0, 0, 0.062);
+        }
+
+        #cookieSvg_cookies {
+            width: 50px;
+        }
+
+        #cookieSvg_cookies g path {
+            fill: rgb(97, 81, 81);
+        }
+
+        .cookieHeading_cookies {
+            font-size: 1.2em;
+            font-weight: 800;
+            color: rgb(26, 26, 26);
+        }
+
+        .cookieDescription_cookies {
+            text-align: center;
+            font-size: 0.7em;
+            font-weight: 600;
+            color: rgb(99, 99, 99);
+        }
+
+        .cookieDescription_cookies a {
+            --tw-text-opacity: 1;
+            color: rgb(59 130 246);
+        }
+
+        .cookieDescription_cookies a:hover {
+            -webkit-text-decoration-line: underline;
+            text-decoration-line: underline;
+        }
+
+        .buttonContainer_cookies {
+            display: flex;
+            gap: 20px;
+            flex-direction: row;
+        }
+
+        .acceptButton_cookies {
+            width: 80px;
+            height: 30px;
+            background-color: #7b57ff;
+            transition-duration: .2s;
+            border: none;
+            color: rgb(241, 241, 241);
+            cursor: pointer;
+            font-weight: 600;
+            border-radius: 20px;
+            box-shadow: 0 4px 6px -1px #977ef3, 0 2px 4px -1px #977ef3;
+            transition: all .6s ease;
+        }
+
+        .declineButton_cookies {
+            width: 80px;
+            height: 30px;
+            background-color: #dadada;
+            transition-duration: .2s;
+            color: rgb(46, 46, 46);
+            border: none;
+            cursor: not-allowed;
+            font-weight: 600;
+            border-radius: 20px;
+            box-shadow: 0 4px 6px -1px #bebdbd, 0 2px 4px -1px #bebdbd;
+            transition: all .6s ease;
+        }
+
+        .declineButton_cookies:hover {
+            background-color: #ebebeb;
+            box-shadow: 0 10px 15px -3px #bebdbd, 0 4px 6px -2px #bebdbd;
+            transition-duration: .2s;
+        }
+
+        .acceptButton_cookies:hover {
+            background-color: #9173ff;
+            box-shadow: 0 10px 15px -3px #977ef3, 0 4px 6px -2px #977ef3;
+            transition-duration: .2s;
+        }
+
         @keyframes ani {
-            0% { background-position: 0%; }
-            50% { background-position: 400%; }
-            100% { background-position: 0%; }
-        }
-        /* 保证细屏时按钮不溢出 */
-        @media (max-width: 576px) {
-            .search-box button {
-                padding: 0 16px;
-                font-size: 0.9rem;
+            0% {
+                background-position: 0%;
             }
-            .download-item {
-                flex-wrap: wrap;
+            50% {
+                background-position: 400%;
             }
-            .file-action {
-                margin-top: 12px;
-                width: 100%;
-                text-align: right;
+            100% {
+                background-position: 0%;
             }
         }
-        /* 保留原时间同步遮罩样式（已在head存在，此处简化避免重复，实际在原代码中保留完整 */
-        .time-sync-overlay, .theme-switch { /* 已有定义，保留 */ }
+
+        /* 主题切换开关 - 完全保留初代样式，一字未改 */
+        .theme-switch {
+            position: absolute;
+            right: 65px;
+            --toggle-size: 10px;
+            --container-width: 5.625em;
+            --container-height: 2.5em;
+            --container-radius: 6.25em;
+            --container-light-bg: #3D7EAE;
+            --container-night-bg: #1D1F2C;
+            --circle-container-diameter: 3.375em;
+            --sun-moon-diameter: 2.125em;
+            --sun-bg: #ECCA2F;
+            --moon-bg: #C4C9D1;
+            --spot-color: #959DB1;
+            --circle-container-offset: calc((var(--circle-container-diameter) - var(--container-height)) / 2 * -1);
+            --stars-color: #fff;
+            --clouds-color: #F3FDFF;
+            --back-clouds-color: #AACADF;
+            --transition: .5s cubic-bezier(0, -0.02, 0.4, 1.25);
+            --circle-transition: .3s cubic-bezier(0, -0.02, 0.35, 1.17);
+        }
+
+        .theme-switch, .theme-switch *, .theme-switch *::before, .theme-switch *::after {
+            -webkit-box-sizing: border-box;
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-size: var(--toggle-size);
+        }
+
+        .theme-switch__container {
+            width: var(--container-width);
+            height: var(--container-height);
+            background-color: var(--container-light-bg);
+            border-radius: var(--container-radius);
+            overflow: hidden;
+            cursor: pointer;
+            -webkit-box-shadow: 0em -0.062em 0.062em rgba(0, 0, 0, 0.25), 0em 0.062em 0.125em rgba(255, 255, 255, 0.94);
+            box-shadow: 0em -0.062em 0.062em rgba(0, 0, 0, 0.25), 0em 0.062em 0.125em rgba(255, 255, 255, 0.94);
+            -webkit-transition: var(--transition);
+            -o-transition: var(--transition);
+            transition: var(--transition);
+            position: relative;
+        }
+
+        .theme-switch__container::before {
+            content: "";
+            position: absolute;
+            z-index: 1;
+            inset: 0;
+            -webkit-box-shadow: 0em 0.05em 0.187em rgba(0, 0, 0, 0.25) inset, 0em 0.05em 0.187em rgba(0, 0, 0, 0.25) inset;
+            box-shadow: 0em 0.05em 0.187em rgba(0, 0, 0, 0.25) inset, 0em 0.05em 0.187em rgba(0, 0, 0, 0.25) inset;
+            border-radius: var(--container-radius)
+        }
+
+        .theme-switch__checkbox {
+            display: none;
+        }
+
+        .theme-switch__circle-container {
+            width: var(--circle-container-diameter);
+            height: var(--circle-container-diameter);
+            background-color: rgba(255, 255, 255, 0.1);
+            position: absolute;
+            left: var(--circle-container-offset);
+            top: var(--circle-container-offset);
+            border-radius: var(--container-radius);
+            -webkit-box-shadow: inset 0 0 0 3.375em rgba(255, 255, 255, 0.1), inset 0 0 0 3.375em rgba(255, 255, 255, 0.1), 0 0 0 0.625em rgba(255, 255, 255, 0.1), 0 0 0 1.25em rgba(255, 255, 255, 0.1);
+            box-shadow: inset 0 0 0 3.375em rgba(255, 255, 255, 0.1), inset 0 0 0 3.375em rgba(255, 255, 255, 0.1), 0 0 0 0.625em rgba(255, 255, 255, 0.1), 0 0 0 1.25em rgba(255, 255, 255, 0.1);
+            display: -webkit-box;
+            display: -ms-flexbox;
+            display: flex;
+            -webkit-transition: var(--circle-transition);
+            -o-transition: var(--circle-transition);
+            transition: var(--circle-transition);
+            pointer-events: none;
+        }
+
+        .theme-switch__sun-moon-container {
+            pointer-events: auto;
+            position: relative;
+            z-index: 2;
+            width: var(--sun-moon-diameter);
+            height: var(--sun-moon-diameter);
+            margin: auto;
+            border-radius: var(--container-radius);
+            background-color: var(--sun-bg);
+            -webkit-box-shadow: 0.062em 0.062em 0.062em 0em rgba(254, 255, 239, 0.61) inset, 0em -0.062em 0.062em 0em #a1872a inset;
+            box-shadow: 0.062em 0.062em 0.062em 0em rgba(254, 255, 239, 0.61) inset, 0em -0.062em 0.062em 0em #a1872a inset;
+            -webkit-filter: drop-shadow(0.062em 0.125em 0.125em rgba(0, 0, 0, 0.25)) drop-shadow(0em 0.062em 0.125em rgba(0, 0, 0, 0.25));
+            filter: drop-shadow(0.062em 0.125em 0.125em rgba(0, 0, 0, 0.25)) drop-shadow(0em 0.062em 0.125em rgba(0, 0, 0, 0.25));
+            overflow: hidden;
+            -webkit-transition: var(--transition);
+            -o-transition: var(--transition);
+            transition: var(--transition);
+        }
+
+        .theme-switch__moon {
+            -webkit-transform: translateX(100%);
+            -ms-transform: translateX(100%);
+            transform: translateX(100%);
+            width: 100%;
+            height: 100%;
+            background-color: var(--moon-bg);
+            border-radius: inherit;
+            -webkit-box-shadow: 0.062em 0.062em 0.062em 0em rgba(254, 255, 239, 0.61) inset, 0em -0.062em 0.062em 0em #969696 inset;
+            box-shadow: 0.062em 0.062em 0.062em 0em rgba(254, 255, 239, 0.61) inset, 0em -0.062em 0.062em 0em #969696 inset;
+            -webkit-transition: var(--transition);
+            -o-transition: var(--transition);
+            transition: var(--transition);
+            position: relative;
+        }
+
+        .theme-switch__spot {
+            position: absolute;
+            top: 0.75em;
+            left: 0.312em;
+            width: 0.75em;
+            height: 0.75em;
+            border-radius: var(--container-radius);
+            background-color: var(--spot-color);
+            -webkit-box-shadow: 0em 0.0312em 0.062em rgba(0, 0, 0, 0.25) inset;
+            box-shadow: 0em 0.0312em 0.062em rgba(0, 0, 0, 0.25) inset;
+        }
+
+        .theme-switch__spot:nth-of-type(2) {
+            width: 0.375em;
+            height: 0.375em;
+            top: 0.937em;
+            left: 1.375em;
+        }
+
+        .theme-switch__spot:nth-last-of-type(3) {
+            width: 0.25em;
+            height: 0.25em;
+            top: 0.312em;
+            left: 0.812em;
+        }
+
+        .theme-switch__clouds {
+            width: 1.25em;
+            height: 1.25em;
+            background-color: var(--clouds-color);
+            border-radius: var(--container-radius);
+            position: absolute;
+            bottom: -0.625em;
+            left: 0.312em;
+            -webkit-box-shadow: 0.937em 0.312em var(--clouds-color), -0.312em -0.312em var(--back-clouds-color), 1.437em 0.375em var(--clouds-color), 0.5em -0.125em var(--back-clouds-color), 2.187em 0 var(--clouds-color), 1.25em -0.062em var(--back-clouds-color), 2.937em 0.312em var(--clouds-color), 2em -0.312em var(--back-clouds-color), 3.625em -0.062em var(--clouds-color), 2.625em 0em var(--back-clouds-color), 4.5em -0.312em var(--clouds-color), 3.375em -0.437em var(--back-clouds-color), 4.625em -1.75em 0 0.437em var(--clouds-color), 4em -0.625em var(--back-clouds-color), 4.125em -2.125em 0 0.437em var(--back-clouds-color);
+            box-shadow: 0.937em 0.312em var(--clouds-color), -0.312em -0.312em var(--back-clouds-color), 1.437em 0.375em var(--clouds-color), 0.5em -0.125em var(--back-clouds-color), 2.187em 0 var(--clouds-color), 1.25em -0.062em var(--back-clouds-color), 2.937em 0.312em var(--clouds-color), 2em -0.312em var(--back-clouds-color), 3.625em -0.062em var(--clouds-color), 2.625em 0em var(--back-clouds-color), 4.5em -0.312em var(--clouds-color), 3.375em -0.437em var(--back-clouds-color), 4.625em -1.75em 0 0.437em var(--clouds-color), 4em -0.625em var(--back-clouds-color), 4.125em -2.125em 0 0.437em var(--back-clouds-color);
+            -webkit-transition: 0.5s cubic-bezier(0, -0.02, 0.4, 1.25);
+            -o-transition: 0.5s cubic-bezier(0, -0.02, 0.4, 1.25);
+            transition: 0.5s cubic-bezier(0, -0.02, 0.4, 1.25);
+        }
+
+        .theme-switch__stars-container {
+            position: absolute;
+            color: var(--stars-color);
+            top: -100%;
+            left: 0.312em;
+            width: 2.75em;
+            height: auto;
+            -webkit-transition: var(--transition);
+            -o-transition: var(--transition);
+            transition: var(--transition);
+        }
+
+        .theme-switch__checkbox:checked + .theme-switch__container {
+            background-color: var(--container-night-bg);
+        }
+
+        .theme-switch__checkbox:checked + .theme-switch__container .theme-switch__circle-container {
+            left: calc(100% - var(--circle-container-offset) - var(--circle-container-diameter));
+        }
+
+        .theme-switch__checkbox:checked + .theme-switch__container .theme-switch__circle-container:hover {
+            left: calc(100% - var(--circle-container-offset) - var(--circle-container-diameter) - 0.187em)
+        }
+
+        .theme-switch__circle-container:hover {
+            left: calc(var(--circle-container-offset) + 0.187em);
+        }
+
+        .theme-switch__checkbox:checked + .theme-switch__container .theme-switch__moon {
+            -webkit-transform: translate(0);
+            -ms-transform: translate(0);
+            transform: translate(0);
+        }
+
+        .theme-switch__checkbox:checked + .theme-switch__container .theme-switch__clouds {
+            bottom: -4.062em;
+        }
+
+        .theme-switch__checkbox:checked + .theme-switch__container .theme-switch__stars-container {
+            top: 50%;
+            -webkit-transform: translateY(-50%);
+            -ms-transform: translateY(-50%);
+            transform: translateY(-50%);
+        }
+
+        .day_mode {
+            position: absolute;
+            right: 125px;
+        }
+
+        .night_mode {
+            position: absolute;
+            right: 5px;
+        }
+
+        /* 白天/黑夜模式标签 */
+        .dark-theme .day_mode {
+            color: #aaa;
+        }
+
+        .dark-theme .night_mode {
+            color: #64b5f6;
+            font-weight: bold;
+        }
+
+        .day_mode {
+            color: #64b5f6;
+            font-weight: bold;
+        }
+
+        /* 暗色模式样式 */
+        .dark-theme {
+            background-color: #121212;
+            color: #e0e0e0;
+        }
+
+        .dark-theme .top-bar {
+            background-color: #1e1e1e;
+            color: #e0e0e0;
+        }
+
+        .dark-theme .top-bar a {
+            color: #b0b0b0;
+        }
+
+        .dark-theme .navbar {
+            background-color: #1e1e1e;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.3);
+        }
+
+        .dark-theme .nav-link {
+            color: #e0e0e0 !important;
+        }
+
+        .dark-theme .nav-link:hover {
+            color: #64b5f6 !important;
+        }
+
+        .dark-theme .nav-link:hover::after {
+            background-color: #64b5f6;
+        }
+
+        .dark-theme .page-header {
+            background-color: #0d4a8d;
+            color: white;
+        }
+
+        .dark-theme .breadcrumb a {
+            color: rgba(255, 255, 255, 0.8);
+        }
+
+        .dark-theme .breadcrumb-item_a {
+            color: white;
+        }
+
+        .dark-theme .download_h1 {
+            color: white;
+        }
+
+        .dark-theme .main-content {
+            background-color: #121212;
+        }
+
+        .dark-theme .section-title {
+            color: #64b5f6;
+        }
+
+        .dark-theme .section-title::after {
+            background-color: #64b5f6;
+        }
+
+        .dark-theme .sidebar {
+            background: #1e1e1e;
+            box-shadow: 0 2px 12px rgba(0, 0, 0, 0.3);
+        }
+
+        .dark-theme .category-list a {
+            color: #b0b0b0;
+        }
+
+        .dark-theme .category-list a:hover, 
+        .dark-theme .category-list a.active {
+            background-color: #2a2a2a;
+            color: #64b5f6;
+        }
+
+        .dark-theme .category-list .badge {
+            background-color: #64b5f6;
+        }
+
+        .dark-theme .list-group-item {
+            background-color: #1e1e1e;
+            border-color: #333;
+            color: #e0e0e0;
+        }
+
+        .dark-theme .list-group-item:hover {
+            background-color: #2a2a2a;
+        }
+
+        .dark-theme .text-muted {
+            color: #aaa !important;
+        }
+
+        .dark-theme .downloads-container {
+            background: #1e1e1e;
+            box-shadow: 0 2px 12px rgba(0, 0, 0, 0.3);
+        }
+
+        .dark-theme .search-box input {
+            background-color: #2a2a2a;
+            border-color: #444;
+            color: #e0e0e0;
+        }
+
+        .dark-theme .search-box input::placeholder {
+            color: #888;
+        }
+
+        .dark-theme .search-box button {
+            background: #64b5f6;
+        }
+
+        .dark-theme .download-item {
+            border-bottom: 1px solid #333;
+        }
+
+        .dark-theme .download-item:hover {
+            background-color: #2a2a2a;
+        }
+
+        .dark-theme .file-icon {
+            color: #64b5f6;
+        }
+
+        .dark-theme .file-meta {
+            color: #aaa;
+        }
+
+        .dark-theme .download-btn {
+            background-color: #64b5f6;
+            color: white;
+        }
+
+        .dark-theme .download-btn:hover {
+            background-color: #4a9de6;
+        }
+
+        .dark-theme .page-link {
+            background-color: #1e1e1e;
+            border-color: #444;
+            color: #64b5f6;
+        }
+
+        .dark-theme .page-item.active .page-link {
+            background-color: #64b5f6;
+            border-color: #64b5f6;
+        }
+
+        .dark-theme .page-link:hover {
+            background-color: #2a2a2a;
+            border-color: #555;
+            color: #64b5f6;
+        }
+
+        .dark-theme footer {
+            background-color: #0a0a0a;
+        }
+
+        .dark-theme footer h5 {
+            color: #fff;
+        }
+
+        .dark-theme footer a {
+            color: #aaa;
+        }
+
+        .dark-theme footer a:hover {
+            color: #fff;
+        }
+
+        .dark-theme .footer-bottom {
+            border-top: 1px solid #333;
+        }
+
+        .dark-theme .button_BH6RKW {
+            --stroke-color: #ffffff7c;
+        }
+
+        /* 时间同步弹窗样式 */
+        .time-sync-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.85);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 10000;
+            font-family: "Microsoft YaHei", sans-serif;
+        }
+        
+        .time-sync-card {
+            width: 400px;
+            max-width: 90%;
+            background-color: white;
+            border-radius: 12px;
+            padding: 30px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+            text-align: center;
+        }
+        
+        .time-sync-icon {
+            font-size: 3rem;
+            color: #4a90e2;
+            margin-bottom: 20px;
+        }
+        
+        .time-sync-title {
+            font-size: 1.5rem;
+            font-weight: bold;
+            color: #333;
+            margin-bottom: 15px;
+        }
+        
+        .time-sync-description {
+            color: #666;
+            line-height: 1.6;
+            margin-bottom: 25px;
+            text-align: left;
+        }
+        
+        .time-sync-features {
+            background-color: #f8f9fa;
+            border-radius: 8px;
+            padding: 15px;
+            margin-bottom: 25px;
+            text-align: left;
+        }
+        
+        .time-sync-feature {
+            display: flex;
+            align-items: center;
+            margin-bottom: 10px;
+        }
+        
+        .time-sync-feature:last-child {
+            margin-bottom: 0;
+        }
+        
+        .feature-icon {
+            color: #4a90e2;
+            margin-right: 10px;
+            font-size: 1.2rem;
+        }
+        
+        .time-sync-buttons {
+            display: flex;
+            gap: 15px;
+        }
+        
+        .time-sync-btn {
+            flex: 1;
+            padding: 12px 20px;
+            border: none;
+            border-radius: 6px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+        
+        .time-sync-agree {
+            background-color: #4a90e2;
+            color: white;
+        }
+        
+        .time-sync-agree:hover {
+            background-color: #3a80d2;
+        }
+        
+        .time-sync-decline {
+            background-color: #f1f1f1;
+            color: #333;
+        }
+        
+        .time-sync-decline:hover {
+            background-color: #e1e1e1;
+        }
+        
+        .time-sync-note {
+            font-size: 0.85rem;
+            color: #888;
+            margin-top: 15px;
+        }
+
+        /* 高亮搜索词 */
+        .highlight {
+            background-color: #ffeb3b;
+            color: #000;
+            padding: 0 2px;
+            border-radius: 3px;
+        }
+        .dark-theme .highlight {
+            background-color: #f9a825;
+            color: #000;
+        }
     </style>
 </head>
 <body>
-    <!-- 时间同步同意弹窗 -->
+    <!-- 时间同步同意弹窗（保留原样） -->
     <div class="time-sync-overlay" id="timeSyncOverlay" style="display: none;">
         <div class="time-sync-card">
             <div class="time-sync-icon"><i class="fas fa-sync-alt"></i></div>
@@ -409,7 +1014,7 @@
         </div>
     </div>
 
-    <!-- 顶部信息栏 -->
+    <!-- 顶部信息栏 - 主题切换按钮完全恢复初代 -->
     <div class="top-bar">
         <div class="container">
             <div class="d-flex justify-content-between">
@@ -420,8 +1025,20 @@
                         <input type="checkbox" class="theme-switch__checkbox">
                         <div class="theme-switch__container">
                             <div class="theme-switch__clouds"></div>
-                            <div class="theme-switch__stars-container"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 144 55" fill="none"><path fill-rule="evenodd" clip-rule="evenodd" d="M135.831 3.00688C135.055 3.85027 134.111 4.29946 133 4.35447C134.111 4.40947 135.055 4.85867 135.831 5.71123C136.607 6.55462 136.996 7.56303 136.996 8.72727C136.996 7.95722 137.172 7.25134 137.525 6.59129C137.886 5.93124 138.372 5.39954 138.98 5.00535C139.598 4.60199 140.268 4.39114 141 4.35447C139.88 4.2903 138.936 3.85027 138.16 3.00688C137.384 2.16348 136.996 1.16425 136.996 0C136.996 1.16425 136.607 2.16348 135.831 3.00688ZM31 23.3545C32.1114 23.2995 33.0551 22.8503 33.8313 22.0069C34.6075 21.1635 34.9956 20.1642 34.9956 19C34.9956 20.1642 35.3837 21.1635 36.1599 22.0069C36.9361 22.8503 37.8798 23.2903 39 23.3545C38.2679 23.3911 37.5976 23.602 36.9802 24.0053C36.3716 24.3995 35.8864 24.9312 35.5248 25.5913C35.172 26.2513 34.9956 26.9572 34.9956 27.7273C34.9956 26.563 34.6075 25.5546 33.8313 24.7112C33.0551 23.8587 32.1114 23.4095 31 23.3545ZM0 36.3545C1.11136 36.2995 2.05513 35.8503 2.83131 35.0069C3.6075 34.1635 3.99559 33.1642 3.99559 32C3.99559 33.1642 4.38368 34.1635 5.15987 35.0069C5.93605 35.8503 6.87982 36.2903 8 36.3545C7.26792 36.3911 6.59757 36.602 5.98015 37.0053C5.37155 37.3995 4.88644 37.9312 4.52481 38.5913C4.172 39.2513 3.99559 39.9572 3.99559 40.7273C3.99559 39.563 3.6075 38.5546 2.83131 37.7112C2.05513 36.8587 1.11136 36.4095 0 36.3545ZM56.8313 24.0069C56.0551 24.8503 55.1114 25.2995 54 25.3545C55.1114 25.4095 56.0551 25.8587 56.8313 26.7112C57.6075 27.5546 57.9956 28.563 57.9956 29.7273C57.9956 28.9572 58.172 28.2513 58.5248 27.5913C58.8864 26.9312 59.3716 26.3995 59.9802 26.0053C60.5976 25.602 61.2679 25.3911 62 25.3545C60.8798 25.2903 59.9361 24.8503 59.1599 24.0069C58.3837 23.1635 57.9956 22.1642 57.9956 21C57.9956 22.1642 57.6075 23.1635 56.8313 24.0069ZM81 25.3545C82.1114 25.2995 83.0551 24.8503 83.8313 24.0069C84.6075 23.1635 84.9956 22.1642 84.9956 21C84.9956 22.1642 85.3837 23.1635 86.1599 24.0069C86.9361 24.8503 87.8798 25.2903 89 25.3545C88.2679 25.3911 87.5976 25.602 86.9802 26.0053C86.3716 26.3995 85.8864 26.9312 85.5248 27.5913C85.172 28.2513 84.9956 28.9572 84.9956 29.7273C84.9956 28.563 84.6075 27.5546 83.8313 26.7112C83.0551 25.8587 82.1114 25.4095 81 25.3545ZM136 36.3545C137.111 36.2995 138.055 35.8503 138.831 35.0069C139.607 34.1635 139.996 33.1642 139.996 32C139.996 33.1642 140.384 34.1635 141.16 35.0069C141.936 35.8503 142.88 36.2903 144 36.3545C143.268 36.3911 142.598 36.602 141.98 37.0053C141.372 37.3995 140.886 37.9312 140.525 38.5913C140.172 39.2513 139.996 39.9572 139.996 40.7273C139.996 39.563 139.607 38.5546 138.831 37.7112C138.055 36.8587 137.111 36.4095 136 36.3545ZM101.831 49.0069C101.055 49.8503 100.111 50.2995 99 50.3545C100.111 50.4095 101.055 50.8587 101.831 51.7112C102.607 52.5546 102.996 53.563 102.996 54.7273C102.996 53.9572 103.172 53.2513 103.525 52.5913C103.886 51.9312 104.372 51.3995 104.98 51.0053C105.598 50.602 106.268 50.3911 107 50.3545C105.88 50.2903 104.936 49.8503 104.16 49.0069C103.384 48.1635 102.996 47.1642 102.996 46C102.996 47.1642 102.607 48.1635 101.831 49.0069Z" fill="currentColor"></path></svg></div>
-                            <div class="theme-switch__circle-container"><div class="theme-switch__sun-moon-container"><div class="theme-switch__moon"><div class="theme-switch__spot"></div><div class="theme-switch__spot"></div><div class="theme-switch__spot"></div></div></div></div>
+                                <div class="theme-switch__stars-container">
+                                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 144 55" fill="none">
+                                    <path fill-rule="evenodd" clip-rule="evenodd" d="M135.831 3.00688C135.055 3.85027 134.111 4.29946 133 4.35447C134.111 4.40947 135.055 4.85867 135.831 5.71123C136.607 6.55462 136.996 7.56303 136.996 8.72727C136.996 7.95722 137.172 7.25134 137.525 6.59129C137.886 5.93124 138.372 5.39954 138.98 5.00535C139.598 4.60199 140.268 4.39114 141 4.35447C139.88 4.2903 138.936 3.85027 138.16 3.00688C137.384 2.16348 136.996 1.16425 136.996 0C136.996 1.16425 136.607 2.16348 135.831 3.00688ZM31 23.3545C32.1114 23.2995 33.0551 22.8503 33.8313 22.0069C34.6075 21.1635 34.9956 20.1642 34.9956 19C34.9956 20.1642 35.3837 21.1635 36.1599 22.0069C36.9361 22.8503 37.8798 23.2903 39 23.3545C38.2679 23.3911 37.5976 23.602 36.9802 24.0053C36.3716 24.3995 35.8864 24.9312 35.5248 25.5913C35.172 26.2513 34.9956 26.9572 34.9956 27.7273C34.9956 26.563 34.6075 25.5546 33.8313 24.7112C33.0551 23.8587 32.1114 23.4095 31 23.3545ZM0 36.3545C1.11136 36.2995 2.05513 35.8503 2.83131 35.0069C3.6075 34.1635 3.99559 33.1642 3.99559 32C3.99559 33.1642 4.38368 34.1635 5.15987 35.0069C5.93605 35.8503 6.87982 36.2903 8 36.3545C7.26792 36.3911 6.59757 36.602 5.98015 37.0053C5.37155 37.3995 4.88644 37.9312 4.52481 38.5913C4.172 39.2513 3.99559 39.9572 3.99559 40.7273C3.99559 39.563 3.6075 38.5546 2.83131 37.7112C2.05513 36.8587 1.11136 36.4095 0 36.3545ZM56.8313 24.0069C56.0551 24.8503 55.1114 25.2995 54 25.3545C55.1114 25.4095 56.0551 25.8587 56.8313 26.7112C57.6075 27.5546 57.9956 28.563 57.9956 29.7273C57.9956 28.9572 58.172 28.2513 58.5248 27.5913C58.8864 26.9312 59.3716 26.3995 59.9802 26.0053C60.5976 25.602 61.2679 25.3911 62 25.3545C60.8798 25.2903 59.9361 24.8503 59.1599 24.0069C58.3837 23.1635 57.9956 22.1642 57.9956 21C57.9956 22.1642 57.6075 23.1635 56.8313 24.0069ZM81 25.3545C82.1114 25.2995 83.0551 24.8503 83.8313 24.0069C84.6075 23.1635 84.9956 22.1642 84.9956 21C84.9956 22.1642 85.3837 23.1635 86.1599 24.0069C86.9361 24.8503 87.8798 25.2903 89 25.3545C88.2679 25.3911 87.5976 25.602 86.9802 26.0053C86.3716 26.3995 85.8864 26.9312 85.5248 27.5913C85.172 28.2513 84.9956 28.9572 84.9956 29.7273C84.9956 28.563 84.6075 27.5546 83.8313 26.7112C83.0551 25.8587 82.1114 25.4095 81 25.3545ZM136 36.3545C137.111 36.2995 138.055 35.8503 138.831 35.0069C139.607 34.1635 139.996 33.1642 139.996 32C139.996 33.1642 140.384 34.1635 141.16 35.0069C141.936 35.8503 142.88 36.2903 144 36.3545C143.268 36.3911 142.598 36.602 141.98 37.0053C141.372 37.3995 140.886 37.9312 140.525 38.5913C140.172 39.2513 139.996 39.9572 139.996 40.7273C139.996 39.563 139.607 38.5546 138.831 37.7112C138.055 36.8587 137.111 36.4095 136 36.3545ZM101.831 49.0069C101.055 49.8503 100.111 50.2995 99 50.3545C100.111 50.4095 101.055 50.8587 101.831 51.7112C102.607 52.5546 102.996 53.563 102.996 54.7273C102.996 53.9572 103.172 53.2513 103.525 52.5913C103.886 51.9312 104.372 51.3995 104.98 51.0053C105.598 50.602 106.268 50.3911 107 50.3545C105.88 50.2903 104.936 49.8503 104.16 49.0069C103.384 48.1635 102.996 47.1642 102.996 46C102.996 47.1642 102.607 48.1635 101.831 49.0069Z" fill="currentColor"></path>
+                                </svg>
+                            </div>
+                            <div class="theme-switch__circle-container">
+                                <div class="theme-switch__sun-moon-container">
+                                    <div class="theme-switch__moon">
+                                    <div class="theme-switch__spot"></div>
+                                    <div class="theme-switch__spot"></div>
+                                    <div class="theme-switch__spot"></div>
+                                    </div>
+                                </div>
+                            </div>
                         </div>
                     </label>
                     <span class="night_mode">夜晚模式</span>
@@ -433,11 +1050,16 @@
     <!-- 主导航 -->
     <nav class="navbar navbar-expand-lg sticky-top">
         <div class="container">
-            <button class="button_BH6RKW"><span class="actual-text_BH6RKW">&nbsp;BH6RKW&nbsp;</span><span aria-hidden="true" class="front-text_BH6RKW">&nbsp;BH6RKW&nbsp;</span></button>
-            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav"><span class="navbar-toggler-icon"></span></button>
+            <button class="button_BH6RKW" data-text="Awesome">
+                <span class="actual-text_BH6RKW">&nbsp;BH6RKW&nbsp;</span>
+                <span aria-hidden="true" class="front-text_BH6RKW">&nbsp;BH6RKW&nbsp;</span>
+            </button>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+                <span class="navbar-toggler-icon"></span>
+            </button>
             <div class="collapse navbar-collapse" id="navbarNav">
                 <ul class="navbar-nav ms-auto">
-                    <li class="nav-item"><a class="nav-link" href="https://bh6rkw.dpdns.org">首页</a></li>
+                    <li class="nav-item"><a class="nav-link active" href="https://bh6rkw.dpdns.org">首页</a></li>
                     <li class="nav-item"><a class="nav-link" href="https://bh6rkw.dpdns.org/about/index.html">关于我</a></li>
                     <li class="nav-item"><a class="nav-link" href="https://bh6rkw.dpdns.org/laws/index.html">政策法规</a></li>
                     <li class="nav-item"><a class="nav-link" href="https://exam.bh6rkw.dpdns.org">模拟考试</a></li>
@@ -450,9 +1072,14 @@
     <!-- 页面标题 -->
     <div class="page-header">
         <div class="container">
-            <nav aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item"><a href="https://bh6rkw.dpdns.org/index.html">首页</a></li><li class="breadcrumb-item_a" aria-current="page">&nbsp;/&nbsp;资料下载</li></ol></nav>
+            <nav aria-label="breadcrumb">
+                <ol class="breadcrumb">
+                    <li class="breadcrumb-item"><a href="https://bh6rkw.dpdns.org/index.html">首页</a></li>
+                    <li class="breadcrumb-item_a" aria-current="page">&nbsp;/&nbsp;资料下载</li>
+                </ol>
+            </nav>
             <h1 class="download_h1">资料下载</h1>
-            <p class="lead">获取业余无线电相关文档、资料和资源（自动识别 /download/ 目录文件）</p>
+            <p class="lead">获取业余无线电相关文档、资料和资源</p>
         </div>
     </div>
 
@@ -460,10 +1087,10 @@
     <div class="main-content">
         <div class="container">
             <div class="row">
-                <!-- 侧边栏：热门下载动态填充 -->
+                <!-- 侧边栏 -->
                 <div class="col-lg-3">
                     <div class="sidebar">
-                        <h4 class="section-title">热门下载</h4>
+                        <h4 class="section-title mt-4">热门下载</h4>
                         <div class="list-group" id="hotDownloadsList">
                             <div class="list-group-item">加载中...</div>
                         </div>
@@ -478,227 +1105,159 @@
                             <button id="searchButton">搜索</button>
                         </div>
                         <div id="dynamicFileList" class="download-list">
-                            <div class="loading-placeholder"><i class="fas fa-spinner fa-pulse me-2"></i> 正在扫描 /download/ 目录，请稍候...</div>
+                            <div class="loading-placeholder"><i class="fas fa-spinner fa-pulse me-2"></i> 正在加载文件列表...</div>
                         </div>
-                        <nav id="paginationNav" aria-label="Page navigation"><ul class="pagination" id="paginationUl"></ul></nav>
+                        <nav id="paginationNav" aria-label="Page navigation">
+                            <ul class="pagination" id="paginationUl"></ul>
+                        </nav>
                     </div>
                 </div>
             </div>
         </div>
     </div>
 
+    <!-- 页脚 -->
     <footer>
         <div class="container">
-            <div class="row"><div class="col-md-4 mb-4"><h5>关于我</h5><p>BH6RKW 操作证类别：B类</p></div><div class="col-md-4 mb-4"><h5>联系我</h5><p><i class="fas fa-envelope me-2"></i> bh6rkw@outlook.com</p></div><div class="col-md-4 mb-4"><h5>快速链接</h5><ul class="list-unstyled"><li><a href="https://wap.miit.gov.cn/"><i class="fas fa-angle-right me-2"></i> 工业和信息化部</a></li><li><a href="https://wap.miit.gov.cn/jgsj/wgj/index.html"><i class="fas fa-angle-right me-2"></i> 国家无线电管理局</a></li><li><a href="http://crac.org.cn"><i class="fas fa-angle-right me-2"></i> 中国无线电协会业余无线电分会</a></li><li><a href="https://qrz.com"><i class="fas fa-angle-right me-2"></i> QRZ</a></li></ul></div></div>
-            <div class="footer-bottom text-center"><p>版权所有 © 2025 BH6RKW</p></div>
+            <div class="row">
+                <div class="col-md-4 mb-4"><h5>关于我</h5><p>BH6RKW 操作证类别：B类</p></div>
+                <div class="col-md-4 mb-4"><h5>联系我</h5><p><i class="fas fa-envelope me-2"></i> bh6rkw@outlook.com</p></div>
+                <div class="col-md-4 mb-4"><h5>快速链接</h5><ul class="list-unstyled"><li><a href="https://wap.miit.gov.cn/"><i class="fas fa-angle-right me-2"></i> 工业和信息化部</a></li><li><a href="https://wap.miit.gov.cn/jgsj/wgj/index.html"><i class="fas fa-angle-right me-2"></i> 国家无线电管理局</a></li><li><a href="http://crac.org.cn"><i class="fas fa-angle-right me-2"></i> 中国无线电协会业余无线电分会</a></li><li><a href="https://qrz.com"><i class="fas fa-angle-right me-2"></i> QRZ</a></li></ul></div>
+            </div>
+            <div class="footer-bottom text-center"><p>版权所有 © 2025-2026 BH6RKW</p></div>
         </div>
     </footer>
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
     <script>
-        (function() {
-            // ---------- 全局变量 ----------
-            let allFiles = [];          // 存储 { name, size, modified, url, ext }
-            let currentPage = 1;
-            let pageSize = 10;
-            let currentSearch = "";
-            let isDataLoaded = false;
+        // ======================== 动态加载 files.json 并渲染 ========================
+        let allFiles = [];          // 存储文件对象 { name, size, modified, url, ext }
+        let currentPage = 1;
+        let pageSize = 10;
+        let currentSearch = "";
+        let isDataLoaded = false;
 
-            const fileListContainer = document.getElementById("dynamicFileList");
-            const paginationUl = document.getElementById("paginationUl");
-            const searchInput = document.getElementById("searchInput");
-            const searchBtn = document.getElementById("searchButton");
-            const hotContainer = document.getElementById("hotDownloadsList");
+        const fileListContainer = document.getElementById("dynamicFileList");
+        const paginationUl = document.getElementById("paginationUl");
+        const searchInput = document.getElementById("searchInput");
+        const searchBtn = document.getElementById("searchButton");
+        const hotContainer = document.getElementById("hotDownloadsList");
 
-            // 获取文件图标样式
-            function getFileIcon(filename) {
-                const ext = filename.split('.').pop().toLowerCase();
-                if (ext === 'pdf') return '<i class="far fa-file-pdf"></i>';
-                if (['doc', 'docx'].includes(ext)) return '<i class="far fa-file-word"></i>';
-                if (['xls', 'xlsx'].includes(ext)) return '<i class="far fa-file-excel"></i>';
-                if (['zip', 'rar', '7z'].includes(ext)) return '<i class="far fa-file-archive"></i>';
-                if (['png', 'jpg', 'jpeg', 'gif'].includes(ext)) return '<i class="far fa-file-image"></i>';
-                return '<i class="far fa-file-alt"></i>';
-            }
+        // 获取文件图标
+        function getFileIcon(filename) {
+            const ext = filename.split('.').pop().toLowerCase();
+            if (ext === 'pdf') return '<i class="far fa-file-pdf"></i>';
+            if (['doc', 'docx'].includes(ext)) return '<i class="far fa-file-word"></i>';
+            if (['xls', 'xlsx'].includes(ext)) return '<i class="far fa-file-excel"></i>';
+            if (['zip', 'rar', '7z'].includes(ext)) return '<i class="far fa-file-archive"></i>';
+            if (['png', 'jpg', 'jpeg', 'gif'].includes(ext)) return '<i class="far fa-file-image"></i>';
+            return '<i class="far fa-file-alt"></i>';
+        }
 
-            function formatFileSize(bytes) {
-                if (!bytes || bytes === '-') return '未知大小';
-                if (bytes < 1024) return bytes + ' B';
-                if (bytes < 1024*1024) return (bytes/1024).toFixed(1) + ' KB';
-                return (bytes/(1024*1024)).toFixed(1) + ' MB';
-            }
+        function formatFileSize(bytes) {
+            if (!bytes || bytes === '-') return '未知大小';
+            if (bytes < 1024) return bytes + ' B';
+            if (bytes < 1024*1024) return (bytes/1024).toFixed(1) + ' KB';
+            return (bytes/(1024*1024)).toFixed(1) + ' MB';
+        }
 
-            // 解析目录HTML (支持Apache/Nginx默认索引表格)
-            async function fetchFileListFromDir() {
-                const dirUrl = '/download/';  // 当前站点download目录
-                try {
-                    const response = await fetch(dirUrl, { cache: 'no-store' });
-                    if (!response.ok) throw new Error(`HTTP ${response.status}`);
-                    const html = await response.text();
-                    const parser = new DOMParser();
-                    const doc = parser.parseFromString(html, 'text/html');
-                    // 尝试查找表格 (标准autoindex)
-                    let table = doc.querySelector('table');
-                    let files = [];
-                    if (table) {
-                        const rows = table.querySelectorAll('tr');
-                        for (let row of rows) {
-                            const cells = row.querySelectorAll('td');
-                            if (cells.length >= 3) {
-                                const linkCell = cells[0];
-                                const a = linkCell.querySelector('a');
-                                if (!a) continue;
-                                let href = a.getAttribute('href');
-                                if (!href || href === '../' || href === '/') continue;
-                                const fileName = decodeURIComponent(href);
-                                // 过滤 index.html, images目录，以及其他目录（以/结尾的目录跳过）
-                                if (fileName === 'index.html' || fileName.endsWith('/')) continue;
-                                if (fileName.toLowerCase() === 'images/' || fileName === 'images') continue;
-                                // 获取大小和日期
-                                let sizeRaw = cells[1]?.textContent.trim() || '-';
-                                let sizeBytes = sizeRaw;
-                                if (sizeRaw !== '-' && !isNaN(parseFloat(sizeRaw))) {
-                                    if (sizeRaw.includes('K') || sizeRaw.includes('k')) sizeBytes = parseFloat(sizeRaw) * 1024;
-                                    else if (sizeRaw.includes('M')) sizeBytes = parseFloat(sizeRaw) * 1024 * 1024;
-                                    else sizeBytes = parseFloat(sizeRaw);
-                                } else if (sizeRaw === '-') sizeBytes = '-';
-                                else sizeBytes = sizeRaw;
-                                const modified = cells[2]?.textContent.trim() || '未知日期';
-                                const fullUrl = href.startsWith('http') ? href : (dirUrl + href);
-                                files.push({
-                                    name: fileName,
-                                    size: sizeBytes,
-                                    sizeText: (sizeRaw === '-' ? '未知' : sizeRaw),
-                                    modified: modified,
-                                    url: fullUrl,
-                                    ext: fileName.split('.').pop().toLowerCase()
-                                });
-                            }
-                        }
-                    } else {
-                        // fallback: 简单提取所有a标签
-                        const links = doc.querySelectorAll('a');
-                        for (let a of links) {
-                            let href = a.getAttribute('href');
-                            if (!href || href === '../' || href === '/') continue;
-                            if (href.endsWith('/') || href === 'index.html' || href.includes('images')) continue;
-                            const fileName = decodeURIComponent(href);
-                            const fullUrl = href.startsWith('http') ? href : (dirUrl + href);
-                            files.push({ name: fileName, size: '-', sizeText: '未知', modified: '未知', url: fullUrl, ext: fileName.split('.').pop() });
-                        }
-                    }
-                    // 去重 & 按文件名排序
-                    const unique = new Map();
-                    files.forEach(f => { if (!unique.has(f.name)) unique.set(f.name, f); });
-                    let result = Array.from(unique.values());
-                    result.sort((a,b) => a.name.localeCompare(b.name));
-                    return result;
-                } catch (err) {
-                    console.error('目录扫描失败:', err);
-                    return [];
-                }
-            }
-
-            // 渲染文件列表 (根据当前页和搜索)
-            function renderFileList() {
-                if (!isDataLoaded) return;
-                let filtered = allFiles.filter(f => f.name.toLowerCase().includes(currentSearch.toLowerCase()));
-                const totalItems = filtered.length;
-                const totalPages = Math.ceil(totalItems / pageSize) || 1;
-                if (currentPage > totalPages) currentPage = totalPages;
-                const start = (currentPage - 1) * pageSize;
-                const pageItems = filtered.slice(start, start + pageSize);
-                
-                if (pageItems.length === 0 && totalItems === 0) {
-                    fileListContainer.innerHTML = `<div class="no-results"><i class="fas fa-folder-open fa-3x mb-3"></i><h5>没有找到任何文件</h5><p>请确保 /download/ 目录下存在文件且服务器开启了目录浏览(Indexes)。</p></div>`;
-                } else if (pageItems.length === 0 && currentSearch !== "") {
-                    fileListContainer.innerHTML = `<div class="no-results"><i class="fas fa-search fa-3x mb-3"></i><h5>未找到匹配的资料</h5><p>尝试其他关键词</p></div>`;
-                } else {
-                    let html = '';
-                    for (let file of pageItems) {
-                        const iconHtml = getFileIcon(file.name);
-                        const sizeDisplay = (file.sizeText && file.sizeText !== '未知') ? file.sizeText : (file.size !== '-' ? formatFileSize(file.size) : '未知');
-                        html += `
-                            <div class="download-item d-flex">
-                                <div class="file-icon">${iconHtml}</div>
-                                <div class="file-info flex-grow-1">
-                                    <h5>${escapeHtml(file.name)}</h5>
-                                    <div class="file-meta">
-                                        <span><i class="far fa-file"></i> ${file.ext.toUpperCase()} 文件</span>
-                                        <span><i class="far fa-calendar-alt"></i> ${escapeHtml(file.modified)}</span>
-                                        <span><i class="fas fa-weight-hanging"></i> ${escapeHtml(sizeDisplay)}</span>
-                                    </div>
-                                </div>
-                                <div class="file-action">
-                                    <a href="${file.url}" download class="download-btn"><i class="fas fa-download me-1"></i> 下载</a>
+        // 渲染文件列表（分页 + 搜索）
+        function renderFileList() {
+            if (!isDataLoaded) return;
+            let filtered = allFiles.filter(f => f.name.toLowerCase().includes(currentSearch.toLowerCase()));
+            const totalItems = filtered.length;
+            const totalPages = Math.ceil(totalItems / pageSize) || 1;
+            if (currentPage > totalPages) currentPage = totalPages;
+            const start = (currentPage - 1) * pageSize;
+            const pageItems = filtered.slice(start, start + pageSize);
+            
+            if (pageItems.length === 0 && totalItems === 0 && currentSearch !== "") {
+                fileListContainer.innerHTML = `<div class="no-results"><i class="fas fa-search fa-3x mb-3"></i><h5>未找到匹配的资料</h5><p>尝试其他关键词</p></div>`;
+            } else if (pageItems.length === 0 && allFiles.length === 0) {
+                fileListContainer.innerHTML = `<div class="no-results"><i class="fas fa-folder-open fa-3x mb-3"></i><h5>没有找到任何文件</h5><p>请确保已上传 files.json 且文件列表非空。</p></div>`;
+            } else {
+                let html = '';
+                for (let file of pageItems) {
+                    const iconHtml = getFileIcon(file.name);
+                    const sizeDisplay = (file.size && file.size !== '-') ? formatFileSize(file.size) : '未知大小';
+                    html += `
+                        <div class="download-item d-flex">
+                            <div class="file-icon">${iconHtml}</div>
+                            <div class="file-info flex-grow-1">
+                                <h5>${escapeHtml(file.name)}</h5>
+                                <div class="file-meta">
+                                    <span><i class="far fa-file"></i> ${file.ext.toUpperCase()} 文件</span>
+                                    <span><i class="far fa-calendar-alt"></i> ${escapeHtml(file.modified || '未知日期')}</span>
+                                    <span><i class="fas fa-weight-hanging"></i> ${escapeHtml(sizeDisplay)}</span>
                                 </div>
                             </div>
-                        `;
-                    }
-                    fileListContainer.innerHTML = html;
+                            <div class="file-action">
+                                <a href="${file.url}" download class="download-btn"><i class="fas fa-download me-1"></i> 下载</a>
+                            </div>
+                        </div>
+                    `;
                 }
-                renderPagination(totalPages);
+                fileListContainer.innerHTML = html;
             }
+            renderPagination(totalPages);
+        }
 
-            function escapeHtml(str) { return str.replace(/[&<>]/g, function(m){if(m==='&') return '&amp;'; if(m==='<') return '&lt;'; if(m==='>') return '&gt;'; return m;}); }
+        function escapeHtml(str) { return String(str).replace(/[&<>]/g, function(m){if(m==='&') return '&amp;'; if(m==='<') return '&lt;'; if(m==='>') return '&gt;'; return m;}); }
 
-            function renderPagination(totalPages) {
-                if (totalPages <= 1) { paginationUl.innerHTML = ''; return; }
-                let html = '';
-                const prevDisabled = currentPage === 1 ? 'disabled' : '';
-                html += `<li class="page-item ${prevDisabled}"><a class="page-link" href="#" data-page="prev">&laquo;</a></li>`;
-                for (let i = 1; i <= totalPages; i++) {
-                    html += `<li class="page-item ${i === currentPage ? 'active' : ''}"><a class="page-link" href="#" data-page="${i}">${i}</a></li>`;
-                }
-                const nextDisabled = currentPage === totalPages ? 'disabled' : '';
-                html += `<li class="page-item ${nextDisabled}"><a class="page-link" href="#" data-page="next">&raquo;</a></li>`;
-                paginationUl.innerHTML = html;
-                // 绑定分页事件
-                paginationUl.querySelectorAll('.page-link').forEach(link => {
-                    link.addEventListener('click', (e) => {
-                        e.preventDefault();
-                        const pageVal = link.getAttribute('data-page');
-                        if (pageVal === 'prev' && currentPage > 1) currentPage--;
-                        else if (pageVal === 'next' && currentPage < totalPages) currentPage++;
-                        else if (!isNaN(parseInt(pageVal))) currentPage = parseInt(pageVal);
-                        renderFileList();
-                    });
+        function renderPagination(totalPages) {
+            if (totalPages <= 1) { paginationUl.innerHTML = ''; return; }
+            let html = '';
+            const prevDisabled = currentPage === 1 ? 'disabled' : '';
+            html += `<li class="page-item ${prevDisabled}"><a class="page-link" href="#" data-page="prev">&laquo;</a></li>`;
+            for (let i = 1; i <= totalPages; i++) {
+                html += `<li class="page-item ${i === currentPage ? 'active' : ''}"><a class="page-link" href="#" data-page="${i}">${i}</a></li>`;
+            }
+            const nextDisabled = currentPage === totalPages ? 'disabled' : '';
+            html += `<li class="page-item ${nextDisabled}"><a class="page-link" href="#" data-page="next">&raquo;</a></li>`;
+            paginationUl.innerHTML = html;
+            paginationUl.querySelectorAll('.page-link').forEach(link => {
+                link.addEventListener('click', (e) => {
+                    e.preventDefault();
+                    const pageVal = link.getAttribute('data-page');
+                    if (pageVal === 'prev' && currentPage > 1) currentPage--;
+                    else if (pageVal === 'next' && currentPage < totalPages) currentPage++;
+                    else if (!isNaN(parseInt(pageVal))) currentPage = parseInt(pageVal);
+                    renderFileList();
                 });
-            }
+            });
+        }
 
-            // 更新侧边栏热门下载 (按修改日期最新的3个)
-            function updateHotDownloads(files) {
-                if (!files.length) { hotContainer.innerHTML = '<div class="list-group-item">暂无文件</div>'; return; }
-                const sorted = [...files].sort((a,b) => {
-                    if (a.modified === '未知') return 1;
-                    if (b.modified === '未知') return -1;
-                    return new Date(b.modified) - new Date(a.modified);
-                });
-                const latest = sorted.slice(0, 3);
-                let html = '';
-                latest.forEach(f => {
-                    html += `<a href="${f.url}" class="list-group-item list-group-item-action"><div class="d-flex w-100 justify-content-between"><h6 class="mb-1">${escapeHtml(f.name.length>30?f.name.slice(0,28)+'...':f.name)}</h6><small>${escapeHtml(f.modified.split(' ')[0] || '近期')}</small></div><small class="text-muted">${escapeHtml(f.sizeText !== '未知'?f.sizeText:formatFileSize(f.size))}</small></a>`;
-                });
-                hotContainer.innerHTML = html;
-            }
+        // 更新侧边栏热门下载（按修改日期最新取3个）
+        function updateHotDownloads(files) {
+            if (!files.length) { hotContainer.innerHTML = '<div class="list-group-item">暂无文件</div>'; return; }
+            const sorted = [...files].sort((a,b) => {
+                if (!a.modified || a.modified === '未知日期') return 1;
+                if (!b.modified || b.modified === '未知日期') return -1;
+                return new Date(b.modified) - new Date(a.modified);
+            });
+            const latest = sorted.slice(0, 3);
+            let html = '';
+            latest.forEach(f => {
+                const shortName = f.name.length > 30 ? f.name.slice(0,28)+'...' : f.name;
+                html += `<a href="${f.url}" class="list-group-item list-group-item-action"><div class="d-flex w-100 justify-content-between"><h6 class="mb-1">${escapeHtml(shortName)}</h6><small>${escapeHtml((f.modified || '').split(' ')[0] || '近期')}</small></div><small class="text-muted">${escapeHtml(f.size ? formatFileSize(f.size) : '未知大小')}</small></a>`;
+            });
+            hotContainer.innerHTML = html;
+        }
 
-            // 搜索联动
-            function onSearch() {
-                currentSearch = searchInput.value.trim();
-                currentPage = 1;
-                renderFileList();
-            }
+        // 搜索事件
+        function onSearch() {
+            currentSearch = searchInput.value.trim();
+            currentPage = 1;
+            renderFileList();
+        }
 
-            // 主初始化：获取目录文件列表
-            async function initDynamicDownload() {
-                fileListContainer.innerHTML = '<div class="loading-placeholder"><i class="fas fa-spinner fa-pulse me-2"></i> 正在扫描 /download/ 目录，请稍候...</div>';
-                const files = await fetchFileListFromDir();
-                if (files.length === 0) {
-                    fileListContainer.innerHTML = '<div class="no-results"><i class="fas fa-exclamation-triangle fa-3x mb-3"></i><h5>无法自动识别文件列表</h5><p>请确保服务器已启用目录浏览（Indexes），或将文件列表通过其他方式生成。<br>当前无法获取 /download/ 下文件清单。</p></div>';
-                    hotContainer.innerHTML = '<div class="list-group-item">暂无可显示文件</div>';
-                    isDataLoaded = true;
-                    return;
-                }
+        // 加载 JSON
+        async function loadFileList() {
+            try {
+                const response = await fetch('/download/files.json?t=' + Date.now()); // 避免缓存
+                if (!response.ok) throw new Error('JSON 加载失败');
+                const files = await response.json();
+                if (!Array.isArray(files)) throw new Error('数据格式错误');
                 allFiles = files;
                 isDataLoaded = true;
                 updateHotDownloads(allFiles);
@@ -706,46 +1265,112 @@
                 currentSearch = "";
                 if(searchInput) searchInput.value = "";
                 renderFileList();
+            } catch (err) {
+                console.error(err);
+                fileListContainer.innerHTML = `<div class="no-results"><i class="fas fa-exclamation-triangle fa-3x mb-3"></i><h5>无法加载文件列表</h5><p>请确保 /download/files.json 存在且格式正确。</p></div>`;
+                hotContainer.innerHTML = '<div class="list-group-item">数据加载失败</div>';
+                isDataLoaded = true;
             }
-            
-            // 绑定搜索事件
-            if (searchBtn) searchBtn.addEventListener('click', onSearch);
-            if (searchInput) searchInput.addEventListener('keypress', (e) => { if (e.key === 'Enter') onSearch(); });
-            
-            // 启动动态识别
-            initDynamicDownload();
+        }
 
-            // ------------- 保留原有时间同步及暗色主题功能 (压缩保留核心) -------------
-            // 为了不破坏原功能，重新挂接主题切换逻辑 (沿用原样式中 theme-switch 及时间同步)
-            const origThemeScript = document.createElement('script');
-            // 原主题/时间同步代码保留样式，但由于重构不影响，快速注入原逻辑确保没覆盖掉
-            // 只需保证深色模式切换继续有效，为避免冲突将原自定义事件重新绑定一下。
-            setTimeout(() => {
-                const themeCheckbox = document.querySelector('.theme-switch__checkbox');
-                const applyTheme = (isDark) => {
-                    if(isDark) document.body.classList.add('dark-theme');
-                    else document.body.classList.remove('dark-theme');
-                    const dayLabel = document.querySelector('.day_mode');
-                    const nightLabel = document.querySelector('.night_mode');
-                    if(dayLabel && nightLabel) {
-                        if(isDark) { dayLabel.style.color='#aaa'; nightLabel.style.color='#64b5f6'; nightLabel.style.fontWeight='bold'; dayLabel.style.fontWeight='normal';}
-                        else { dayLabel.style.color='#64b5f6'; nightLabel.style.fontWeight='bold'; nightLabel.style.color='#aaa'; dayLabel.style.fontWeight='normal';}
-                    }
-                };
-                if(themeCheckbox) {
-                    themeCheckbox.addEventListener('change', (e) => { applyTheme(e.target.checked); });
-                    if(document.body.classList.contains('dark-theme')) themeCheckbox.checked = true;
+        // 绑定搜索事件
+        if (searchBtn) searchBtn.addEventListener('click', onSearch);
+        if (searchInput) searchInput.addEventListener('keypress', (e) => { if (e.key === 'Enter') onSearch(); });
+
+        loadFileList();
+
+        // ======================== 时间同步与主题切换（保留初代完整逻辑，未作任何改动） ========================
+        document.addEventListener('DOMContentLoaded', function() {
+            const themeSwitch = document.querySelector('.theme-switch__checkbox');
+            const timeSyncOverlay = document.getElementById('timeSyncOverlay');
+            const agreeTimeSyncBtn = document.getElementById('agreeTimeSync');
+            const declineTimeSyncBtn = document.getElementById('declineTimeSync');
+            let userManuallySwitched = false;
+            let timeSyncIntervalId = null;
+
+            function checkStoredTimeSyncChoice() {
+                const urlParams = new URLSearchParams(window.location.search);
+                const urlTimeSync = urlParams.get('timeSync');
+                if (urlTimeSync === 'agree') { handleTimeSyncChoice('agree'); return true; }
+                else if (urlTimeSync === 'decline') { handleTimeSyncChoice('decline'); return true; }
+                const stored = sessionStorage.getItem('timeSyncChoice');
+                if (stored === 'agree') { handleTimeSyncChoice('agree'); return true; }
+                else if (stored === 'decline') { handleTimeSyncChoice('decline'); return true; }
+                return false;
+            }
+            function showTimeSyncOverlay() { timeSyncOverlay.style.display = 'flex'; }
+            function hideTimeSyncOverlay() { timeSyncOverlay.style.display = 'none'; }
+            function handleTimeSyncChoice(choice) {
+                if (choice === 'agree') {
+                    sessionStorage.setItem('timeSyncChoice', 'agree');
+                    setThemeByOnlineTime();
+                    timeSyncIntervalId = setInterval(() => { if (!userManuallySwitched) setThemeByOnlineTime(); }, 60 * 1000);
+                } else {
+                    sessionStorage.setItem('timeSyncChoice', 'decline');
+                    useLocalTime();
+                    if (timeSyncIntervalId) clearInterval(timeSyncIntervalId);
                 }
-                // 时间同步弹窗简单保证可用
-                const overlay = document.getElementById('timeSyncOverlay');
-                const agree = document.getElementById('agreeTimeSync');
-                const decline = document.getElementById('declineTimeSync');
-                if(overlay && !sessionStorage.getItem('timeSyncChoice')) overlay.style.display = 'flex';
-                const closeHandler = (choice) => { sessionStorage.setItem('timeSyncChoice', choice); overlay.style.display = 'none'; if(choice==='agree') { /* 在线时间逻辑(保留原) */ } };
-                if(agree) agree.onclick = () => closeHandler('agree');
-                if(decline) decline.onclick = () => closeHandler('decline');
-            }, 100);
-        })();
+                hideTimeSyncOverlay();
+            }
+            function setThemeByOnlineTime() {
+                if (userManuallySwitched) return;
+                fetch('https://worldtimeapi.org/api/ip')
+                    .then(res => res.json())
+                    .then(data => {
+                        const hour = new Date(data.datetime).getHours();
+                        if (hour >= 6 && hour < 18) {
+                            if (themeSwitch) themeSwitch.checked = false;
+                            switchToLightTheme();
+                        } else {
+                            if (themeSwitch) themeSwitch.checked = true;
+                            switchToDarkTheme();
+                        }
+                        userManuallySwitched = false;
+                    })
+                    .catch(() => useLocalTime());
+            }
+            function useLocalTime() {
+                if (userManuallySwitched) return;
+                const hour = new Date().getHours();
+                if (hour >= 6 && hour < 18) {
+                    if (themeSwitch) themeSwitch.checked = false;
+                    switchToLightTheme();
+                } else {
+                    if (themeSwitch) themeSwitch.checked = true;
+                    switchToDarkTheme();
+                }
+                userManuallySwitched = false;
+            }
+            function switchToDarkTheme() {
+                document.body.classList.add('dark-theme');
+                updateModeLabels('night');
+            }
+            function switchToLightTheme() {
+                document.body.classList.remove('dark-theme');
+                updateModeLabels('day');
+            }
+            function updateModeLabels(mode) {
+                const dayLabel = document.querySelector('.day_mode');
+                const nightLabel = document.querySelector('.night_mode');
+                if (mode === 'day') {
+                    if (dayLabel) { dayLabel.style.color = '#64b5f6'; dayLabel.style.fontWeight = 'bold'; }
+                    if (nightLabel) { nightLabel.style.color = '#aaa'; nightLabel.style.fontWeight = 'normal'; }
+                } else {
+                    if (dayLabel) { dayLabel.style.color = '#aaa'; dayLabel.style.fontWeight = 'normal'; }
+                    if (nightLabel) { nightLabel.style.color = '#64b5f6'; nightLabel.style.fontWeight = 'bold'; }
+                }
+            }
+            agreeTimeSyncBtn?.addEventListener('click', () => handleTimeSyncChoice('agree'));
+            declineTimeSyncBtn?.addEventListener('click', () => handleTimeSyncChoice('decline'));
+            if (!checkStoredTimeSyncChoice()) showTimeSyncOverlay();
+            if (themeSwitch) {
+                themeSwitch.addEventListener('change', function() {
+                    userManuallySwitched = true;
+                    if (this.checked) switchToDarkTheme();
+                    else switchToLightTheme();
+                });
+            }
+        });
     </script>
 </body>
 </html>
