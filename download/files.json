@@ -49,6 +49,24 @@
     "ext": "pdf"
   },
   {
+    "name": "HMCL_JDK20.z01",
+    "size": 104857600,
+    "modified": "2026-05-17 00:44:56",
+    "url": "./HMCL_JDK20.z01",
+    "ext": "z01",
+    "protected": true,
+    "password": "114514"
+  },
+  {
+    "name": "HMCL_JDK20.zip",
+    "size": 69885172,
+    "modified": "2026-05-17 00:44:56",
+    "url": "./HMCL_JDK20.zip",
+    "ext": "zip",
+    "protected": true,
+    "password": "114514"
+  },
+  {
     "name": "QSL卡片1.0反面.webp",
     "size": 67988,
     "modified": "2025-11-14 10:32:38",

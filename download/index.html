@@ -1129,248 +1129,303 @@
     </footer>
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
-    <script>
-        // ======================== 动态加载 files.json 并渲染 ========================
-        let allFiles = [];          // 存储文件对象 { name, size, modified, url, ext }
-        let currentPage = 1;
-        let pageSize = 10;
-        let currentSearch = "";
-        let isDataLoaded = false;
+<script>
+    // ======================== 动态加载 files.json 并渲染（支持密码保护） ========================
+    let allFiles = [];
+    let currentPage = 1;
+    let pageSize = 10;
+    let currentSearch = "";
+    let isDataLoaded = false;
 
-        const fileListContainer = document.getElementById("dynamicFileList");
-        const paginationUl = document.getElementById("paginationUl");
-        const searchInput = document.getElementById("searchInput");
-        const searchBtn = document.getElementById("searchButton");
-        const hotContainer = document.getElementById("hotDownloadsList");
+    const fileListContainer = document.getElementById("dynamicFileList");
+    const paginationUl = document.getElementById("paginationUl");
+    const searchInput = document.getElementById("searchInput");
+    const searchBtn = document.getElementById("searchButton");
+    const hotContainer = document.getElementById("hotDownloadsList");
 
-        // 获取文件图标
-        function getFileIcon(filename) {
-            const ext = filename.split('.').pop().toLowerCase();
-            if (ext === 'pdf') return '<i class="far fa-file-pdf"></i>';
-            if (['doc', 'docx'].includes(ext)) return '<i class="far fa-file-word"></i>';
-            if (['xls', 'xlsx'].includes(ext)) return '<i class="far fa-file-excel"></i>';
-            if (['zip', 'rar', '7z'].includes(ext)) return '<i class="far fa-file-archive"></i>';
-            if (['png', 'jpg', 'jpeg', 'gif'].includes(ext)) return '<i class="far fa-file-image"></i>';
-            return '<i class="far fa-file-alt"></i>';
+    function getFileIcon(filename) {
+        const ext = filename.split('.').pop().toLowerCase();
+        if (ext === 'pdf') return '<i class="far fa-file-pdf"></i>';
+        if (['doc', 'docx'].includes(ext)) return '<i class="far fa-file-word"></i>';
+        if (['xls', 'xlsx'].includes(ext)) return '<i class="far fa-file-excel"></i>';
+        if (['zip', 'rar', '7z'].includes(ext)) return '<i class="far fa-file-archive"></i>';
+        if (['png', 'jpg', 'jpeg', 'gif'].includes(ext)) return '<i class="far fa-file-image"></i>';
+        return '<i class="far fa-file-alt"></i>';
+    }
+
+    function formatFileSize(bytes) {
+        if (!bytes || bytes === '-') return '未知大小';
+        if (bytes < 1024) return bytes + ' B';
+        if (bytes < 1024*1024) return (bytes/1024).toFixed(1) + ' KB';
+        return (bytes/(1024*1024)).toFixed(1) + ' MB';
+    }
+
+    function escapeHtml(str) {
+        return String(str).replace(/[&<>]/g, function(m){
+            if(m==='&') return '&amp;';
+            if(m==='<') return '&lt;';
+            if(m==='>') return '&gt;';
+            return m;
+        });
+    }
+
+    // 下载点击处理（事件委托）
+    function handleDownloadClick(e) {
+        const btn = e.target.closest('.download-btn');
+        if (!btn) return;
+        e.preventDefault();
+        const url = btn.getAttribute('data-url');
+        const isProtected = btn.getAttribute('data-protected') === 'true';
+        const requiredPassword = btn.getAttribute('data-password') || '';
+
+        if (!isProtected) {
+            // 直接下载
+            window.location.href = url;
+            return;
         }
 
-        function formatFileSize(bytes) {
-            if (!bytes || bytes === '-') return '未知大小';
-            if (bytes < 1024) return bytes + ' B';
-            if (bytes < 1024*1024) return (bytes/1024).toFixed(1) + ' KB';
-            return (bytes/(1024*1024)).toFixed(1) + ' MB';
+        // 受保护，弹出密码输入框
+        const userPwd = prompt('该文件需要密码才能下载，请输入密码：');
+        if (userPwd === requiredPassword) {
+            window.location.href = url;
+        } else if (userPwd !== null) {
+            alert('密码错误，无权下载！');
         }
+    }
 
-        // 渲染文件列表（分页 + 搜索）
-        function renderFileList() {
-            if (!isDataLoaded) return;
-            let filtered = allFiles.filter(f => f.name.toLowerCase().includes(currentSearch.toLowerCase()));
-            const totalItems = filtered.length;
-            const totalPages = Math.ceil(totalItems / pageSize) || 1;
-            if (currentPage > totalPages) currentPage = totalPages;
-            const start = (currentPage - 1) * pageSize;
-            const pageItems = filtered.slice(start, start + pageSize);
-            
-            if (pageItems.length === 0 && totalItems === 0 && currentSearch !== "") {
-                fileListContainer.innerHTML = `<div class="no-results"><i class="fas fa-search fa-3x mb-3"></i><h5>未找到匹配的资料</h5><p>尝试其他关键词</p></div>`;
-            } else if (pageItems.length === 0 && allFiles.length === 0) {
-                fileListContainer.innerHTML = `<div class="no-results"><i class="fas fa-folder-open fa-3x mb-3"></i><h5>没有找到任何文件</h5><p>服务器错误。</p></div>`;
-            } else {
-                let html = '';
-                for (let file of pageItems) {
-                    const iconHtml = getFileIcon(file.name);
-                    const sizeDisplay = (file.size && file.size !== '-') ? formatFileSize(file.size) : '未知大小';
-                    html += `
-                        <div class="download-item d-flex">
-                            <div class="file-icon">${iconHtml}</div>
-                            <div class="file-info flex-grow-1">
-                                <h5>${escapeHtml(file.name)}</h5>
-                                <div class="file-meta">
-                                    <span><i class="far fa-file"></i> ${file.ext.toUpperCase()} 文件</span>
-                                    <span><i class="far fa-calendar-alt"></i> ${escapeHtml(file.modified || '未知日期')}</span>
-                                    <span><i class="fas fa-weight-hanging"></i> ${escapeHtml(sizeDisplay)}</span>
-                                </div>
-                            </div>
-                            <div class="file-action">
-                                <a href="${file.url}" download class="download-btn"><i class="fas fa-download me-1"></i> 下载</a>
+    // 渲染文件列表
+    function renderFileList() {
+        if (!isDataLoaded) return;
+        let filtered = allFiles.filter(f => f.name.toLowerCase().includes(currentSearch.toLowerCase()));
+        const totalItems = filtered.length;
+        const totalPages = Math.ceil(totalItems / pageSize) || 1;
+        if (currentPage > totalPages) currentPage = totalPages;
+        const start = (currentPage - 1) * pageSize;
+        const pageItems = filtered.slice(start, start + pageSize);
+
+        if (pageItems.length === 0 && totalItems === 0 && currentSearch !== "") {
+            fileListContainer.innerHTML = `<div class="no-results"><i class="fas fa-search fa-3x mb-3"></i><h5>未找到匹配的资料</h5><p>尝试其他关键词</p></div>`;
+        } else if (pageItems.length === 0 && allFiles.length === 0) {
+            fileListContainer.innerHTML = `<div class="no-results"><i class="fas fa-folder-open fa-3x mb-3"></i><h5>没有找到任何文件</h5><p>请确保已上传 files.json 且文件列表非空。</p></div>`;
+        } else {
+            let html = '';
+            for (let file of pageItems) {
+                const iconHtml = getFileIcon(file.name);
+                const sizeDisplay = (file.size && file.size !== '-') ? formatFileSize(file.size) : '未知大小';
+                const isProtected = file.protected === true;
+                const passwordAttr = isProtected ? ` data-protected="true" data-password="${escapeHtml(file.password)}"` : ` data-protected="false"`;
+                html += `
+                    <div class="download-item d-flex">
+                        <div class="file-icon">${iconHtml}</div>
+                        <div class="file-info flex-grow-1">
+                            <h5>${escapeHtml(file.name)}${isProtected ? ' <i class="fas fa-lock" style="color:#f0ad4e; font-size:0.9rem;"></i>' : ''}</h5>
+                            <div class="file-meta">
+                                <span><i class="far fa-file"></i> ${file.ext.toUpperCase()} 文件</span>
+                                <span><i class="far fa-calendar-alt"></i> ${escapeHtml(file.modified || '未知日期')}</span>
+                                <span><i class="fas fa-weight-hanging"></i> ${escapeHtml(sizeDisplay)}</span>
                             </div>
                         </div>
-                    `;
-                }
-                fileListContainer.innerHTML = html;
+                        <div class="file-action">
+                            <a href="#" class="download-btn" data-url="${escapeHtml(file.url)}"${passwordAttr}><i class="fas fa-download me-1"></i> 下载</a>
+                        </div>
+                    </div>
+                `;
             }
-            renderPagination(totalPages);
+            fileListContainer.innerHTML = html;
         }
+        renderPagination(totalPages);
+    }
 
-        function escapeHtml(str) { return String(str).replace(/[&<>]/g, function(m){if(m==='&') return '&amp;'; if(m==='<') return '&lt;'; if(m==='>') return '&gt;'; return m;}); }
-
-        function renderPagination(totalPages) {
-            if (totalPages <= 1) { paginationUl.innerHTML = ''; return; }
-            let html = '';
-            const prevDisabled = currentPage === 1 ? 'disabled' : '';
-            html += `<li class="page-item ${prevDisabled}"><a class="page-link" href="#" data-page="prev">&laquo;</a></li>`;
-            for (let i = 1; i <= totalPages; i++) {
-                html += `<li class="page-item ${i === currentPage ? 'active' : ''}"><a class="page-link" href="#" data-page="${i}">${i}</a></li>`;
-            }
-            const nextDisabled = currentPage === totalPages ? 'disabled' : '';
-            html += `<li class="page-item ${nextDisabled}"><a class="page-link" href="#" data-page="next">&raquo;</a></li>`;
-            paginationUl.innerHTML = html;
-            paginationUl.querySelectorAll('.page-link').forEach(link => {
-                link.addEventListener('click', (e) => {
-                    e.preventDefault();
-                    const pageVal = link.getAttribute('data-page');
-                    if (pageVal === 'prev' && currentPage > 1) currentPage--;
-                    else if (pageVal === 'next' && currentPage < totalPages) currentPage++;
-                    else if (!isNaN(parseInt(pageVal))) currentPage = parseInt(pageVal);
-                    renderFileList();
-                });
-            });
+    function renderPagination(totalPages) {
+        if (totalPages <= 1) { paginationUl.innerHTML = ''; return; }
+        let html = '';
+        const prevDisabled = currentPage === 1 ? 'disabled' : '';
+        html += `<li class="page-item ${prevDisabled}"><a class="page-link" href="#" data-page="prev">&laquo;</a></li>`;
+        for (let i = 1; i <= totalPages; i++) {
+            html += `<li class="page-item ${i === currentPage ? 'active' : ''}"><a class="page-link" href="#" data-page="${i}">${i}</a></li>`;
         }
-
-        // 更新侧边栏热门下载（按修改日期最新取3个）
-        function updateHotDownloads(files) {
-            if (!files.length) { hotContainer.innerHTML = '<div class="list-group-item">暂无文件</div>'; return; }
-            const sorted = [...files].sort((a,b) => {
-                if (!a.modified || a.modified === '未知日期') return 1;
-                if (!b.modified || b.modified === '未知日期') return -1;
-                return new Date(b.modified) - new Date(a.modified);
-            });
-            const latest = sorted.slice(0, 3);
-            let html = '';
-            latest.forEach(f => {
-                const shortName = f.name.length > 30 ? f.name.slice(0,28)+'...' : f.name;
-                html += `<a href="${f.url}" class="list-group-item list-group-item-action"><div class="d-flex w-100 justify-content-between"><h6 class="mb-1">${escapeHtml(shortName)}</h6><small>${escapeHtml((f.modified || '').split(' ')[0] || '近期')}</small></div><small class="text-muted">${escapeHtml(f.size ? formatFileSize(f.size) : '未知大小')}</small></a>`;
-            });
-            hotContainer.innerHTML = html;
-        }
-
-        // 搜索事件
-        function onSearch() {
-            currentSearch = searchInput.value.trim();
-            currentPage = 1;
-            renderFileList();
-        }
-
-        // 加载 JSON
-        async function loadFileList() {
-            try {
-                const response = await fetch('/download/files.json?t=' + Date.now()); // 避免缓存
-                if (!response.ok) throw new Error('JSON 加载失败');
-                const files = await response.json();
-                if (!Array.isArray(files)) throw new Error('数据格式错误');
-                allFiles = files;
-                isDataLoaded = true;
-                updateHotDownloads(allFiles);
-                currentPage = 1;
-                currentSearch = "";
-                if(searchInput) searchInput.value = "";
+        const nextDisabled = currentPage === totalPages ? 'disabled' : '';
+        html += `<li class="page-item ${nextDisabled}"><a class="page-link" href="#" data-page="next">&raquo;</a></li>`;
+        paginationUl.innerHTML = html;
+        paginationUl.querySelectorAll('.page-link').forEach(link => {
+            link.addEventListener('click', (e) => {
+                e.preventDefault();
+                const pageVal = link.getAttribute('data-page');
+                if (pageVal === 'prev' && currentPage > 1) currentPage--;
+                else if (pageVal === 'next' && currentPage < totalPages) currentPage++;
+                else if (!isNaN(parseInt(pageVal))) currentPage = parseInt(pageVal);
                 renderFileList();
-            } catch (err) {
-                console.error(err);
-                fileListContainer.innerHTML = `<div class="no-results"><i class="fas fa-exclamation-triangle fa-3x mb-3"></i><h5>无法加载文件列表</h5><p>服务器错误。</p></div>`;
-                hotContainer.innerHTML = '<div class="list-group-item">数据加载失败</div>';
-                isDataLoaded = true;
+            });
+        });
+    }
+
+    function updateHotDownloads(files) {
+        if (!files.length) { hotContainer.innerHTML = '<div class="list-group-item">暂无文件</div>'; return; }
+        const sorted = [...files].sort((a,b) => {
+            if (!a.modified || a.modified === '未知日期') return 1;
+            if (!b.modified || b.modified === '未知日期') return -1;
+            return new Date(b.modified) - new Date(a.modified);
+        });
+        const latest = sorted.slice(0, 3);
+        let html = '';
+        latest.forEach(f => {
+            const shortName = f.name.length > 30 ? f.name.slice(0,28)+'...' : f.name;
+            html += `<a href="#" class="list-group-item list-group-item-action hot-download-item" data-url="${escapeHtml(f.url)}" data-protected="${f.protected === true}" data-password="${escapeHtml(f.password || '')}">
+                        <div class="d-flex w-100 justify-content-between">
+                            <h6 class="mb-1">${escapeHtml(shortName)}${f.protected ? ' <i class="fas fa-lock" style="font-size:0.8rem;"></i>' : ''}</h6>
+                            <small>${escapeHtml((f.modified || '').split(' ')[0] || '近期')}</small>
+                        </div>
+                        <small class="text-muted">${escapeHtml(f.size ? formatFileSize(f.size) : '未知大小')}</small>
+                    </a>`;
+        });
+        hotContainer.innerHTML = html;
+        // 为热门下载项绑定点击验证
+        document.querySelectorAll('.hot-download-item').forEach(el => {
+            el.addEventListener('click', (e) => {
+                e.preventDefault();
+                const url = el.getAttribute('data-url');
+                const isProtected = el.getAttribute('data-protected') === 'true';
+                const requiredPassword = el.getAttribute('data-password') || '';
+                if (!isProtected) {
+                    window.location.href = url;
+                    return;
+                }
+                const userPwd = prompt('该文件需要密码才能下载，请输入密码：');
+                if (userPwd === requiredPassword) {
+                    window.location.href = url;
+                } else if (userPwd !== null) {
+                    alert('密码错误，无权下载！');
+                }
+            });
+        });
+    }
+
+    function onSearch() {
+        currentSearch = searchInput.value.trim();
+        currentPage = 1;
+        renderFileList();
+    }
+
+    async function loadFileList() {
+        try {
+            const response = await fetch('/download/files.json?t=' + Date.now());
+            if (!response.ok) throw new Error('JSON 加载失败');
+            const files = await response.json();
+            if (!Array.isArray(files)) throw new Error('数据格式错误');
+            allFiles = files;
+            isDataLoaded = true;
+            updateHotDownloads(allFiles);
+            currentPage = 1;
+            currentSearch = "";
+            if(searchInput) searchInput.value = "";
+            renderFileList();
+            // 绑定下载按钮事件（委托）
+            fileListContainer.addEventListener('click', handleDownloadClick);
+        } catch (err) {
+            console.error(err);
+            fileListContainer.innerHTML = `<div class="no-results"><i class="fas fa-exclamation-triangle fa-3x mb-3"></i><h5>无法加载文件列表</h5><p>请确保 /download/files.json 存在且格式正确。</p></div>`;
+            hotContainer.innerHTML = '<div class="list-group-item">数据加载失败</div>';
+            isDataLoaded = true;
+        }
+    }
+
+    if (searchBtn) searchBtn.addEventListener('click', onSearch);
+    if (searchInput) searchInput.addEventListener('keypress', (e) => { if (e.key === 'Enter') onSearch(); });
+
+    loadFileList();
+
+    // ======================== 时间同步与主题切换（保留初代完整逻辑） ========================
+    document.addEventListener('DOMContentLoaded', function() {
+        const themeSwitch = document.querySelector('.theme-switch__checkbox');
+        const timeSyncOverlay = document.getElementById('timeSyncOverlay');
+        const agreeTimeSyncBtn = document.getElementById('agreeTimeSync');
+        const declineTimeSyncBtn = document.getElementById('declineTimeSync');
+        let userManuallySwitched = false;
+        let timeSyncIntervalId = null;
+
+        function checkStoredTimeSyncChoice() {
+            const urlParams = new URLSearchParams(window.location.search);
+            const urlTimeSync = urlParams.get('timeSync');
+            if (urlTimeSync === 'agree') { handleTimeSyncChoice('agree'); return true; }
+            else if (urlTimeSync === 'decline') { handleTimeSyncChoice('decline'); return true; }
+            const stored = sessionStorage.getItem('timeSyncChoice');
+            if (stored === 'agree') { handleTimeSyncChoice('agree'); return true; }
+            else if (stored === 'decline') { handleTimeSyncChoice('decline'); return true; }
+            return false;
+        }
+        function showTimeSyncOverlay() { timeSyncOverlay.style.display = 'flex'; }
+        function hideTimeSyncOverlay() { timeSyncOverlay.style.display = 'none'; }
+        function handleTimeSyncChoice(choice) {
+            if (choice === 'agree') {
+                sessionStorage.setItem('timeSyncChoice', 'agree');
+                setThemeByOnlineTime();
+                timeSyncIntervalId = setInterval(() => { if (!userManuallySwitched) setThemeByOnlineTime(); }, 60 * 1000);
+            } else {
+                sessionStorage.setItem('timeSyncChoice', 'decline');
+                useLocalTime();
+                if (timeSyncIntervalId) clearInterval(timeSyncIntervalId);
+            }
+            hideTimeSyncOverlay();
+        }
+        function setThemeByOnlineTime() {
+            if (userManuallySwitched) return;
+            fetch('https://worldtimeapi.org/api/ip')
+                .then(res => res.json())
+                .then(data => {
+                    const hour = new Date(data.datetime).getHours();
+                    if (hour >= 6 && hour < 18) {
+                        if (themeSwitch) themeSwitch.checked = false;
+                        switchToLightTheme();
+                    } else {
+                        if (themeSwitch) themeSwitch.checked = true;
+                        switchToDarkTheme();
+                    }
+                    userManuallySwitched = false;
+                })
+                .catch(() => useLocalTime());
+        }
+        function useLocalTime() {
+            if (userManuallySwitched) return;
+            const hour = new Date().getHours();
+            if (hour >= 6 && hour < 18) {
+                if (themeSwitch) themeSwitch.checked = false;
+                switchToLightTheme();
+            } else {
+                if (themeSwitch) themeSwitch.checked = true;
+                switchToDarkTheme();
+            }
+            userManuallySwitched = false;
+        }
+        function switchToDarkTheme() {
+            document.body.classList.add('dark-theme');
+            updateModeLabels('night');
+        }
+        function switchToLightTheme() {
+            document.body.classList.remove('dark-theme');
+            updateModeLabels('day');
+        }
+        function updateModeLabels(mode) {
+            const dayLabel = document.querySelector('.day_mode');
+            const nightLabel = document.querySelector('.night_mode');
+            if (mode === 'day') {
+                if (dayLabel) { dayLabel.style.color = '#64b5f6'; dayLabel.style.fontWeight = 'bold'; }
+                if (nightLabel) { nightLabel.style.color = '#aaa'; nightLabel.style.fontWeight = 'normal'; }
+            } else {
+                if (dayLabel) { dayLabel.style.color = '#aaa'; dayLabel.style.fontWeight = 'normal'; }
+                if (nightLabel) { nightLabel.style.color = '#64b5f6'; nightLabel.style.fontWeight = 'bold'; }
             }
         }
-
-        // 绑定搜索事件
-        if (searchBtn) searchBtn.addEventListener('click', onSearch);
-        if (searchInput) searchInput.addEventListener('keypress', (e) => { if (e.key === 'Enter') onSearch(); });
-
-        loadFileList();
-
-        // ======================== 时间同步与主题切换（保留初代完整逻辑，未作任何改动） ========================
-        document.addEventListener('DOMContentLoaded', function() {
-            const themeSwitch = document.querySelector('.theme-switch__checkbox');
-            const timeSyncOverlay = document.getElementById('timeSyncOverlay');
-            const agreeTimeSyncBtn = document.getElementById('agreeTimeSync');
-            const declineTimeSyncBtn = document.getElementById('declineTimeSync');
-            let userManuallySwitched = false;
-            let timeSyncIntervalId = null;
-
-            function checkStoredTimeSyncChoice() {
-                const urlParams = new URLSearchParams(window.location.search);
-                const urlTimeSync = urlParams.get('timeSync');
-                if (urlTimeSync === 'agree') { handleTimeSyncChoice('agree'); return true; }
-                else if (urlTimeSync === 'decline') { handleTimeSyncChoice('decline'); return true; }
-                const stored = sessionStorage.getItem('timeSyncChoice');
-                if (stored === 'agree') { handleTimeSyncChoice('agree'); return true; }
-                else if (stored === 'decline') { handleTimeSyncChoice('decline'); return true; }
-                return false;
-            }
-            function showTimeSyncOverlay() { timeSyncOverlay.style.display = 'flex'; }
-            function hideTimeSyncOverlay() { timeSyncOverlay.style.display = 'none'; }
-            function handleTimeSyncChoice(choice) {
-                if (choice === 'agree') {
-                    sessionStorage.setItem('timeSyncChoice', 'agree');
-                    setThemeByOnlineTime();
-                    timeSyncIntervalId = setInterval(() => { if (!userManuallySwitched) setThemeByOnlineTime(); }, 60 * 1000);
-                } else {
-                    sessionStorage.setItem('timeSyncChoice', 'decline');
-                    useLocalTime();
-                    if (timeSyncIntervalId) clearInterval(timeSyncIntervalId);
-                }
-                hideTimeSyncOverlay();
-            }
-            function setThemeByOnlineTime() {
-                if (userManuallySwitched) return;
-                fetch('https://worldtimeapi.org/api/ip')
-                    .then(res => res.json())
-                    .then(data => {
-                        const hour = new Date(data.datetime).getHours();
-                        if (hour >= 6 && hour < 18) {
-                            if (themeSwitch) themeSwitch.checked = false;
-                            switchToLightTheme();
-                        } else {
-                            if (themeSwitch) themeSwitch.checked = true;
-                            switchToDarkTheme();
-                        }
-                        userManuallySwitched = false;
-                    })
-                    .catch(() => useLocalTime());
-            }
-            function useLocalTime() {
-                if (userManuallySwitched) return;
-                const hour = new Date().getHours();
-                if (hour >= 6 && hour < 18) {
-                    if (themeSwitch) themeSwitch.checked = false;
-                    switchToLightTheme();
-                } else {
-                    if (themeSwitch) themeSwitch.checked = true;
-                    switchToDarkTheme();
-                }
-                userManuallySwitched = false;
-            }
-            function switchToDarkTheme() {
-                document.body.classList.add('dark-theme');
-                updateModeLabels('night');
-            }
-            function switchToLightTheme() {
-                document.body.classList.remove('dark-theme');
-                updateModeLabels('day');
-            }
-            function updateModeLabels(mode) {
-                const dayLabel = document.querySelector('.day_mode');
-                const nightLabel = document.querySelector('.night_mode');
-                if (mode === 'day') {
-                    if (dayLabel) { dayLabel.style.color = '#64b5f6'; dayLabel.style.fontWeight = 'bold'; }
-                    if (nightLabel) { nightLabel.style.color = '#aaa'; nightLabel.style.fontWeight = 'normal'; }
-                } else {
-                    if (dayLabel) { dayLabel.style.color = '#aaa'; dayLabel.style.fontWeight = 'normal'; }
-                    if (nightLabel) { nightLabel.style.color = '#64b5f6'; nightLabel.style.fontWeight = 'bold'; }
-                }
-            }
-            agreeTimeSyncBtn?.addEventListener('click', () => handleTimeSyncChoice('agree'));
-            declineTimeSyncBtn?.addEventListener('click', () => handleTimeSyncChoice('decline'));
-            if (!checkStoredTimeSyncChoice()) showTimeSyncOverlay();
-            if (themeSwitch) {
-                themeSwitch.addEventListener('change', function() {
-                    userManuallySwitched = true;
-                    if (this.checked) switchToDarkTheme();
-                    else switchToLightTheme();
-                });
-            }
-        });
-    </script>
+        agreeTimeSyncBtn?.addEventListener('click', () => handleTimeSyncChoice('agree'));
+        declineTimeSyncBtn?.addEventListener('click', () => handleTimeSyncChoice('decline'));
+        if (!checkStoredTimeSyncChoice()) showTimeSyncOverlay();
+        if (themeSwitch) {
+            themeSwitch.addEventListener('change', function() {
+                userManuallySwitched = true;
+                if (this.checked) switchToDarkTheme();
+                else switchToLightTheme();
+            });
+        }
+    });
+</script>
 </body>
 </html>
