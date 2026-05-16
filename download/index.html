@@ -1174,7 +1174,7 @@
             if (pageItems.length === 0 && totalItems === 0 && currentSearch !== "") {
                 fileListContainer.innerHTML = `<div class="no-results"><i class="fas fa-search fa-3x mb-3"></i><h5>未找到匹配的资料</h5><p>尝试其他关键词</p></div>`;
             } else if (pageItems.length === 0 && allFiles.length === 0) {
-                fileListContainer.innerHTML = `<div class="no-results"><i class="fas fa-folder-open fa-3x mb-3"></i><h5>没有找到任何文件</h5><p>请确保已上传 files.json 且文件列表非空。</p></div>`;
+                fileListContainer.innerHTML = `<div class="no-results"><i class="fas fa-folder-open fa-3x mb-3"></i><h5>没有找到任何文件</h5><p>服务器错误。</p></div>`;
             } else {
                 let html = '';
                 for (let file of pageItems) {
@@ -1267,7 +1267,7 @@
                 renderFileList();
             } catch (err) {
                 console.error(err);
-                fileListContainer.innerHTML = `<div class="no-results"><i class="fas fa-exclamation-triangle fa-3x mb-3"></i><h5>无法加载文件列表</h5><p>请确保 /download/files.json 存在且格式正确。</p></div>`;
+                fileListContainer.innerHTML = `<div class="no-results"><i class="fas fa-exclamation-triangle fa-3x mb-3"></i><h5>无法加载文件列表</h5><p>服务器错误。</p></div>`;
                 hotContainer.innerHTML = '<div class="list-group-item">数据加载失败</div>';
                 isDataLoaded = true;
             }
