@@ -816,11 +816,22 @@
             margin-top: 15px;
         }
 
-        /* 让轮播占满可视高度（按需改成固定高度如 400px）*/
+        /* 让轮播只占视口五分之二高度 */
         #mainCarousel,
         #mainCarousel .carousel-inner,
         #mainCarousel .carousel-item {
-          height: 100vh; /* 或使用 min-height: 400px; */
+          height: 20vh;
+        }
+        
+        /* 隐藏的 Beijing 时间组件 */
+        .hidden-time-widget {
+          position: absolute;
+          left: -9999px;
+          top: -9999px;
+          width: 1px;
+          height: 1px;
+          overflow: hidden;
+          visibility: hidden;
         }
         
         /* 图片铺满容器并保持裁切（cover）*/
@@ -894,6 +905,19 @@
             </p>
         </div>
     </div>
+
+    <div class="hidden-time-widget" aria-hidden="true">
+        <a href="https://time.is/Wuhan" id="time_is_link" rel="nofollow" style="font-size:36px">北京时间:</a>
+        <span id="Wuhan_z43d" style="font-size:36px"></span>
+    </div>
+    <script src="//widget.time.is/t.js"></script>
+    <script>
+        try {
+            time_is_widget.init({Wuhan_z43d:{}});
+        } catch (e) {
+            console.warn('time.is widget init failed:', e);
+        }
+    </script>
 
     <!-- 顶部信息栏 -->
     <div class="top-bar">
@@ -969,7 +993,7 @@
     <div id="mainCarousel" class="carousel slide" data-bs-ride="carousel">
         <div class="carousel-inner">
             <div class="carousel-item active">
-                <img src="/crac/images/QSL卡片1.0正面.webp" class="d-block w-100" alt="QSL卡片1.0正面">
+                <img src="/images/QSL卡片1.0正面.webp" class="d-block w-100" alt="QSL卡片1.0正面">
                 <div class="d-flex align-items-center justify-content-center h-100" style="background: linear-gradient(rgba(0,0,0,0.3), rgba(0,0,0,0.3)), center/cover;">
                     <div class="carousel-caption text-center">
                         <h2>中国武汉·光谷星河</h2>
@@ -978,7 +1002,7 @@
                 </div>
             </div>
             <div class="carousel-item">
-                <img src="/crac/images/QSL卡片2.0正面.webp" class="d-block w-100" alt="QSL卡片2.0正面">
+                <img src="/images/QSL卡片2.0正面.webp" class="d-block w-100" alt="QSL卡片2.0正面">
                 <div class="d-flex align-items-center justify-content-center h-100" style="background: linear-gradient(rgba(0,0,0,0.3), rgba(0,0,0,0.3)), center/cover;">
                     <div class="carousel-caption text-center">
                         <h2>中国武汉·江汉关</h2>
@@ -1273,11 +1297,61 @@
                 }
             }
             
+            const beijingTimeSpan = document.getElementById('Wuhan_z43d');
+
+            function readBeijingTime() {
+                if (!beijingTimeSpan) {
+                    return null;
+                }
+                const text = beijingTimeSpan.textContent.trim();
+                if (!text) {
+                    return null;
+                }
+                const parts = text.split(':').map(part => Number(part));
+                if (parts.length !== 3 || parts.some(isNaN)) {
+                    return null;
+                }
+                return {
+                    hour: parts[0],
+                    minute: parts[1],
+                    second: parts[2],
+                    raw: text
+                };
+            }
+
+            function applyHourToTheme(hour, source) {
+                if (themeSwitch) {
+                    themeSwitch.checked = !(hour >= 6 && hour < 18);
+                    userManuallySwitched = false;
+                }
+                if (hour >= 6 && hour < 18) {
+                    switchToLightTheme();
+                    console.log(`${source} 时间: ${hour}:00，设置为白天模式`);
+                } else {
+                    switchToDarkTheme();
+                    console.log(`${source} 时间: ${hour}:00，设置为夜晚模式`);
+                }
+            }
+
+            function setThemeByBeijingTime() {
+                const beijingTime = readBeijingTime();
+                if (beijingTime) {
+                    applyHourToTheme(beijingTime.hour, '北京时间');
+                    return true;
+                }
+                return false;
+            }
+
             // 获取在线时间并设置主题
             function setThemeByOnlineTime() {
                 // 只有在用户没有手动切换时才自动更新
                 if (userManuallySwitched) {
                     console.log('用户已手动切换主题，跳过自动更新');
+                    return;
+                }
+
+                // 先尝试从隐藏的 Beijing 时间组件读取
+                if (setThemeByBeijingTime()) {
                     return;
                 }
                 
@@ -1294,25 +1368,7 @@
                         const currentHour = onlineTime.getHours();
                         
                         // 6-18时为白天模式，18-6时为夜晚模式
-                        if (currentHour >= 6 && currentHour < 18) {
-                            // 白天模式
-                            if (themeSwitch) {
-                                themeSwitch.checked = false;
-                                // 重置手动切换标志
-                                userManuallySwitched = false;
-                            }
-                            switchToLightTheme();
-                            console.log(`在线时间: ${onlineTime.toLocaleString('zh-CN')}, 设置为白天模式`);
-                        } else {
-                            // 夜晚模式
-                            if (themeSwitch) {
-                                themeSwitch.checked = true;
-                                // 重置手动切换标志
-                                userManuallySwitched = false;
-                            }
-                            switchToDarkTheme();
-                            console.log(`在线时间: ${onlineTime.toLocaleString('zh-CN')}, 设置为夜晚模式`);
-                        }
+                        applyHourToTheme(currentHour, '在线时间');
                     })
                     .catch(error => {
                         console.log('所有在线时间API请求失败，使用本地时间:', error);
