@@ -1,0 +1,1858 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>资料下载 - 中国无线电协会业余无线电爱好者BH6RKW</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <style>
+        :root {
+            --primary-blue: #1a5faf;
+            --secondary-blue: #0d4a8d;
+            --light-blue: #e8f1fc;
+            --dark-gray: #333;
+            --light-gray: #f5f5f5;
+        }
+        
+        body {
+            font-family: "Microsoft YaHei", sans-serif;
+            color: #333;
+            line-height: 1.6;
+            background-color: #f9f9f9;
+        }
+        
+        /* 顶部导航 */
+        .top-bar {
+            background-color: #f8f9fa;
+            font-size: 0.9rem;
+            padding: 5px 0;
+        }
+        
+        .top-bar a {
+            color: #666;
+            text-decoration: none;
+            margin: 0 10px;
+        }
+        
+        /* 主导航 */
+        .navbar {
+            background-color: white;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+            padding: 15px 0;
+        }
+        
+        .navbar-brand img {
+            height: 50px;
+        }
+        
+        .nav-link {
+            color: var(--dark-gray) !important;
+            font-weight: 500;
+            margin: 0 10px;
+            position: relative;
+        }
+        
+        .nav-link:hover {
+            color: var(--primary-blue) !important;
+        }
+        
+        .nav-link:hover::after {
+            content: '';
+            position: absolute;
+            bottom: -5px;
+            left: 0;
+            width: 100%;
+            height: 3px;
+            background-color: var(--primary-blue);
+        }
+        
+        /* 页面标题 */
+        .page-header {
+            background-color: var(--primary-blue);
+            color: white;
+            padding: 40px 0;
+            margin-bottom: 30px;
+        }
+        
+        .breadcrumb {
+            background: transparent;
+            margin-bottom: 0;
+            padding: 0;
+        }
+        
+        .breadcrumb a {
+            color: rgba(255, 255, 255, 0.8);
+        }
+        
+        /* 主要内容区域 */
+        .main-content {
+            padding: 20px 0 40px;
+        }
+        
+        .section-title {
+            position: relative;
+            margin-bottom: 25px;
+            padding-bottom: 15px;
+            font-weight: bold;
+            color: var(--primary-blue);
+        }
+        
+        .section-title::after {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            width: 60px;
+            height: 3px;
+            background-color: var(--primary-blue);
+        }
+        
+        /* 侧边栏 */
+        .sidebar {
+            background: white;
+            border-radius: 8px;
+            box-shadow: 0 2px 12px rgba(0, 0, 0, 0.1);
+            padding: 25px;
+            margin-bottom: 30px;
+        }
+        
+        .category-list {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+        }
+        
+        .category-list li {
+            margin-bottom: 12px;
+        }
+        
+        .category-list a {
+            display: block;
+            padding: 10px 15px;
+            color: #555;
+            text-decoration: none;
+            border-radius: 5px;
+            transition: all 0.3s;
+        }
+        
+        .category-list a:hover, .category-list a.active {
+            background-color: var(--light-blue);
+            color: var(--primary-blue);
+            font-weight: 500;
+        }
+        
+        .category-list .badge {
+            float: right;
+            background-color: var(--primary-blue);
+        }
+        
+        /* 下载列表 */
+        .downloads-container {
+            background: white;
+            border-radius: 8px;
+            box-shadow: 0 2px 12px rgba(0, 0, 0, 0.1);
+            padding: 25px;
+        }
+        
+         .search-box {
+            position: relative;
+            margin-bottom: 25px;
+        }
+        
+        .search-box input {
+            padding-right: 60%;
+            border-radius: 30px;
+        }
+        
+        .search-box button {
+            position: absolute;
+            right: 5px;
+            top: 5px;
+            border: none;
+            background: var(--primary-blue);
+            color: white;
+            border-radius: 50%;
+            width: 50px;
+            height: 50px;
+        }
+        
+        .download-item {
+            padding: 20px;
+            border-bottom: 1px solid #eee;
+            transition: background-color 0.3s;
+        }
+        
+        .download-item:hover {
+            background-color: #f9f9f9;
+        }
+        
+        .download-item:last-child {
+            border-bottom: none;
+        }
+        
+        .file-icon {
+            font-size: 2.2rem;
+            color: var(--primary-blue);
+            margin-right: 20px;
+        }
+        
+        .file-info h5 {
+            margin-bottom: 8px;
+            font-weight: 600;
+        }
+        
+        .file-meta {
+            color: #777;
+            font-size: 0.9rem;
+            margin-bottom: 10px;
+        }
+        
+        .file-meta span {
+            margin-right: 15px;
+        }
+        
+        .download-btn {
+            background-color: var(--primary-blue);
+            color: white;
+            border: none;
+            padding: 8px 18px;
+            border-radius: 4px;
+            font-size: 0.9rem;
+            transition: all 0.3s;
+        }
+        
+        .download-btn:hover {
+            background-color: var(--secondary-blue);
+        }
+        
+        /* 分页 */
+        .pagination {
+            margin-top: 30px;
+            justify-content: center;
+        }
+        
+        .page-link {
+            color: var(--primary-blue);
+        }
+        
+        .page-item.active .page-link {
+            background-color: var(--primary-blue);
+            border-color: var(--primary-blue);
+        }
+        
+        /* 页脚 */
+        footer {
+            background-color: var(--dark-gray);
+            color: white;
+            padding: 40px 0 20px;
+        }
+        
+        footer h5 {
+            color: #fff;
+            margin-bottom: 20px;
+            font-weight: 600;
+        }
+        
+        footer a {
+            color: #ccc;
+            text-decoration: none;
+        }
+        
+        footer a:hover {
+            color: white;
+        }
+        
+        .footer-bottom {
+            border-top: 1px solid #444;
+            padding-top: 20px;
+            margin-top: 30px;
+            font-size: 0.9rem;
+        }
+
+        .breadcrumb-item_a {
+            color: white;
+        }
+
+        .button_BH6RKW {
+            position: relative;
+            border: none;
+            background: transparent;
+            --stroke-color: #0000007c;
+            --ani-color: rgba(95, 3, 244, 0);
+            --color-gar: linear-gradient(90deg,#03a9f4,#f441a5,#ffeb3b,#03a9f4);
+            letter-spacing: 3px;
+            font-size: 2em;
+            text-transform: uppercase;
+            color: transparent;
+            -webkit-text-stroke: 1px var(--stroke-color);
+            cursor: pointer;
+            padding: 10px 20px;
+        }
+
+        .actual-text_BH6RKW {
+            display: inline-block;
+        }
+
+        .front-text_BH6RKW {
+            position: absolute;
+            top: 10px;
+            left: 0;
+            width: 100%;
+            background: var(--color-gar);
+            -webkit-background-clip: text;
+            background-clip: text;
+            background-size: 200%;
+            overflow: hidden;
+            transition: all 1s;
+            animation: 8s ani linear infinite;
+            border-bottom: 2px solid transparent;
+            clip-path: polygon(0 0, 0% 0, 0% 100%, 0 100%);
+        }
+
+        .button_BH6RKW:hover .front-text_BH6RKW {
+            clip-path: polygon(0 0, 100% 0, 100% 100%, 0 100%);
+            border-bottom: 2px solid #03a9f4;
+            -webkit-text-stroke: 1px var(--ani-color);
+        }
+
+        /* Cookies 遮罩层 */
+        .cookies-overlay_cookies {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.8);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 9999;
+        }
+
+        /* Cookies 卡片样式 */
+        .card_cookies {
+            width: 300px;
+            height: 220px;
+            background-color: rgb(255, 255, 255);
+            border-radius: 8px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: 20px 30px;
+            gap: 13px;
+            position: relative;
+            overflow: hidden;
+            box-shadow: 2px 2px 20px rgba(0, 0, 0, 0.062);
+        }
+
+        #cookieSvg_cookies {
+            width: 50px;
+        }
+
+        #cookieSvg_cookies g path {
+            fill: rgb(97, 81, 81);
+        }
+
+        .cookieHeading_cookies {
+            font-size: 1.2em;
+            font-weight: 800;
+            color: rgb(26, 26, 26);
+        }
+
+        .cookieDescription_cookies {
+            text-align: center;
+            font-size: 0.7em;
+            font-weight: 600;
+            color: rgb(99, 99, 99);
+        }
+
+        .cookieDescription_cookies a {
+            --tw-text-opacity: 1;
+            color: rgb(59 130 246);
+        }
+
+        .cookieDescription_cookies a:hover {
+            -webkit-text-decoration-line: underline;
+            text-decoration-line: underline;
+        }
+
+        .buttonContainer_cookies {
+            display: flex;
+            gap: 20px;
+            flex-direction: row;
+        }
+
+        .acceptButton_cookies {
+            width: 80px;
+            height: 30px;
+            background-color: #7b57ff;
+            transition-duration: .2s;
+            border: none;
+            color: rgb(241, 241, 241);
+            cursor: pointer;
+            font-weight: 600;
+            border-radius: 20px;
+            box-shadow: 0 4px 6px -1px #977ef3, 0 2px 4px -1px #977ef3;
+            transition: all .6s ease;
+        }
+
+        .declineButton_cookies {
+            width: 80px;
+            height: 30px;
+            background-color: #dadada;
+            transition-duration: .2s;
+            color: rgb(46, 46, 46);
+            border: none;
+            cursor: not-allowed;
+            font-weight: 600;
+            border-radius: 20px;
+            box-shadow: 0 4px 6px -1px #bebdbd, 0 2px 4px -1px #bebdbd;
+            transition: all .6s ease;
+        }
+
+        .declineButton_cookies:hover {
+            background-color: #ebebeb;
+            box-shadow: 0 10px 15px -3px #bebdbd, 0 4px 6px -2px #bebdbd;
+            transition-duration: .2s;
+        }
+
+        .acceptButton_cookies:hover {
+            background-color: #9173ff;
+            box-shadow: 0 10px 15px -3px #977ef3, 0 4px 6px -2px #977ef3;
+            transition-duration: .2s;
+        }
+
+        @keyframes ani {
+            0% {
+                background-position: 0%;
+            }
+            50% {
+                background-position: 400%;
+            }
+            100% {
+                background-position: 0%;
+            }
+        }
+
+        .theme-switch {
+            position: absolute;
+            right: 65px;
+            --toggle-size: 10px;
+            /* the size is adjusted using font-size,
+                this is not transform scale,
+                so you can choose any size */
+            --container-width: 5.625em;
+            --container-height: 2.5em;
+            --container-radius: 6.25em;
+            /* radius 0 - minecraft mode :) */
+            --container-light-bg: #3D7EAE;
+            --container-night-bg: #1D1F2C;
+            --circle-container-diameter: 3.375em;
+            --sun-moon-diameter: 2.125em;
+            --sun-bg: #ECCA2F;
+            --moon-bg: #C4C9D1;
+            --spot-color: #959DB1;
+            --circle-container-offset: calc((var(--circle-container-diameter) - var(--container-height)) / 2 * -1);
+            --stars-color: #fff;
+            --clouds-color: #F3FDFF;
+            --back-clouds-color: #AACADF;
+            --transition: .5s cubic-bezier(0, -0.02, 0.4, 1.25);
+            --circle-transition: .3s cubic-bezier(0, -0.02, 0.35, 1.17);
+        }
+
+        .theme-switch, .theme-switch *, .theme-switch *::before, .theme-switch *::after {
+            -webkit-box-sizing: border-box;
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-size: var(--toggle-size);
+        }
+
+        .theme-switch__container {
+            width: var(--container-width);
+            height: var(--container-height);
+            background-color: var(--container-light-bg);
+            border-radius: var(--container-radius);
+            overflow: hidden;
+            cursor: pointer;
+            -webkit-box-shadow: 0em -0.062em 0.062em rgba(0, 0, 0, 0.25), 0em 0.062em 0.125em rgba(255, 255, 255, 0.94);
+            box-shadow: 0em -0.062em 0.062em rgba(0, 0, 0, 0.25), 0em 0.062em 0.125em rgba(255, 255, 255, 0.94);
+            -webkit-transition: var(--transition);
+            -o-transition: var(--transition);
+            transition: var(--transition);
+            position: relative;
+        }
+
+        .theme-switch__container::before {
+            content: "";
+            position: absolute;
+            z-index: 1;
+            inset: 0;
+            -webkit-box-shadow: 0em 0.05em 0.187em rgba(0, 0, 0, 0.25) inset, 0em 0.05em 0.187em rgba(0, 0, 0, 0.25) inset;
+            box-shadow: 0em 0.05em 0.187em rgba(0, 0, 0, 0.25) inset, 0em 0.05em 0.187em rgba(0, 0, 0, 0.25) inset;
+            border-radius: var(--container-radius)
+        }
+
+        .theme-switch__checkbox {
+            display: none;
+        }
+
+        .theme-switch__circle-container {
+            width: var(--circle-container-diameter);
+            height: var(--circle-container-diameter);
+            background-color: rgba(255, 255, 255, 0.1);
+            position: absolute;
+            left: var(--circle-container-offset);
+            top: var(--circle-container-offset);
+            border-radius: var(--container-radius);
+            -webkit-box-shadow: inset 0 0 0 3.375em rgba(255, 255, 255, 0.1), inset 0 0 0 3.375em rgba(255, 255, 255, 0.1), 0 0 0 0.625em rgba(255, 255, 255, 0.1), 0 0 0 1.25em rgba(255, 255, 255, 0.1);
+            box-shadow: inset 0 0 0 3.375em rgba(255, 255, 255, 0.1), inset 0 0 0 3.375em rgba(255, 255, 255, 0.1), 0 0 0 0.625em rgba(255, 255, 255, 0.1), 0 0 0 1.25em rgba(255, 255, 255, 0.1);
+            display: -webkit-box;
+            display: -ms-flexbox;
+            display: flex;
+            -webkit-transition: var(--circle-transition);
+            -o-transition: var(--circle-transition);
+            transition: var(--circle-transition);
+            pointer-events: none;
+        }
+
+        .theme-switch__sun-moon-container {
+            pointer-events: auto;
+            position: relative;
+            z-index: 2;
+            width: var(--sun-moon-diameter);
+            height: var(--sun-moon-diameter);
+            margin: auto;
+            border-radius: var(--container-radius);
+            background-color: var(--sun-bg);
+            -webkit-box-shadow: 0.062em 0.062em 0.062em 0em rgba(254, 255, 239, 0.61) inset, 0em -0.062em 0.062em 0em #a1872a inset;
+            box-shadow: 0.062em 0.062em 0.062em 0em rgba(254, 255, 239, 0.61) inset, 0em -0.062em 0.062em 0em #a1872a inset;
+            -webkit-filter: drop-shadow(0.062em 0.125em 0.125em rgba(0, 0, 0, 0.25)) drop-shadow(0em 0.062em 0.125em rgba(0, 0, 0, 0.25));
+            filter: drop-shadow(0.062em 0.125em 0.125em rgba(0, 0, 0, 0.25)) drop-shadow(0em 0.062em 0.125em rgba(0, 0, 0, 0.25));
+            overflow: hidden;
+            -webkit-transition: var(--transition);
+            -o-transition: var(--transition);
+            transition: var(--transition);
+        }
+
+        .theme-switch__moon {
+            -webkit-transform: translateX(100%);
+            -ms-transform: translateX(100%);
+            transform: translateX(100%);
+            width: 100%;
+            height: 100%;
+            background-color: var(--moon-bg);
+            border-radius: inherit;
+            -webkit-box-shadow: 0.062em 0.062em 0.062em 0em rgba(254, 255, 239, 0.61) inset, 0em -0.062em 0.062em 0em #969696 inset;
+            box-shadow: 0.062em 0.062em 0.062em 0em rgba(254, 255, 239, 0.61) inset, 0em -0.062em 0.062em 0em #969696 inset;
+            -webkit-transition: var(--transition);
+            -o-transition: var(--transition);
+            transition: var(--transition);
+            position: relative;
+        }
+
+        .theme-switch__spot {
+            position: absolute;
+            top: 0.75em;
+            left: 0.312em;
+            width: 0.75em;
+            height: 0.75em;
+            border-radius: var(--container-radius);
+            background-color: var(--spot-color);
+            -webkit-box-shadow: 0em 0.0312em 0.062em rgba(0, 0, 0, 0.25) inset;
+            box-shadow: 0em 0.0312em 0.062em rgba(0, 0, 0, 0.25) inset;
+        }
+
+        .theme-switch__spot:nth-of-type(2) {
+            width: 0.375em;
+            height: 0.375em;
+            top: 0.937em;
+            left: 1.375em;
+        }
+
+        .theme-switch__spot:nth-last-of-type(3) {
+            width: 0.25em;
+            height: 0.25em;
+            top: 0.312em;
+            left: 0.812em;
+        }
+
+        .theme-switch__clouds {
+            width: 1.25em;
+            height: 1.25em;
+            background-color: var(--clouds-color);
+            border-radius: var(--container-radius);
+            position: absolute;
+            bottom: -0.625em;
+            left: 0.312em;
+            -webkit-box-shadow: 0.937em 0.312em var(--clouds-color), -0.312em -0.312em var(--back-clouds-color), 1.437em 0.375em var(--clouds-color), 0.5em -0.125em var(--back-clouds-color), 2.187em 0 var(--clouds-color), 1.25em -0.062em var(--back-clouds-color), 2.937em 0.312em var(--clouds-color), 2em -0.312em var(--back-clouds-color), 3.625em -0.062em var(--clouds-color), 2.625em 0em var(--back-clouds-color), 4.5em -0.312em var(--clouds-color), 3.375em -0.437em var(--back-clouds-color), 4.625em -1.75em 0 0.437em var(--clouds-color), 4em -0.625em var(--back-clouds-color), 4.125em -2.125em 0 0.437em var(--back-clouds-color);
+            box-shadow: 0.937em 0.312em var(--clouds-color), -0.312em -0.312em var(--back-clouds-color), 1.437em 0.375em var(--clouds-color), 0.5em -0.125em var(--back-clouds-color), 2.187em 0 var(--clouds-color), 1.25em -0.062em var(--back-clouds-color), 2.937em 0.312em var(--clouds-color), 2em -0.312em var(--back-clouds-color), 3.625em -0.062em var(--clouds-color), 2.625em 0em var(--back-clouds-color), 4.5em -0.312em var(--clouds-color), 3.375em -0.437em var(--back-clouds-color), 4.625em -1.75em 0 0.437em var(--clouds-color), 4em -0.625em var(--back-clouds-color), 4.125em -2.125em 0 0.437em var(--back-clouds-color);
+            -webkit-transition: 0.5s cubic-bezier(0, -0.02, 0.4, 1.25);
+            -o-transition: 0.5s cubic-bezier(0, -0.02, 0.4, 1.25);
+            transition: 0.5s cubic-bezier(0, -0.02, 0.4, 1.25);
+        }
+
+        .theme-switch__stars-container {
+            position: absolute;
+            color: var(--stars-color);
+            top: -100%;
+            left: 0.312em;
+            width: 2.75em;
+            height: auto;
+            -webkit-transition: var(--transition);
+            -o-transition: var(--transition);
+            transition: var(--transition);
+        }
+
+        /* actions */
+
+        .theme-switch__checkbox:checked + .theme-switch__container {
+            background-color: var(--container-night-bg);
+        }
+
+        .theme-switch__checkbox:checked + .theme-switch__container .theme-switch__circle-container {
+            left: calc(100% - var(--circle-container-offset) - var(--circle-container-diameter));
+        }
+
+        .theme-switch__checkbox:checked + .theme-switch__container .theme-switch__circle-container:hover {
+            left: calc(100% - var(--circle-container-offset) - var(--circle-container-diameter) - 0.187em)
+        }
+
+        .theme-switch__circle-container:hover {
+            left: calc(var(--circle-container-offset) + 0.187em);
+        }
+
+        .theme-switch__checkbox:checked + .theme-switch__container .theme-switch__moon {
+            -webkit-transform: translate(0);
+            -ms-transform: translate(0);
+            transform: translate(0);
+        }
+
+        .theme-switch__checkbox:checked + .theme-switch__container .theme-switch__clouds {
+            bottom: -4.062em;
+        }
+
+        .theme-switch__checkbox:checked + .theme-switch__container .theme-switch__stars-container {
+            top: 50%;
+            -webkit-transform: translateY(-50%);
+            -ms-transform: translateY(-50%);
+            transform: translateY(-50%);
+        }
+
+        .day_mode {
+            position: absolute;
+            right: 125px;
+        }
+
+        .night_mode {
+            position: absolute;
+            right: 5px;
+        }
+
+        /* 白天/黑夜模式标签 */
+        .dark-theme .day_mode {
+            color: #aaa;
+        }
+
+        .dark-theme .night_mode {
+            color: #64b5f6;
+            font-weight: bold;
+        }
+
+        .day_mode {
+            color: #64b5f6;
+            font-weight: bold;
+        }
+
+        /* 暗色模式样式 */
+        .dark-theme {
+            background-color: #121212;
+            color: #e0e0e0;
+        }
+
+        .dark-theme .top-bar {
+            background-color: #1e1e1e;
+            color: #e0e0e0;
+        }
+
+        .dark-theme .top-bar a {
+            color: #b0b0b0;
+        }
+
+        .dark-theme .navbar {
+            background-color: #1e1e1e;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.3);
+        }
+
+        .dark-theme .nav-link {
+            color: #e0e0e0 !important;
+        }
+
+        .dark-theme .nav-link:hover {
+            color: #64b5f6 !important;
+        }
+
+        .dark-theme .nav-link:hover::after {
+            background-color: #64b5f6;
+        }
+
+        .dark-theme .page-header {
+            background-color: #0d4a8d;
+            color: white;
+        }
+
+        .dark-theme .breadcrumb a {
+            color: rgba(255, 255, 255, 0.8);
+        }
+
+        .dark-theme .breadcrumb-item_a {
+            color: white;
+        }
+
+        .dark-theme .download_h1 {
+            color: white;
+        }
+
+        .dark-theme .main-content {
+            background-color: #121212;
+        }
+
+        .dark-theme .section-title {
+            color: #64b5f6;
+        }
+
+        .dark-theme .section-title::after {
+            background-color: #64b5f6;
+        }
+
+        .dark-theme .sidebar {
+            background: #1e1e1e;
+            box-shadow: 0 2px 12px rgba(0, 0, 0, 0.3);
+        }
+
+        .dark-theme .category-list a {
+            color: #b0b0b0;
+        }
+
+        .dark-theme .category-list a:hover, 
+        .dark-theme .category-list a.active {
+            background-color: #2a2a2a;
+            color: #64b5f6;
+        }
+
+        .dark-theme .category-list .badge {
+            background-color: #64b5f6;
+        }
+
+        .dark-theme .list-group-item {
+            background-color: #1e1e1e;
+            border-color: #333;
+            color: #e0e0e0;
+        }
+
+        .dark-theme .list-group-item:hover {
+            background-color: #2a2a2a;
+        }
+
+        .dark-theme .text-muted {
+            color: #aaa !important;
+        }
+
+        .dark-theme .downloads-container {
+            background: #1e1e1e;
+            box-shadow: 0 2px 12px rgba(0, 0, 0, 0.3);
+        }
+
+        .dark-theme .search-box input {
+            background-color: #2a2a2a;
+            border-color: #444;
+            color: #e0e0e0;
+        }
+
+        .dark-theme .search-box input::placeholder {
+            color: #888;
+        }
+
+        .dark-theme .search-box button {
+            background: #64b5f6;
+        }
+
+        .dark-theme .download-item {
+            border-bottom: 1px solid #333;
+        }
+
+        .dark-theme .download-item:hover {
+            background-color: #2a2a2a;
+        }
+
+        .dark-theme .file-icon {
+            color: #64b5f6;
+        }
+
+        .dark-theme .file-meta {
+            color: #aaa;
+        }
+
+        .dark-theme .file-desc {
+            color: #b0b0b0;
+        }
+
+        .dark-theme .download-btn {
+            background-color: #64b5f6;
+            color: white;
+        }
+
+        .dark-theme .download-btn:hover {
+            background-color: #4a9de6;
+        }
+
+        .dark-theme .page-link {
+            background-color: #1e1e1e;
+            border-color: #444;
+            color: #64b5f6;
+        }
+
+        .dark-theme .page-item.active .page-link {
+            background-color: #64b5f6;
+            border-color: #64b5f6;
+        }
+
+        .dark-theme .page-link:hover {
+            background-color: #2a2a2a;
+            border-color: #555;
+            color: #64b5f6;
+        }
+
+        .dark-theme footer {
+            background-color: #0a0a0a;
+        }
+
+        .dark-theme footer h5 {
+            color: #fff;
+        }
+
+        .dark-theme footer a {
+            color: #aaa;
+        }
+
+        .dark-theme footer a:hover {
+            color: #fff;
+        }
+
+        .dark-theme .footer-bottom {
+            border-top: 1px solid #333;
+        }
+
+        .dark-theme .button_BH6RKW {
+            --stroke-color: #ffffff7c;
+        }
+
+        /* 白天/黑夜模式标签 */
+        .dark-theme .day_mode {
+            color: #aaa;
+        }
+
+        .dark-theme .night_mode {
+            color: #64b5f6;
+            font-weight: bold;
+        }
+
+        .dark-theme .day_mode {
+            color: #aaa;
+        }
+
+        /* 表单元素暗色模式 */
+        .dark-theme .form-control {
+            background-color: #2a2a2a;
+            border-color: #444;
+            color: #e0e0e0;
+        }
+
+        .dark-theme .form-control:focus {
+            background-color: #2a2a2a;
+            border-color: #64b5f6;
+            color: #e0e0e0;
+            box-shadow: 0 0 0 0.2rem rgba(100, 181, 246, 0.25);
+        }
+
+        /* 时间同步弹窗样式 */
+        .time-sync-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.85);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 10000;
+            font-family: "Microsoft YaHei", sans-serif;
+        }
+        
+        .time-sync-card {
+            width: 400px;
+            max-width: 90%;
+            background-color: white;
+            border-radius: 12px;
+            padding: 30px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+            text-align: center;
+        }
+        
+        .time-sync-icon {
+            font-size: 3rem;
+            color: #4a90e2;
+            margin-bottom: 20px;
+        }
+        
+        .time-sync-title {
+            font-size: 1.5rem;
+            font-weight: bold;
+            color: #333;
+            margin-bottom: 15px;
+        }
+        
+        .time-sync-description {
+            color: #666;
+            line-height: 1.6;
+            margin-bottom: 25px;
+            text-align: left;
+        }
+        
+        .time-sync-features {
+            background-color: #f8f9fa;
+            border-radius: 8px;
+            padding: 15px;
+            margin-bottom: 25px;
+            text-align: left;
+        }
+        
+        .time-sync-feature {
+            display: flex;
+            align-items: center;
+            margin-bottom: 10px;
+        }
+        
+        .time-sync-feature:last-child {
+            margin-bottom: 0;
+        }
+        
+        .feature-icon {
+            color: #4a90e2;
+            margin-right: 10px;
+            font-size: 1.2rem;
+        }
+        
+        .time-sync-buttons {
+            display: flex;
+            gap: 15px;
+        }
+        
+        .time-sync-btn {
+            flex: 1;
+            padding: 12px 20px;
+            border: none;
+            border-radius: 6px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+        
+        .time-sync-agree {
+            background-color: #4a90e2;
+            color: white;
+        }
+        
+        .time-sync-agree:hover {
+            background-color: #3a80d2;
+        }
+        
+        .time-sync-decline {
+            background-color: #f1f1f1;
+            color: #333;
+        }
+        
+        .time-sync-decline:hover {
+            background-color: #e1e1e1;
+        }
+        
+        .time-sync-note {
+            font-size: 0.85rem;
+            color: #888;
+            margin-top: 15px;
+        }
+    </style>
+</head>
+<body>
+    <!-- 时间同步同意弹窗 -->
+    <div class="time-sync-overlay" id="timeSyncOverlay" style="display: none;">
+        <div class="time-sync-card">
+            <div class="time-sync-icon">
+                <i class="fas fa-sync-alt"></i>
+            </div>
+            <h2 class="time-sync-title">时间同步设置</h2>
+            <p class="time-sync-description">
+                为了确保网站主题能根据准确的时间自动切换，我们需要获取准确的当前时间。
+            </p>
+            
+            <div class="time-sync-features">
+                <div class="time-sync-feature">
+                    <i class="fas fa-check-circle feature-icon"></i>
+                    <span>每分钟自动同步时间</span>
+                </div>
+                <div class="time-sync-feature">
+                    <i class="fas fa-check-circle feature-icon"></i>
+                    <span>根据时间自动切换白天/夜晚模式</span>
+                </div>
+                <div class="time-sync-feature">
+                    <i class="fas fa-exclamation-triangle feature-icon"></i>
+                    <span>会消耗少量数据流量</span>
+                </div>
+            </div>
+            
+            <div class="time-sync-buttons">
+                <button class="time-sync-btn time-sync-decline" id="declineTimeSync">使用本地时间</button>
+                <button class="time-sync-btn time-sync-agree" id="agreeTimeSync">同步在线时间</button>
+            </div>
+            
+            <p class="time-sync-note">
+                您可以在下次访问网站时重新选择此设置
+            </p>
+        </div>
+    </div>
+
+    <!-- 顶部信息栏 -->
+    <div class="top-bar">
+        <div class="container">
+            <div class="d-flex justify-content-between">
+                <div>
+                    <span>欢迎访问中国无线电爱好者BH6RKW的网页</span>
+                    <span class="day_mode">白天模式</span>
+                    <label class="theme-switch">
+                        <input type="checkbox" class="theme-switch__checkbox">
+                        <div class="theme-switch__container">
+                            <div class="theme-switch__clouds"></div>
+                                <div class="theme-switch__stars-container">
+                                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 144 55" fill="none">
+                                    <path fill-rule="evenodd" clip-rule="evenodd" d="M135.831 3.00688C135.055 3.85027 134.111 4.29946 133 4.35447C134.111 4.40947 135.055 4.85867 135.831 5.71123C136.607 6.55462 136.996 7.56303 136.996 8.72727C136.996 7.95722 137.172 7.25134 137.525 6.59129C137.886 5.93124 138.372 5.39954 138.98 5.00535C139.598 4.60199 140.268 4.39114 141 4.35447C139.88 4.2903 138.936 3.85027 138.16 3.00688C137.384 2.16348 136.996 1.16425 136.996 0C136.996 1.16425 136.607 2.16348 135.831 3.00688ZM31 23.3545C32.1114 23.2995 33.0551 22.8503 33.8313 22.0069C34.6075 21.1635 34.9956 20.1642 34.9956 19C34.9956 20.1642 35.3837 21.1635 36.1599 22.0069C36.9361 22.8503 37.8798 23.2903 39 23.3545C38.2679 23.3911 37.5976 23.602 36.9802 24.0053C36.3716 24.3995 35.8864 24.9312 35.5248 25.5913C35.172 26.2513 34.9956 26.9572 34.9956 27.7273C34.9956 26.563 34.6075 25.5546 33.8313 24.7112C33.0551 23.8587 32.1114 23.4095 31 23.3545ZM0 36.3545C1.11136 36.2995 2.05513 35.8503 2.83131 35.0069C3.6075 34.1635 3.99559 33.1642 3.99559 32C3.99559 33.1642 4.38368 34.1635 5.15987 35.0069C5.93605 35.8503 6.87982 36.2903 8 36.3545C7.26792 36.3911 6.59757 36.602 5.98015 37.0053C5.37155 37.3995 4.88644 37.9312 4.52481 38.5913C4.172 39.2513 3.99559 39.9572 3.99559 40.7273C3.99559 39.563 3.6075 38.5546 2.83131 37.7112C2.05513 36.8587 1.11136 36.4095 0 36.3545ZM56.8313 24.0069C56.0551 24.8503 55.1114 25.2995 54 25.3545C55.1114 25.4095 56.0551 25.8587 56.8313 26.7112C57.6075 27.5546 57.9956 28.563 57.9956 29.7273C57.9956 28.9572 58.172 28.2513 58.5248 27.5913C58.8864 26.9312 59.3716 26.3995 59.9802 26.0053C60.5976 25.602 61.2679 25.3911 62 25.3545C60.8798 25.2903 59.9361 24.8503 59.1599 24.0069C58.3837 23.1635 57.9956 22.1642 57.9956 21C57.9956 22.1642 57.6075 23.1635 56.8313 24.0069ZM81 25.3545C82.1114 25.2995 83.0551 24.8503 83.8313 24.0069C84.6075 23.1635 84.9956 22.1642 84.9956 21C84.9956 22.1642 85.3837 23.1635 86.1599 24.0069C86.9361 24.8503 87.8798 25.2903 89 25.3545C88.2679 25.3911 87.5976 25.602 86.9802 26.0053C86.3716 26.3995 85.8864 26.9312 85.5248 27.5913C85.172 28.2513 84.9956 28.9572 84.9956 29.7273C84.9956 28.563 84.6075 27.5546 83.8313 26.7112C83.0551 25.8587 82.1114 25.4095 81 25.3545ZM136 36.3545C137.111 36.2995 138.055 35.8503 138.831 35.0069C139.607 34.1635 139.996 33.1642 139.996 32C139.996 33.1642 140.384 34.1635 141.16 35.0069C141.936 35.8503 142.88 36.2903 144 36.3545C143.268 36.3911 142.598 36.602 141.98 37.0053C141.372 37.3995 140.886 37.9312 140.525 38.5913C140.172 39.2513 139.996 39.9572 139.996 40.7273C139.996 39.563 139.607 38.5546 138.831 37.7112C138.055 36.8587 137.111 36.4095 136 36.3545ZM101.831 49.0069C101.055 49.8503 100.111 50.2995 99 50.3545C100.111 50.4095 101.055 50.8587 101.831 51.7112C102.607 52.5546 102.996 53.563 102.996 54.7273C102.996 53.9572 103.172 53.2513 103.525 52.5913C103.886 51.9312 104.372 51.3995 104.98 51.0053C105.598 50.602 106.268 50.3911 107 50.3545C105.88 50.2903 104.936 49.8503 104.16 49.0069C103.384 48.1635 102.996 47.1642 102.996 46C102.996 47.1642 102.607 48.1635 101.831 49.0069Z" fill="currentColor"></path>
+                                </svg>
+                            </div>
+                            <div class="theme-switch__circle-container">
+                                <div class="theme-switch__sun-moon-container">
+                                    <div class="theme-switch__moon">
+                                    <div class="theme-switch__spot"></div>
+                                    <div class="theme-switch__spot"></div>
+                                    <div class="theme-switch__spot"></div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </label>
+                    <span class="night_mode">夜晚模式</span>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 主导航 -->
+    <nav class="navbar navbar-expand-lg sticky-top">
+        <div class="container">
+            <button class="button_BH6RKW" data-text="Awesome">
+                <span class="actual-text_BH6RKW">&nbsp;BH6RKW&nbsp;</span>
+                <span aria-hidden="true" class="front-text_BH6RKW">&nbsp;BH6RKW&nbsp;</span>
+            </button>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav ms-auto">
+                    <li class="nav-item">
+                        <a class="nav-link active" href="https://bh6rkw.dpdns.org">首页</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="https://bh6rkw.dpdns.org/about/index.html">关于我</a>
+                    </li>
+                    <!-- <li class="nav-item">
+                        <a class="nav-link" href="https://bh6rkw.dpdns.org/news">新闻动态</a>
+                    </li> -->
+                    <li class="nav-item">
+                        <a class="nav-link" href="https://bh6rkw.dpdns.org/laws/index.html">政策法规</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="https://exam.bh6rkw.dpdns.org">模拟考试</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="https://bh6rkw.dpdns.org/download/index.html">资料下载</a>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+
+    <!-- 页面标题 -->
+    <div class="page-header">
+        <div class="container">
+            <nav aria-label="breadcrumb">
+                <ol class="breadcrumb">
+                    <li class="breadcrumb-item"><a href="https://bh6rkw.dpdns.org/index.html">首页</a></li>
+                    <li class="breadcrumb-item_a" aria-current="page">&nbsp;/&nbsp;资料下载</li>
+                </ol>
+            </nav>
+            <h1 class="download_h1">资料下载</h1>
+            <p class="lead">获取业余无线电相关文档、资料和资源</p>
+        </div>
+    </div>
+
+    <!-- 主要内容 -->
+    <div class="main-content">
+        <div class="container">
+            <div class="row">
+                <!-- 侧边栏 -->
+                <div class="col-lg-3">
+                    <div class="sidebar">
+                        <!-- <h4 class="section-title">资料分类</h4>
+                        <ul class="category-list">
+                            <li><a href="#" class="active">全部资料 <span class="badge rounded-pill">16</span></a></li>
+                            <li><a href="#">政策法规 <span class="badge rounded-pill">3</span></a></li>
+                            <li><a href="#">考试资料 <span class="badge rounded-pill">5</span></a></li>
+                            <li><a href="#">申请表格 <span class="badge rounded-pill">2</span></a></li>
+                            <li><a href="#">技术文档 <span class="badge rounded-pill">0</span></a></li>
+                            <li><a href="#">操作指南 <span class="badge rounded-pill">0</span></a></li>
+                            <li><a href="#">QSL卡片 <span class="badge rounded-pill">6</span></a></li>
+                        </ul> -->
+                        
+                        <h4 class="section-title mt-4">热门下载</h4>
+                        <div class="list-group">
+                            <a href="https://bh6rkw.dpdns.org/download/17.xls" class="list-group-item list-group-item-action">
+                                <div class="d-flex w-100 justify-content-between">
+                                    <h6 class="mb-1">湖北省国无管表17</h6>
+                                    <small>3天前</small>
+                                </div>
+                                <small class="text-muted">XLS(Excel表格), 25KB</small>
+                            </a>
+                            <a href="https://bh6rkw.dpdns.org/download/19.xls" class="list-group-item list-group-item-action">
+                                <div class="d-flex w-100 justify-content-between">
+                                    <h6 class="mb-1">湖北省国无管表19</h6>
+                                    <small>1周前</small>
+                                </div>
+                                <small class="text-muted">XLS(Excel表格), 21KB</small>
+                            </a>
+                            <a href="https://bh6rkw.dpdns.org/download/跨省说明材料.doc" class="list-group-item list-group-item-action">
+                                <div class="d-flex w-100 justify-content-between">
+                                    <h6 class="mb-1">湖北省补充性说明材料</h6>
+                                    <small>2周前</small>
+                                </div>
+                                <small class="text-muted">DOC(Word文档), 24.5MB</small>
+                            </a>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- 下载列表 -->
+                <div class="col-lg-9">
+                    <div class="downloads-container">
+                        <!-- 搜索框部分 -->
+                        <div class="search-box">
+                        <input type="text" id="searchInput" placeholder="&nbsp;&nbsp;&nbsp;&nbsp;搜索资料...">
+                        <button id="searchButton">搜索</button>
+                        </div>
+                        
+                        <div class="download-list">
+                            <!-- 下载项目1 -->
+                            <div class="download-item d-flex">
+                                <div class="file-icon">
+                                    <i class="far fa-file-pdf"></i>
+                                </div>
+                                <div class="file-info flex-grow-1">
+                                    <h5>湖北省国无管表17</h5>
+                                    <div class="file-meta">
+                                        <span><i class="far fa-file-alt me-1"></i> Word文档</span>
+                                        <span><i class="far fa-clock me-1"></i> 2025-09-07</span>
+                                        <span><i class="fas fa-weight-hanging me-1"></i> 25KB</span>
+                                    </div>
+                                    <p class="file-desc">1、国无管表17中右下角签名盖章处需个人手签并按手印。2、国无管表17中，个人申请时常住地址、联系地址、邮编都必须填报，且地址要详细至门牌号。3、国无管表17中，个人设置车载台时，若车牌有信息变更，须在国无管表17中“其他事项说明”栏备注。4、国无管表17中，所持操作技术能力证明文件及编号是个人通过资格考试颁发的证书编号，非填报电台执照编号。</p>
+                                </div>
+                                <div class="file-action">
+                                    <a href="https://bh6rkw.dpdns.org/download/17.xls">
+                                    <button class="download-btn"><i class="fas fa-download me-1"></i> 下载</button>
+                                    </a>
+                                </div>
+                            </div>
+                            
+                            <!-- 下载项目2 -->
+                            <div class="download-item d-flex">
+                                <div class="file-icon">
+                                    <i class="far fa-file-word"></i>
+                                </div>
+                                <div class="file-info flex-grow-1">
+                                    <h5>湖北省国无管表19</h5>
+                                    <div class="file-meta">
+                                        <span><i class="far fa-file-word me-1"></i> Word文档</span>
+                                        <span><i class="far fa-clock me-1"></i> 2025-09-07</span>
+                                        <span><i class="fas fa-weight-hanging me-1"></i> 21KB</span>
+                                    </div>
+                                    <p class="file-desc">1、国无管表19中,设台设备工作频段须在国家规定的业余频段，具有A类《业余无线电台操作证书》，设置A类业余无线电台可以在30-3000MHZ范围内的各业余业务和卫星业余业务频段内发射，最大发射功率不大于25W。具有B类《业余无线电台操作证书》，设置B类业余无线电台可以在各业余业务和卫星业余业务频段内发射工作，30MHZ以上频段最大发射频段不大于25W。业余手持台最大发射功率一般不超过5W，车载台一般不超过25W；设置15W以上短波台时由国家无线电管理机构实施许可,详情可咨询电话010-68206241,王老师。2、国无管表19中,设台设备数据栏必须填报设备型号、生产厂家、工信部核准后的核准代码、出厂编号，数据务必保证准确，否则影响数据库正常录入，进而影响许可进度。3、若停用已设业余电台，务必填报国无管表19中④ 停用设备数据栏。</p>
+                                </div>
+                                <div class="file-action">
+                                    <a href="https://bh6rkw.dpdns.org/download/19.xls">
+                                    <button class="download-btn"><i class="fas fa-download me-1"></i> 下载</button>
+                                    </a>
+                                </div>
+                            </div>
+                            
+                            <!-- 下载项目3 -->
+                            <div class="download-item d-flex">
+                                <div class="file-icon">
+                                    <i class="far fa-file-pdf"></i>
+                                </div>
+                                <div class="file-info flex-grow-1">
+                                    <h5>业余无线电操作能力考试A类题库</h5>
+                                    <div class="file-meta">
+                                        <span><i class="far fa-file-alt me-1"></i> PDF文档</span>
+                                        <span><i class="far fa-clock me-1"></i> 2025-09-07</span>
+                                        <span><i class="fas fa-weight-hanging me-1"></i> 761KB</span>
+                                    </div>
+                                    <p class="file-desc">A类业余无线电操作证书考试题库。</p>
+                                </div>
+                                <div class="file-action">
+                                    <a href="https://bh6rkw.dpdns.org/download/A类题库.pdf">
+                                    <button class="download-btn"><i class="fas fa-download me-1"></i> 下载</button>
+                                    </a>
+                                </div>
+                            </div>
+                            
+                            <!-- 下载项目4 -->
+                            <div class="download-item d-flex">
+                                <div class="file-icon">
+                                    <i class="far fa-file-pdf"></i>
+                                </div>
+                                <div class="file-info flex-grow-1">
+                                    <h5>业余无线电操作能力考试B类题库</h5>
+                                    <div class="file-meta">
+                                        <span><i class="far fa-file-alt me-1"></i> PDF文档</span>
+                                        <span><i class="far fa-clock me-1"></i> 2025-09-07</span>
+                                        <span><i class="fas fa-weight-hanging me-1"></i> 1034KB</span>
+                                    </div>
+                                    <p class="file-desc">B类业余无线电操作证书考试题库。</p>
+                                </div>
+                                <div class="file-action">
+                                    <a href="https://bh6rkw.dpdns.org/download/B类题库.pdf">
+                                    <button class="download-btn"><i class="fas fa-download me-1"></i> 下载</button>
+                                    </a>
+                                </div>
+                            </div>
+                            
+                            <!-- 下载项目5 -->
+                            <div class="download-item d-flex">
+                                <div class="file-icon">
+                                    <i class="far fa-file-pdf"></i>
+                                </div>
+                                <div class="file-info flex-grow-1">
+                                    <h5>业余无线电操作能力考试C类题库</h5>
+                                    <div class="file-meta">
+                                        <span><i class="far fa-file-alt me-1"></i> PDF文档</span>
+                                        <span><i class="far fa-clock me-1"></i> 2025-09-07</span>
+                                        <span><i class="fas fa-weight-hanging me-1"></i> 1394KB</span>
+                                    </div>
+                                    <p class="file-desc">C类业余无线电操作证书考试题库。</p>
+                                </div>
+                                <div class="file-action">
+                                    <a href="https://bh6rkw.dpdns.org/download/C类题库.pdf">
+                                    <button class="download-btn"><i class="fas fa-download me-1"></i> 下载</button>
+                                    </a>
+                                </div>
+                            </div>
+
+                            <div class="download-item d-flex">
+                                <div class="file-icon">
+                                    <i class="far fa-file-pdf"></i>
+                                </div>
+                                <div class="file-info flex-grow-1">
+                                    <h5>CRAC LOGO</h5>
+                                    <div class="file-meta">
+                                        <span><i class="far fa-file-alt me-1"></i> ZIP压缩包</span>
+                                        <span><i class="far fa-clock me-1"></i> 2025-09-21</span>
+                                        <span><i class="fas fa-weight-hanging me-1"></i> 4848KB</span>
+                                    </div>
+                                    <p class="file-desc">CRAC logo 高清png重制版与原版，重制版分为圆形和菱形，每种下都分为有/无底线，是/否透明。</p>
+                                </div>
+                                <div class="file-action">
+                                    <a href="https://bh6rkw.dpdns.org/download/CRAC LOGO.zip">
+                                    <button class="download-btn"><i class="fas fa-download me-1"></i> 下载</button>
+                                    </a>
+                                </div>
+                            </div>
+
+                            <div class="download-item d-flex">
+                                <div class="file-icon">
+                                    <i class="far fa-file-pdf"></i>
+                                </div>
+                                <div class="file-info flex-grow-1">
+                                    <h5>QSL一代卡正面</h5>
+                                    <div class="file-meta">
+                                        <span><i class="far fa-file-alt me-1"></i> PNG图片</span>
+                                        <span><i class="far fa-clock me-1"></i> 2025-09-07</span>
+                                        <span><i class="fas fa-weight-hanging me-1"></i> 10KB</span>
+                                    </div>
+                                    <p class="file-desc">QSL一代卡正面。</p>
+                                </div>
+                                <div class="file-action">
+                                    <a href="https://bh6rkw.dpdns.org/images/QSL卡片1.0正面.png">
+                                    <button class="download-btn"><i class="fas fa-download me-1"></i> 下载</button>
+                                    </a>
+                                </div>
+                            </div>
+
+                            <div class="download-item d-flex">
+                                <div class="file-icon">
+                                    <i class="far fa-file-pdf"></i>
+                                </div>
+                                <div class="file-info flex-grow-1">
+                                    <h5>QSL二代卡正面</h5>
+                                    <div class="file-meta">
+                                        <span><i class="far fa-file-alt me-1"></i> PNG图片</span>
+                                        <span><i class="far fa-clock me-1"></i> 2025-09-07</span>
+                                        <span><i class="fas fa-weight-hanging me-1"></i> 10KB</span>
+                                    </div>
+                                    <p class="file-desc">QSL二代卡正面。</p>
+                                </div>
+                                <div class="file-action">
+                                    <a href="https://bh6rkw.dpdns.org/images/QSL卡片2.0正面.png">
+                                    <button class="download-btn"><i class="fas fa-download me-1"></i> 下载</button>
+                                    </a>
+                                </div>
+                            </div>
+
+                            <div class="download-item d-flex">
+                                <div class="file-icon">
+                                    <i class="far fa-file-pdf"></i>
+                                </div>
+                                <div class="file-info flex-grow-1">
+                                    <h5>QSL三代卡正面</h5>
+                                    <div class="file-meta">
+                                        <span><i class="far fa-file-alt me-1"></i> PNG图片</span>
+                                        <span><i class="far fa-clock me-1"></i> 2025-09-07</span>
+                                        <span><i class="fas fa-weight-hanging me-1"></i> 10KB</span>
+                                    </div>
+                                    <p class="file-desc">QSL三代卡正面。</p>
+                                </div>
+                                <div class="file-action">
+                                    <a href="https://bh6rkw.dpdns.org/images/QSL卡片3.0正面.png">
+                                    <button class="download-btn"><i class="fas fa-download me-1"></i> 下载</button>
+                                    </a>
+                                </div>
+                            </div>
+
+                            <div class="download-item d-flex">
+                                <div class="file-icon">
+                                    <i class="far fa-file-pdf"></i>
+                                </div>
+                                <div class="file-info flex-grow-1">
+                                    <h5>QSL一代卡反面</h5>
+                                    <div class="file-meta">
+                                        <span><i class="far fa-file-alt me-1"></i> PNG图片</span>
+                                        <span><i class="far fa-clock me-1"></i> 2025-09-07</span>
+                                        <span><i class="fas fa-weight-hanging me-1"></i> 10KB</span>
+                                    </div>
+                                    <p class="file-desc">QSL一代卡反面。</p>
+                                </div>
+                                <div class="file-action">
+                                    <a href="https://bh6rkw.dpdns.org/images/1.0.png">
+                                    <button class="download-btn"><i class="fas fa-download me-1"></i> 下载</button>
+                                    </a>
+                                </div>
+                            </div>
+
+                            <div class="download-item d-flex">
+                                <div class="file-icon">
+                                    <i class="far fa-file-pdf"></i>
+                                </div>
+                                <div class="file-info flex-grow-1">
+                                    <h5>QSL二代卡反面</h5>
+                                    <div class="file-meta">
+                                        <span><i class="far fa-file-alt me-1"></i> PNG图片</span>
+                                        <span><i class="far fa-clock me-1"></i> 2025-09-07</span>
+                                        <span><i class="fas fa-weight-hanging me-1"></i> 10KB</span>
+                                    </div>
+                                    <p class="file-desc">QSL二代卡反面。</p>
+                                </div>
+                                <div class="file-action">
+                                    <a href="https://bh6rkw.dpdns.org/images/2.0.png">
+                                    <button class="download-btn"><i class="fas fa-download me-1"></i> 下载</button>
+                                    </a>
+                                </div>
+                            </div>
+
+                            <div class="download-item d-flex">
+                                <div class="file-icon">
+                                    <i class="far fa-file-pdf"></i>
+                                </div>
+                                <div class="file-info flex-grow-1">
+                                    <h5>QSL三代卡反面</h5>
+                                    <div class="file-meta">
+                                        <span><i class="far fa-file-alt me-1"></i> PNG图片</span>
+                                        <span><i class="far fa-clock me-1"></i> 2025-09-07</span>
+                                        <span><i class="fas fa-weight-hanging me-1"></i> 10KB</span>
+                                    </div>
+                                    <p class="file-desc">QSL三代卡反面。</p>
+                                </div>
+                                <div class="file-action">
+                                    <a href="https://bh6rkw.dpdns.org/images/3.0.png">
+                                    <button class="download-btn"><i class="fas fa-download me-1"></i> 下载</button>
+                                    </a>
+                                </div>
+                            </div>
+
+                        </div>
+                        
+                        <!-- 分页 -->
+                        <nav aria-label="Page navigation">
+                            <ul class="pagination">
+                                <li class="page-item disabled">
+                                    <a class="page-link" href="#" aria-label="Previous">
+                                        <span aria-hidden="true">&laquo;</span>
+                                    </a>
+                                </li>
+                                <li class="page-item active"><a class="page-link" href="#">1</a></li>
+                                <!-- <li class="page-item"><a class="page-link" href="#">2</a></li>
+                                <li class="page-item"><a class="page-link" href="#">3</a></li> -->
+                                <li class="page-item">
+                                    <a class="page-link" href="#" aria-label="Next">
+                                        <span aria-hidden="true">&raquo;</span>
+                                    </a>
+                                </li>
+                            </ul>
+                        </nav>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 页脚 -->
+    <footer>
+        <div class="container">
+            <div class="row">
+                <div class="col-md-4 mb-4">
+                    <h5>关于我</h5>
+                    <p>BH6RKW 操作证类别：B类</p>
+                </div>
+                <div class="col-md-4 mb-4">
+                    <h5>联系我</h5>
+                    <p><i class="fas fa-envelope me-2"></i> bh6rkw@outlook.com</p>
+                </div>
+                <div class="col-md-4 mb-4">
+                    <h5>快速链接</h5>
+                    <ul class="list-unstyled">
+                        <li><a href="https://wap.miit.gov.cn/"><i class="fas fa-angle-right me-2"></i> 工业和信息化部</a></li>
+                        <li><a href="https://wap.miit.gov.cn/jgsj/wgj/index.html"><i class="fas fa-angle-right me-2"></i> 国家无线电管理局</a></li>
+                        <li><a href="http://crac.org.cn"><i class="fas fa-angle-right me-2"></i> 中国无线电协会业余无线电分会</a></li>
+                        <li><a href="https://qrz.com"><i class="fas fa-angle-right me-2"></i> QRZ</a></li>
+                    </ul>
+                </div>
+            </div>
+            <div class="footer-bottom text-center">
+                <p>版权所有 © 2025 BH6RKW </p>
+            </div>
+        </div>
+    </footer>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const searchInput = document.getElementById('searchInput');
+            const searchButton = document.getElementById('searchButton');
+            const downloadItems = document.querySelectorAll('.download-item');
+            const categoryLinks = document.querySelectorAll('.category-list a');
+            
+            // 搜索功能
+            function performSearch() {
+                const searchTerm = searchInput.value.trim().toLowerCase();
+                
+                downloadItems.forEach(item => {
+                    const title = item.getAttribute('data-title').toLowerCase();
+                    const description = item.getAttribute('data-description').toLowerCase();
+                    
+                    // 高亮显示匹配的关键词
+                    if (searchTerm) {
+                        const regex = new RegExp(searchTerm, 'gi');
+                        
+                        const titleElement = item.querySelector('h5');
+                        const descElement = item.querySelector('.file-desc');
+                        
+                        // 移除之前的高亮
+                        titleElement.innerHTML = titleElement.textContent;
+                        descElement.innerHTML = descElement.textContent;
+                        
+                        // 添加新的高亮
+                        if (title.includes(searchTerm)) {
+                            titleElement.innerHTML = titleElement.textContent.replace(regex, match => `<span class="highlight">${match}</span>`);
+                        }
+                        
+                        if (description.includes(searchTerm)) {
+                            descElement.innerHTML = descElement.textContent.replace(regex, match => `<span class="highlight">${match}</span>`);
+                        }
+                    }
+                    
+                    // 显示/隐藏项目
+                    if (searchTerm === '' || title.includes(searchTerm) || description.includes(searchTerm)) {
+                        item.style.display = 'flex';
+                    } else {
+                        item.style.display = 'none';
+                    }
+                });
+                
+                // 检查是否有结果
+                const visibleItems = Array.from(downloadItems).filter(item => item.style.display !== 'none');
+                if (visibleItems.length === 0 && searchTerm !== '') {
+                    document.getElementById('downloadList').innerHTML = '<div class="no-results"><i class="fas fa-search fa-3x mb-3"></i><h4>未找到匹配的资料</h4><p>请尝试使用其他关键词搜索</p></div>';
+                }
+            }
+            
+            // 分类筛选
+            function filterByCategory(category) {
+                downloadItems.forEach(item => {
+                    const itemCategory = item.getAttribute('data-category');
+                    
+                    if (category === 'all' || itemCategory === category) {
+                        item.style.display = 'flex';
+                    } else {
+                        item.style.display = 'none';
+                    }
+                });
+                
+                // 更新分类链接的激活状态
+                categoryLinks.forEach(link => {
+                    if (link.getAttribute('data-category') === category) {
+                        link.classList.add('active');
+                    } else {
+                        link.classList.remove('active');
+                    }
+                });
+            }
+            
+            // 事件监听
+            searchButton.addEventListener('click', performSearch);
+            searchInput.addEventListener('keypress', function(e) {
+                if (e.key === 'Enter') {
+                    performSearch();
+                }
+            });
+            
+            // 输入时实时搜索（带防抖）
+            let searchTimeout;
+            searchInput.addEventListener('input', function() {
+                clearTimeout(searchTimeout);
+                searchTimeout = setTimeout(performSearch, 300);
+            });
+            
+            // 分类筛选事件
+            categoryLinks.forEach(link => {
+                link.addEventListener('click', function(e) {
+                    e.preventDefault();
+                    const category = this.getAttribute('data-category');
+                    filterByCategory(category);
+                    // 清空搜索框
+                    searchInput.value = '';
+                    // 移除高亮
+                    downloadItems.forEach(item => {
+                        const titleElement = item.querySelector('h5');
+                        const descElement = item.querySelector('.file-desc');
+                        titleElement.innerHTML = titleElement.textContent;
+                        descElement.innerHTML = descElement.textContent;
+                    });
+                });
+            });
+        });
+
+        // 完整的时间同步功能，修复手动切换被覆盖的问题
+        document.addEventListener('DOMContentLoaded', function() {
+            const themeSwitch = document.querySelector('.theme-switch__checkbox');
+            const timeSyncOverlay = document.getElementById('timeSyncOverlay');
+            const agreeTimeSyncBtn = document.getElementById('agreeTimeSync');
+            const declineTimeSyncBtn = document.getElementById('declineTimeSync');
+            const downloadLink = document.getElementById('downloadLink');
+            
+            // 是否启用时间同步
+            let enableTimeSync = false;
+            // 是否用户手动切换了主题
+            let userManuallySwitched = false;
+            // 时间同步定时器ID
+            let timeSyncIntervalId = null;
+            
+            // 检查是否有存储的时间同步选择
+            function checkStoredTimeSyncChoice() {
+                // 方法1: 检查URL参数
+                const urlParams = new URLSearchParams(window.location.search);
+                const urlTimeSync = urlParams.get('timeSync');
+                
+                if (urlTimeSync === 'agree') {
+                    handleTimeSyncChoice('agree');
+                    return true;
+                } else if (urlTimeSync === 'decline') {
+                    handleTimeSyncChoice('decline');
+                    return true;
+                }
+                
+                // 方法2: 检查sessionStorage
+                const storedTimeSync = sessionStorage.getItem('timeSyncChoice');
+                if (storedTimeSync === 'agree') {
+                    handleTimeSyncChoice('agree');
+                    return true;
+                } else if (storedTimeSync === 'decline') {
+                    handleTimeSyncChoice('decline');
+                    return true;
+                }
+                
+                return false;
+            }
+            
+            // 显示时间同步弹窗
+            function showTimeSyncOverlay() {
+                timeSyncOverlay.style.display = 'flex';
+            }
+            
+            // 隐藏时间同步弹窗
+            function hideTimeSyncOverlay() {
+                timeSyncOverlay.style.display = 'none';
+            }
+            
+            // 处理时间同步选择
+            function handleTimeSyncChoice(choice) {
+                if (choice === 'agree') {
+                    enableTimeSync = true;
+                    // 存储选择到sessionStorage
+                    sessionStorage.setItem('timeSyncChoice', 'agree');
+                    // 更新下载链接
+                    updateDownloadLink('agree');
+                    // 立即使用在线时间设置主题
+                    setThemeByOnlineTime();
+                    // 每分钟检查一次时间，自动切换主题
+                    timeSyncIntervalId = setInterval(() => {
+                        // 只有在用户没有手动切换时才自动更新
+                        if (!userManuallySwitched) {
+                            setThemeByOnlineTime();
+                        }
+                    }, 60 * 1000);
+                    console.log('用户同意时间同步，启用每分钟同步');
+                } else {
+                    enableTimeSync = false;
+                    // 存储选择到sessionStorage
+                    sessionStorage.setItem('timeSyncChoice', 'decline');
+                    // 更新下载链接
+                    updateDownloadLink('decline');
+                    // 使用本地时间设置主题
+                    useLocalTime();
+                    // 清除定时器
+                    if (timeSyncIntervalId) {
+                        clearInterval(timeSyncIntervalId);
+                        timeSyncIntervalId = null;
+                    }
+                    console.log('用户拒绝时间同步，使用本地时间');
+                }
+                
+                hideTimeSyncOverlay();
+            }
+            
+            // 更新下载链接，添加时间同步参数
+            function updateDownloadLink(timeSyncChoice) {
+                if (downloadLink) {
+                    const url = new URL(downloadLink.href, window.location.origin);
+                    url.searchParams.set('timeSync', timeSyncChoice);
+                    downloadLink.href = url.toString();
+                }
+            }
+            
+            // 获取在线时间并设置主题
+            function setThemeByOnlineTime() {
+                // 只有在用户没有手动切换时才自动更新
+                if (userManuallySwitched) {
+                    console.log('用户已手动切换主题，跳过自动更新');
+                    return;
+                }
+                
+                // 使用重试机制获取时间
+                fetchWithRetry('https://worldtimeapi.org/api/ip', 10, 500)
+                    .then(response => {
+                        if (!response.ok) {
+                            throw new Error('网络响应不正常');
+                        }
+                        return response.json();
+                    })
+                    .then(data => {
+                        const onlineTime = new Date(data.datetime);
+                        const currentHour = onlineTime.getHours();
+                        
+                        // 6-18时为白天模式，18-6时为夜晚模式
+                        if (currentHour >= 6 && currentHour < 18) {
+                            // 白天模式
+                            if (themeSwitch) {
+                                themeSwitch.checked = false;
+                                // 重置手动切换标志
+                                userManuallySwitched = false;
+                            }
+                            switchToLightTheme();
+                            console.log(`在线时间: ${onlineTime.toLocaleString('zh-CN')}, 设置为白天模式`);
+                        } else {
+                            // 夜晚模式
+                            if (themeSwitch) {
+                                themeSwitch.checked = true;
+                                // 重置手动切换标志
+                                userManuallySwitched = false;
+                            }
+                            switchToDarkTheme();
+                            console.log(`在线时间: ${onlineTime.toLocaleString('zh-CN')}, 设置为夜晚模式`);
+                        }
+                    })
+                    .catch(error => {
+                        console.log('所有在线时间API请求失败，使用本地时间:', error);
+                        // 使用本地时间作为备选
+                        useLocalTime();
+                    });
+            }
+            
+            // 带重试机制的fetch函数
+            function fetchWithRetry(url, maxRetries, timeout) {
+                return new Promise((resolve, reject) => {
+                    let retries = 0;
+                    
+                    function attemptFetch() {
+                        console.log(`尝试获取时间 (${retries + 1}/${maxRetries})...`);
+                        
+                        // 设置超时
+                        const timeoutPromise = new Promise((_, reject) => {
+                            setTimeout(() => reject(new Error('请求超时')), timeout);
+                        });
+                        
+                        // 发起请求
+                        const fetchPromise = fetch(url);
+                        
+                        // 竞速：请求 vs 超时
+                        Promise.race([fetchPromise, timeoutPromise])
+                            .then(response => {
+                                resolve(response);
+                            })
+                            .catch(error => {
+                                retries++;
+                                if (retries < maxRetries) {
+                                    console.log(`第${retries}次尝试失败，${timeout}ms后重试...`);
+                                    setTimeout(attemptFetch, timeout);
+                                } else {
+                                    reject(new Error(`所有${maxRetries}次尝试均失败`));
+                                }
+                            });
+                    }
+                    
+                    attemptFetch();
+                });
+            }
+            
+            // 使用本地时间作为备选方案
+            function useLocalTime() {
+                // 只有在用户没有手动切换时才自动更新
+                if (userManuallySwitched) {
+                    console.log('用户已手动切换主题，跳过本地时间更新');
+                    return;
+                }
+                
+                const localTime = new Date();
+                const currentHour = localTime.getHours();
+                
+                if (currentHour >= 6 && currentHour < 18) {
+                    if (themeSwitch) {
+                        themeSwitch.checked = false;
+                        // 重置手动切换标志
+                        userManuallySwitched = false;
+                    }
+                    switchToLightTheme();
+                    console.log(`本地时间: ${localTime.toLocaleString('zh-CN')}, 设置为白天模式`);
+                } else {
+                    if (themeSwitch) {
+                        themeSwitch.checked = true;
+                        // 重置手动切换标志
+                        userManuallySwitched = false;
+                    }
+                    switchToDarkTheme();
+                    console.log(`本地时间: ${localTime.toLocaleString('zh-CN')}, 设置为夜晚模式`);
+                }
+            }
+            
+            // 主题切换函数
+            function switchToDarkTheme() {
+                document.body.classList.add('dark-theme');
+                // 更新模式标签
+                updateModeLabels('night');
+            }
+            
+            function switchToLightTheme() {
+                document.body.classList.remove('dark-theme');
+                // 更新模式标签
+                updateModeLabels('day');
+            }
+            
+            // 更新白天/夜晚模式标签
+            function updateModeLabels(mode) {
+                const dayModeLabel = document.querySelector('.day_mode');
+                const nightModeLabel = document.querySelector('.night_mode');
+                
+                if (mode === 'day') {
+                    if (dayModeLabel) {
+                        dayModeLabel.style.color = '#64b5f6';
+                        dayModeLabel.style.fontWeight = 'bold';
+                    }
+                    if (nightModeLabel) {
+                        nightModeLabel.style.color = '#aaa';
+                        nightModeLabel.style.fontWeight = 'normal';
+                    }
+                } else {
+                    if (dayModeLabel) {
+                        dayModeLabel.style.color = '#aaa';
+                        dayModeLabel.style.fontWeight = 'normal';
+                    }
+                    if (nightModeLabel) {
+                        nightModeLabel.style.color = '#64b5f6';
+                        nightModeLabel.style.fontWeight = 'bold';
+                    }
+                }
+            }
+            
+            // 同意时间同步
+            agreeTimeSyncBtn.addEventListener('click', function() {
+                handleTimeSyncChoice('agree');
+            });
+            
+            // 拒绝时间同步
+            declineTimeSyncBtn.addEventListener('click', function() {
+                handleTimeSyncChoice('decline');
+            });
+            
+            // 初始化
+            // 检查是否有存储的时间同步选择
+            const hasStoredChoice = checkStoredTimeSyncChoice();
+            
+            // 如果没有存储的选择，显示时间同步弹窗
+            if (!hasStoredChoice) {
+                showTimeSyncOverlay();
+            }
+            
+            // 监听手动切换事件
+            if (themeSwitch) {
+                themeSwitch.addEventListener('change', function() {
+                    // 设置手动切换标志
+                    userManuallySwitched = true;
+                    console.log('用户手动切换主题，设置手动切换标志');
+                    
+                    if (this.checked) {
+                        switchToDarkTheme();
+                    } else {
+                        switchToLightTheme();
+                    }
+                });
+            }
+        });
+    </script>
+</body>
+</html>
