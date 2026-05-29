@@ -851,8 +851,14 @@
         }
         
         /* 夜晚模式（dark-theme）下未被图片覆盖区域为深灰/黑色 */
+        .dark-theme #mainCarousel,
+        .dark-theme #mainCarousel .carousel-inner,
         .dark-theme #mainCarousel .carousel-item {
-          background-color: #1e1e1e; /* 可调整为你想要的暗色 */
+          background-color: #11131a !important;
+        }
+        
+        .dark-theme #mainCarousel .carousel-item img {
+          background-color: transparent;
         }
         
         /* 保持现有遮罩层和 caption 居中（若需要微调）*/
@@ -1013,10 +1019,11 @@
                 </div>
             </div>
             <div class="carousel-item">
+                <img src="/images/CRAC-圆形-无底-带边线.webp" class="d-block w-100" alt="CRAC">
                 <div class="d-flex align-items-center justify-content-center h-100" style="background: linear-gradient(rgba(0,0,0,0.3), rgba(0,0,0,0.3)), center/cover;">
                     <div class="carousel-caption text-center">
-                        <h2>业余无线电操作证书模拟考试2025</h2>
-                        <p>最新题库，10月1日启用，支持A,B,C类（请前往“模拟考试”页面）</p>
+                        <h2>业余无线电操作证书模拟考试</h2>
+                        <p>最新题库，2025年10月1日启用，支持A,B,C类（请前往“模拟考试”页面）</p>
                     </div>
                 </div>
             </div>
