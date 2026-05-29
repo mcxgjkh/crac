@@ -199,48 +199,15 @@
         <div class="row mb-5">
             <div class="col-lg-8">
                 <div class="search-box">
-                    <label for="lawSearch" class="form-label">关键字查询</label>
+                    <label for="lawSearch" class="form-label">关键字查询（离线）</label>
                     <input id="lawSearch" type="text" class="form-control" placeholder="输入法规名称、条文关键字或主题进行搜索">
+                    <div class="form-text">页面会在本地 `laws/manifest.json` 指定的文件中建立索引并进行检索。</div>
                 </div>
             </div>
         </div>
 
         <div class="row g-4" id="lawList">
-            <div class="col-md-6">
-                <div class="law-card" data-keywords="无线电 管理 条例">
-                    <h3>中华人民共和国无线电管理条例</h3>
-                    <p>国务院发布的行政法规，规范无线电频谱管理、无线电台设置与使用、无线电设备生产和销售等内容，是业余无线电管理的基础法规。</p>
-                    <p><a href="https://www.miit.gov.cn/datainfo/fgk/gytxyxxhfg/xzfg/art/2020/art_9cf6a6c8f8e141c5868fa2c508f75f77.html" target="_blank" rel="noreferrer">访问中华人民共和国政府网站</a></p>
-                </div>
-            </div>
-            <div class="col-md-6">
-                <div class="law-card" data-keywords="频率 划分 规定 无线电 频率">
-                    <h3>无线电频率划分规定</h3>
-                    <p>工信部发布的规定，详细列明频率资源在不同业务、不同类型无线电台之间的划分方案，包括业余无线电使用频段。</p>
-                    <p><a href="https://wap.miit.gov.cn/gyhxxhb/jgsj/cyzcyfgs/bmgz/wxdl/art/2023/art_1e98823e689f42ca9ed14dcb6feec07a.html" target="_blank" rel="noreferrer">访问工信部官网</a></p>
-                </div>
-            </div>
-            <div class="col-md-6">
-                <div class="law-card" data-keywords="电信 条例 管理 无线电 规则">
-                    <h3>中华人民共和国电信条例</h3>
-                    <p>国务院发布的行政法规，对电信业务管理、无线电频谱利用、通信设施和用户权益等方面作出规定，包含业余无线电应用的法律基准。</p>
-                    <p><a href="https://www.gov.cn/gongbao/content/2016/content_5139478.htm" target="_blank" rel="noreferrer">访问中华人民共和国政府网站</a></p>
-                </div>
-            </div>
-            <div class="col-md-6">
-                <div class="law-card" data-keywords="业余 无线电 台 管理 办法">
-                    <h3>业余无线电台管理办法</h3>
-                    <p>业余无线电台管理的具体实施办法，规范业余无线电台的申请、使用、频率遵守与台站运行要求。</p>
-                    <p><a href="https://www.miit.gov.cn/zcfg/wxdl/art/2024/art_3c0db49faea543f1a7bf54318b60df6a.html" target="_blank" rel="noreferrer">访问中国无线电协会</a></p>
-                </div>
-            </div>
-            <div class="col-md-6">
-                <div class="law-card" data-keywords="操作 技术 能力 验证 办法 无线电">
-                    <h3>业余无线电台操作技术能力验证暂行办法</h3>
-                    <p>用于说明业余无线电台操作能力验证的程序和要求，适用于业余无线电操作证书、考试与技术资格评定。</p>
-                    <p><a href="https://zhipu.allspectrum.cn:9528/CRAC//file/law/110645.pdf" target="_blank" rel="noreferrer">访问中国无线电协会</a></p>
-                </div>
-            </div>
+            <!-- offline results rendered here -->
         </div>
     </section>
 
@@ -273,15 +240,109 @@
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
     <script>
-        const lawCards = Array.from(document.querySelectorAll('.law-card'));
-        document.getElementById('lawSearch').addEventListener('input', function() {
-            const value = this.value.trim().toLowerCase();
-            lawCards.forEach(card => {
-                const keywords = card.dataset.keywords.toLowerCase();
-                const title = card.querySelector('h3').textContent.toLowerCase();
-                const description = card.querySelector('p').textContent.toLowerCase();
-                const match = !value || title.includes(value) || description.includes(value) || keywords.includes(value);
-                card.parentElement.style.display = match ? 'block' : 'none';
+        // 离线搜索：从 laws/manifest.json 读取文件清单并建立本地索引（文本文件）
+        async function loadManifest() {
+            try {
+                const res = await fetch('manifest.json');
+                if (!res.ok) throw new Error('无法读取 manifest.json');
+                return await res.json();
+            } catch (e) {
+                console.error(e);
+                return [];
+            }
+        }
+
+        function stripHtmlTags(str) {
+            return str.replace(/<script[\s\S]*?>[\s\S]*?<\/script>/gi, ' ')
+                      .replace(/<style[\s\S]*?>[\s\S]*?<\/style>/gi, ' ')
+                      .replace(/<[^>]+>/g, ' ')
+                      .replace(/\s+/g, ' ')
+                      .trim();
+        }
+
+        async function buildIndex(manifest) {
+            const index = [];
+            for (const item of manifest) {
+                const path = encodeURIComponent(item.file).replace(/%2F/g, '/');
+                if (item.type === 'text') {
+                    try {
+                        const resp = await fetch(item.file);
+                        if (!resp.ok) throw new Error('fetch failed');
+                        const text = await resp.text();
+                        const plain = stripHtmlTags(text);
+                        index.push({file: item.file, title: item.title || item.file, type: 'text', content: plain});
+                    } catch (e) {
+                        console.warn('无法读取', item.file, e);
+                        index.push({file: item.file, title: item.title || item.file, type: 'text', content: ''});
+                    }
+                } else {
+                    // pdf 或其他非文本文件，只保留条目用于链接
+                    index.push({file: item.file, title: item.title || item.file, type: item.type, content: ''});
+                }
+            }
+            return index;
+        }
+
+        function renderList(index, container, filter) {
+            container.innerHTML = '';
+            const q = filter ? filter.trim().toLowerCase() : '';
+            const results = index.filter(entry => {
+                if (!q) return true;
+                return (entry.title && entry.title.toLowerCase().includes(q)) || (entry.content && entry.content.toLowerCase().includes(q));
+            });
+
+            if (results.length === 0) {
+                container.innerHTML = '<div class="col-12"><div class="alert alert-light">未找到匹配结果</div></div>';
+                return;
+            }
+
+            for (const entry of results) {
+                const col = document.createElement('div');
+                col.className = 'col-md-6';
+                const card = document.createElement('div');
+                card.className = 'law-card';
+                const h3 = document.createElement('h3');
+                h3.textContent = entry.title;
+                const p = document.createElement('p');
+                if (entry.type === 'pdf') {
+                    p.innerHTML = '该条目为 PDF 文件，点击以打开。';
+                    const a = document.createElement('a');
+                    a.href = entry.file;
+                    a.target = '_blank';
+                    a.rel = 'noreferrer';
+                    a.textContent = '打开文件';
+                    p.appendChild(document.createElement('br'));
+                    p.appendChild(a);
+                } else {
+                    const snippet = entry.content ? entry.content.slice(0, 600) : '无法读取内容';
+                    p.textContent = snippet + (entry.content && entry.content.length > 600 ? '…' : '');
+                    const a = document.createElement('a');
+                    a.href = entry.file;
+                    a.target = '_blank';
+                    a.rel = 'noreferrer';
+                    a.textContent = '阅读全文/打开原文';
+                    p.appendChild(document.createElement('br'));
+                    p.appendChild(a);
+                }
+                card.appendChild(h3);
+                card.appendChild(p);
+                col.appendChild(card);
+                container.appendChild(col);
+            }
+        }
+
+        document.addEventListener('DOMContentLoaded', async function() {
+            const manifest = await loadManifest();
+            const index = await buildIndex(manifest);
+            const container = document.getElementById('lawList');
+            renderList(index, container, '');
+
+            const search = document.getElementById('lawSearch');
+            let timer = null;
+            search.addEventListener('input', function() {
+                clearTimeout(timer);
+                const v = this.value;
+                timer = setTimeout(() => renderList(index, container, v), 200);
             });
         });
     </script>
