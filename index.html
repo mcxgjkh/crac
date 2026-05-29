@@ -820,7 +820,7 @@
         #mainCarousel,
         #mainCarousel .carousel-inner,
         #mainCarousel .carousel-item {
-          height: 20vh;
+          height: 60vh;
         }
         
         /* 隐藏的 Beijing 时间组件 */
@@ -834,18 +834,20 @@
           visibility: hidden;
         }
         
-        /* 图片铺满容器并保持裁切（cover）*/
+        /* 图片完整显示，保持宽高比例，不裁切 */
         #mainCarousel .carousel-item img {
           width: 100%;
           height: 100%;
-          object-fit: cover;
+          object-fit: contain;
           object-position: center;
           display: block;
+          background-color: transparent;
         }
         
-        /* 白天模式下轮播未被图片覆盖区域为白色 */
+        /* 白天模式下轮播未被图片覆盖区域使用柔和背景 */
         #mainCarousel .carousel-item {
-          background-color: white;
+          background-color: #f2f5f9;
+          background-image: linear-gradient(180deg, #f8fbff 0%, #eef3f9 100%);
         }
         
         /* 夜晚模式（dark-theme）下未被图片覆盖区域为深灰/黑色 */
