@@ -374,10 +374,7 @@
     </footer>
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
     <script>
-        pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js';
-
         document.addEventListener('DOMContentLoaded', function() {
             const themeSwitch = document.querySelector('.theme-switch__checkbox');
 
@@ -443,47 +440,46 @@
                         var entry = index.find(function(e) { return e.file === file; });
                         if (entry && entry.content) {
                             displayContent(entry.title, entry.content);
+                            appendImageIfNeeded(file);
                             return;
                         }
                     }
                 } catch(e) {}
 
-                if (file.endsWith('.pdf')) {
-                    try {
-                        const pdf = await pdfjsLib.getDocument(file).promise;
-                        let text = '';
-                        for (let i = 1; i <= pdf.numPages; i++) {
-                            const page = await pdf.getPage(i);
-                            const content = await page.getTextContent();
-                            var lastY = null;
-                            for (var j = 0; j < content.items.length; j++) {
-                                var item = content.items[j];
-                                if (lastY !== null && Math.abs(item.transform[5] - lastY) > 3) {
-                                    text += '\n';
-                                }
-                                text += item.str;
-                                lastY = item.transform[5];
-                            }
-                            text += '\n\n';
-                        }
-                        if (text.trim()) {
-                            displayContent(file.replace('.pdf', ''), text.trim());
-                        } else {
-                            showError('PDF 文件无法提取文本内容，请尝试直接下载查看。');
-                        }
-                    } catch(e) {
-                        showError('PDF 解析失败：' + e.message);
-                    }
-                } else {
-                    try {
-                        const resp = await fetch(file);
-                        if (!resp.ok) throw new Error('HTTP ' + resp.status);
-                        const text = await resp.text();
-                        const clean = text.trim();
-                        displayContent(file.replace('.txt', ''), clean || '(文件内容为空)');
-                    } catch(e) {
-                        showError('无法读取文件：' + e.message);
-                    }
+                if (file.endsWith('.doc')) {
+                    titleEl.textContent = file.replace('.doc', '');
+                    metaEl.textContent = 'DOC 文档（含表格）';
+                    loadingBox.innerHTML = '<i class="fas fa-table" style="font-size:3rem;color:var(--primary-blue);"></i><p style="max-width:500px;margin:15px auto;line-height:1.8;">此文件为 DOC 格式，内含复杂表格，无法在线解码预览。<br>请在政策法规页面搜索关键词定位相关内容后，下载原文件对照查看。</p><a href="' + file + '" download class="btn btn-primary mt-2"><i class="fas fa-download me-2"></i>下载原文件</a><br><a href="index.html" class="back-link mt-3 d-inline-block"><i class="fas fa-arrow-left me-1"></i>返回政策法规</a>';
+                    return;
+                }
+
+                try {
+                    const resp = await fetch(file);
+                    if (!resp.ok) throw new Error('HTTP ' + resp.status);
+                    const text = await resp.text();
+                    displayContent(file.replace('.txt', ''), text.trim() || '(文件内容为空)');
+                    appendImageIfNeeded(file);
+                } catch(e) {
+                    showError('无法读取文件：' + e.message);
+                }
+            }
+
+            function appendImageIfNeeded(file) {
+                if (file.indexOf('业余无线电台呼号编制和核发要求') !== -1) {
+                    var img = document.createElement('img');
+                    img.src = '/crac/images/业余无线电台呼号编制和核发要求.webp';
+                    img.alt = '业余无线电台呼号编制和核发要求附表';
+                    img.style.maxWidth = '100%';
+                    img.style.marginTop = '30px';
+                    img.style.borderRadius = '8px';
+                    img.style.boxShadow = '0 3px 10px rgba(0,0,0,0.1)';
+                    contentEl.appendChild(img);
+
+                    var caption = document.createElement('p');
+                    caption.className = 'viewer-meta';
+                    caption.style.marginTop = '8px';
+                    caption.textContent = '▲ 各省、自治区、直辖市无线电管理机构可核发的业余无线电台呼号号段表';
+                    contentEl.appendChild(caption);
                 }
             }
 

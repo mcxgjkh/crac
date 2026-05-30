@@ -729,10 +729,7 @@
     </footer>
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
     <script>
-        pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js';
-
         document.addEventListener('DOMContentLoaded', function() {
             const themeSwitch = document.querySelector('.theme-switch__checkbox');
 
@@ -755,37 +752,16 @@
 
             const container = document.getElementById('lawList');
             const searchInput = document.getElementById('lawSearch');
-            const PDF_FILES = ['业余无线电台呼号编制和核发要求.pdf', '业余无线电台操作技术能力验证暂行办法.pdf', '中华人民共和国无线电频率划分规定.pdf'];
+            const DOC_FILES = [
+                {file:'中华人民共和国无线电频率划分规定.doc', title:'中华人民共和国无线电频率划分规定'}
+            ];
             const TEXT_FILES = [
                 {file:'业余无线电台管理办法.txt', title:'业余无线电台管理办法'},
                 {file:'中华人民共和国无线电管理条例.txt', title:'中华人民共和国无线电管理条例'},
-                {file:'中华人民共和国电信条例.txt', title:'中华人民共和国电信条例'}
+                {file:'中华人民共和国电信条例.txt', title:'中华人民共和国电信条例'},
+                {file:'业余无线电台呼号编制和核发要求.txt', title:'业余无线电台呼号编制和核发要求'},
+                {file:'业余无线电台操作技术能力验证暂行办法.txt', title:'业余无线电台操作技术能力验证暂行办法'}
             ];
-
-            async function extractPdfText(url) {
-                try {
-                    const pdf = await pdfjsLib.getDocument(url).promise;
-                    let text = '';
-                    for (let i = 1; i <= pdf.numPages; i++) {
-                        const page = await pdf.getPage(i);
-                        const content = await page.getTextContent();
-                        var lastY = null;
-                        for (var j = 0; j < content.items.length; j++) {
-                            var item = content.items[j];
-                            if (lastY !== null && Math.abs(item.transform[5] - lastY) > 3) {
-                                text += '\n';
-                            }
-                            text += item.str;
-                            lastY = item.transform[5];
-                        }
-                        text += '\n';
-                    }
-                    return text.trim();
-                } catch (e) {
-                    console.warn('PDF 解析失败:', url, e);
-                    return '';
-                }
-            }
 
             function highlightText(text, query) {
                 if (!query) return text;
@@ -824,9 +800,27 @@
                     lawIndex.push(entry);
                     lawIndexMap[entry.file] = entry;
                 }
-                document.getElementById('lawCount').textContent = lawIndex.length + PDF_FILES.length;
+                for (var i = 0; i < DOC_FILES.length; i++) {
+                    var entry = {
+                        file: DOC_FILES[i].file,
+                        title: DOC_FILES[i].title,
+                        type: 'doc',
+                        content: ''
+                    };
+                    lawIndex.push(entry);
+                    lawIndexMap[entry.file] = entry;
+                }
+                document.getElementById('lawCount').textContent = lawIndex.length;
                 renderCards(lawIndex, '');
                 fetchAllTextFiles();
+            }
+
+            function extractDocText(buffer) {
+                var decoder = new TextDecoder('gbk');
+                var text = decoder.decode(buffer);
+                text = text.replace(/[^\u4e00-\u9fff\u3000-\u303f\uff00-\uffef\u0020-\u007e\n\r\t\u2018-\u201d\u2026\u2014\u2015\u00b7]+/g, ' ');
+                text = text.replace(/ {2,}/g, ' ').replace(/\n{3,}/g, '\n\n');
+                return text.trim();
             }
 
             async function fetchAllTextFiles() {
@@ -843,25 +837,25 @@
                         entry.content = '';
                     }
                 }
-                document.getElementById('lawCount').textContent = lawIndex.length;
-                doSearch(searchInput.value);
-            }
-
-            async function loadPdfTexts() {
-                for (var i = 0; i < PDF_FILES.length; i++) {
-                    var title = PDF_FILES[i].replace('.pdf', '');
-                    var text = await extractPdfText(PDF_FILES[i]);
-                    var entry = {file: PDF_FILES[i], title: title, type: 'pdf', content: text || ''};
-                    lawIndex.push(entry);
-                    lawIndexMap[entry.file] = entry;
+                for (var i = 0; i < DOC_FILES.length; i++) {
+                    var entry = lawIndexMap[DOC_FILES[i].file];
+                    if (!entry) continue;
+                    try {
+                        var resp = await fetch(DOC_FILES[i].file);
+                        if (resp.ok) {
+                            var buf = await resp.arrayBuffer();
+                            entry.content = extractDocText(buf);
+                            try { sessionStorage.setItem('lawIndex', JSON.stringify(lawIndex)); } catch(e) {}
+                        }
+                    } catch(e) {
+                        entry.content = '';
+                    }
                 }
                 document.getElementById('lawCount').textContent = lawIndex.length;
-                try { sessionStorage.setItem('lawIndex', JSON.stringify(lawIndex)); } catch(e) {}
                 doSearch(searchInput.value);
             }
 
             initTextLaws();
-            loadPdfTexts();
 
             function renderCards(results, query) {
                 container.innerHTML = '';
@@ -875,11 +869,15 @@
                     col.innerHTML = [
                         '<div class="law-card">',
                         '<h3>' + highlightText(entry.title, query) + '</h3>',
-                        (!entry.content)
-                            ? '<p class="search-preview"><i class="fas fa-spinner fa-pulse me-1"></i>内容加载中…</p>'
-                            : '<p class="search-preview">' + getPreview(entry.content, query) + '</p>',
-                        '<p class="search-source"><i class="fas fa-file-alt me-1"></i>' + entry.title + '</p>',
-                        '<a href="viewer.html?file=' + encodeURIComponent(entry.file) + '&q=' + encodeURIComponent(query || '') + '"><i class="fas fa-book-open me-1"></i>阅读全文</a>',
+                        entry.type === 'doc'
+                            ? '<p class="search-preview">文本提取内容供检索参考，完整文件含表格请下载原文档查看。</p>'
+                            : (!entry.content
+                                ? '<p class="search-preview"><i class="fas fa-spinner fa-pulse me-1"></i>内容加载中…</p>'
+                                : '<p class="search-preview">' + getPreview(entry.content, query) + '</p>'),
+                        '<p class="search-source"><i class="fas fa-file-alt me-1"></i>' + entry.title + (entry.type === 'doc' ? '（DOC）' : '') + '</p>',
+                        entry.type === 'doc'
+                            ? '<a href="viewer.html?file=' + encodeURIComponent(entry.file) + '" class="me-3"><i class="fas fa-book-open me-1"></i>阅读全文</a><a href="' + entry.file + '" download><i class="fas fa-download me-1"></i>下载原文件</a>'
+                            : '<a href="viewer.html?file=' + encodeURIComponent(entry.file) + '&q=' + encodeURIComponent(query || '') + '"><i class="fas fa-book-open me-1"></i>阅读全文</a>',
                         '</div>'
                     ].join('');
                     container.appendChild(col);
