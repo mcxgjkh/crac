@@ -585,6 +585,75 @@
         .dark-theme .profile-card i {
             color: #64b5f6 !important;
         }
+
+        /* ---- 内容组件类 ---- */
+        .content-text {
+            font-size: 1.05rem;
+            color: #555;
+            margin-bottom: 30px;
+        }
+
+        .email-icon {
+            font-size: 1.5rem;
+            color: var(--primary-blue);
+        }
+
+        .email-link {
+            color: var(--primary-blue);
+            text-decoration: none;
+        }
+
+        .email-link:hover {
+            color: var(--secondary-blue);
+        }
+
+        .profile-name {
+            color: var(--primary-blue);
+        }
+
+        .profile-icon {
+            color: var(--primary-blue);
+        }
+
+        .card-heading {
+            color: var(--primary-blue);
+        }
+
+        .news-text {
+            font-size: 0.9rem;
+        }
+
+        .dark-theme .content-text {
+            color: #bbb;
+        }
+
+        .dark-theme .email-icon {
+            color: #64b5f6;
+        }
+
+        .dark-theme .email-link {
+            color: #64b5f6;
+        }
+
+        .dark-theme .email-link:hover {
+            color: #90caf9;
+        }
+
+        .dark-theme .profile-name {
+            color: #64b5f6;
+        }
+
+        .dark-theme .profile-icon {
+            color: #64b5f6;
+        }
+
+        .dark-theme .card-heading {
+            color: #64b5f6;
+        }
+
+        .dark-theme .news-text {
+            color: #aaa;
+        }
     </style>
 </head>
 <body>
@@ -668,12 +737,12 @@
             <div class="row">
                 <div class="col-lg-8">
                     <h3 class="section-title">个人简介</h3>
-                    <p style="font-size: 1.05rem; color: #555; margin-bottom: 30px;">
+                    <p class="content-text">
                         长期关注业余无线电文化和技术交流。业余无线电对我来说不仅是兴趣爱好，更是沟通世界、了解电磁波应用和应急通信能力的重要方式。
                     </p>
 
                     <h3 class="section-title">无线电经历</h3>
-                    <p style="font-size: 1.05rem; color: #555; margin-bottom: 30px;">
+                    <p class="content-text">
                         参与过多次无线电活动，从 QSL 卡片设计、业余无线电台的搭建，到无线电操作证书考试的准备。通过分享经验，希望让更多人了解无线电的魅力。
                     </p>
 
@@ -727,8 +796,8 @@
 
                     <h3 class="section-title">联系方式</h3>
                     <div class="service-card p-3 d-flex align-items-center mb-4">
-                        <i class="fas fa-envelope me-3" style="font-size: 1.5rem; color: var(--primary-blue);"></i>
-                        <a href="mailto:bh6rkw@outlook.com" style="color: var(--primary-blue); text-decoration: none;">bh6rkw@outlook.com</a>
+                        <i class="fas fa-envelope me-3 email-icon"></i>
+                        <a href="mailto:bh6rkw@outlook.com" class="email-link">bh6rkw@outlook.com</a>
                     </div>
                 </div>
 
@@ -737,20 +806,20 @@
                         <div class="profile-avatar">
                             <i class="fas fa-user-astronaut"></i>
                         </div>
-                        <h5 style="color: var(--primary-blue);">BH6RKW</h5>
+                        <h5 class="profile-name">BH6RKW</h5>
                         <p class="text-muted mb-2">业余无线电爱好者</p>
                         <hr>
                         <div class="text-start">
-                            <p class="mb-2"><i class="fas fa-map-marker-alt me-2" style="color: var(--primary-blue);"></i>中国湖北</p>
-                            <p class="mb-2"><i class="fas fa-id-card me-2" style="color: var(--primary-blue);"></i>操作证类别：B类</p>
-                            <p class="mb-2"><i class="fas fa-globe-asia me-2" style="color: var(--primary-blue);"></i>ITU分区：44</p>
-                            <p class="mb-0"><i class="fas fa-chart-line me-2" style="color: var(--primary-blue);"></i>状态：活跃</p>
+                            <p class="mb-2"><i class="fas fa-map-marker-alt me-2 profile-icon"></i>中国湖北</p>
+                            <p class="mb-2"><i class="fas fa-id-card me-2 profile-icon"></i>操作证类别：B类</p>
+                            <p class="mb-2"><i class="fas fa-globe-asia me-2 profile-icon"></i>ITU分区：44</p>
+                            <p class="mb-0"><i class="fas fa-chart-line me-2 profile-icon"></i>状态：活跃</p>
                         </div>
                     </div>
 
                     <div class="service-card p-3 mb-4">
-                        <h6 style="color: var(--primary-blue);"><i class="fas fa-rss me-2"></i>最新动态</h6>
-                        <p class="text-muted mb-0" style="font-size: 0.9rem;">模拟考试与资料下载栏目持续完善中。</p>
+                        <h6 class="card-heading"><i class="fas fa-rss me-2"></i>最新动态</h6>
+                        <p class="text-muted mb-0 news-text">模拟考试与资料下载栏目持续完善中。</p>
                     </div>
                 </div>
             </div>
