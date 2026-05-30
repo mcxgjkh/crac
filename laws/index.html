@@ -377,6 +377,48 @@
             height: 3px;
             background-color: var(--primary-blue);
         }
+
+        .button_BH6RKW {
+            position: relative;
+            border: none;
+            background: transparent;
+            --stroke-color: #0000007c;
+            --ani-color: rgba(95, 3, 244, 0);
+            --color-gar: linear-gradient(90deg,#03a9f4,#f441a5,#ffeb3b,#03a9f4);
+            letter-spacing: 3px;
+            font-size: 2em;
+            text-transform: uppercase;
+            color: transparent;
+            -webkit-text-stroke: 1px var(--stroke-color);
+            cursor: pointer;
+            padding: 10px 20px;
+        }
+
+        .actual-text_BH6RKW {
+            display: inline-block;
+        }
+
+        .front-text_BH6RKW {
+            position: absolute;
+            top: 10px;
+            left: 0;
+            width: 100%;
+            background: var(--color-gar);
+            -webkit-background-clip: text;
+            background-clip: text;
+            background-size: 200%;
+            overflow: hidden;
+            transition: all 1s;
+            animation: 8s ani linear infinite;
+            border-bottom: 2px solid transparent;
+            clip-path: polygon(0 0, 0% 0, 0% 100%, 0 100%);
+        }
+
+        .button_BH6RKW:hover .front-text_BH6RKW {
+            clip-path: polygon(0 0, 100% 0, 100% 100%, 0 100%);
+            border-bottom: 2px solid #03a9f4;
+            -webkit-text-stroke: 1px var(--ani-color);
+        }
     </style>
 </head>
 <body>
