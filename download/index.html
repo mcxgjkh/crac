@@ -70,10 +70,20 @@
         
         /* 页面标题 */
         .page-header {
-            background-color: var(--primary-blue);
+            padding: 80px 0 50px;
+            background: linear-gradient(135deg, var(--primary-blue) 0%, var(--secondary-blue) 100%);
             color: white;
-            padding: 40px 0;
-            margin-bottom: 30px;
+        }
+
+        .page-header h1 {
+            font-size: 2.8rem;
+            font-weight: bold;
+            margin-bottom: 10px;
+        }
+
+        .page-header .lead {
+            font-size: 1.1rem;
+            opacity: 0.9;
         }
         
         .breadcrumb {
@@ -1020,7 +1030,6 @@
             <div class="d-flex justify-content-between">
                 <div>
                     <span>欢迎访问中国无线电爱好者BH6RKW的网页</span>
-                    <span class="day_mode">白天模式</span>
                     <label class="theme-switch">
                         <input type="checkbox" class="theme-switch__checkbox">
                         <div class="theme-switch__container">
@@ -1041,7 +1050,6 @@
                             </div>
                         </div>
                     </label>
-                    <span class="night_mode">夜晚模式</span>
                 </div>
             </div>
         </div>
@@ -1074,12 +1082,6 @@
     <!-- 页面标题 -->
     <div class="page-header">
         <div class="container">
-            <nav aria-label="breadcrumb">
-                <ol class="breadcrumb">
-                    <li class="breadcrumb-item"><a href="https://bh6rkw.dpdns.org/index.html">首页</a></li>
-                    <li class="breadcrumb-item_a" aria-current="page">&nbsp;/&nbsp;资料下载</li>
-                </ol>
-            </nav>
             <h1 class="download_h1">资料下载</h1>
             <p class="lead">获取业余无线电相关文档、资料和资源</p>
         </div>

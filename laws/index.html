@@ -815,14 +815,6 @@
                 fetchAllTextFiles();
             }
 
-            function extractDocText(buffer) {
-                var decoder = new TextDecoder('gbk');
-                var text = decoder.decode(buffer);
-                text = text.replace(/[^\u4e00-\u9fff\u3000-\u303f\uff00-\uffef\u0020-\u007e\n\r\t\u2018-\u201d\u2026\u2014\u2015\u00b7]+/g, ' ');
-                text = text.replace(/ {2,}/g, ' ').replace(/\n{3,}/g, '\n\n');
-                return text.trim();
-            }
-
             async function fetchAllTextFiles() {
                 for (var i = 0; i < TEXT_FILES.length; i++) {
                     var entry = lawIndexMap[TEXT_FILES[i].file];
@@ -831,20 +823,6 @@
                         var resp = await fetch(TEXT_FILES[i].file);
                         if (resp.ok) {
                             entry.content = await resp.text();
-                            try { sessionStorage.setItem('lawIndex', JSON.stringify(lawIndex)); } catch(e) {}
-                        }
-                    } catch(e) {
-                        entry.content = '';
-                    }
-                }
-                for (var i = 0; i < DOC_FILES.length; i++) {
-                    var entry = lawIndexMap[DOC_FILES[i].file];
-                    if (!entry) continue;
-                    try {
-                        var resp = await fetch(DOC_FILES[i].file);
-                        if (resp.ok) {
-                            var buf = await resp.arrayBuffer();
-                            entry.content = extractDocText(buf);
                             try { sessionStorage.setItem('lawIndex', JSON.stringify(lawIndex)); } catch(e) {}
                         }
                     } catch(e) {
@@ -869,11 +847,15 @@
                     col.innerHTML = [
                         '<div class="law-card">',
                         '<h3>' + highlightText(entry.title, query) + '</h3>',
-                        (!entry.content)
-                            ? '<p class="search-preview"><i class="fas fa-spinner fa-pulse me-1"></i>内容加载中…</p>'
-                            : '<p class="search-preview">' + getPreview(entry.content, query) + '</p>',
-                        '<p class="search-source"><i class="fas fa-file-alt me-1"></i>' + entry.title + (entry.type === 'doc' ? '（DOC）' : '') + '</p>',
-                        '<a href="viewer.html?file=' + encodeURIComponent(entry.file) + '&q=' + encodeURIComponent(query || '') + '"><i class="fas fa-book-open me-1"></i>阅读全文</a>',
+                        entry.type === 'doc'
+                            ? '<p class="search-preview">此文件为 DOCX 格式，不支持在线预览与搜索，请下载后查看。</p>'
+                            : (!entry.content
+                                ? '<p class="search-preview"><i class="fas fa-spinner fa-pulse me-1"></i>内容加载中…</p>'
+                                : '<p class="search-preview">' + getPreview(entry.content, query) + '</p>'),
+                        '<p class="search-source"><i class="fas fa-file-alt me-1"></i>' + entry.title + (entry.type === 'doc' ? '（DOCX）' : '') + '</p>',
+                        entry.type === 'doc'
+                            ? '<a href="' + entry.file + '" download><i class="fas fa-download me-1"></i>下载原文件</a>'
+                            : '<a href="viewer.html?file=' + encodeURIComponent(entry.file) + '&q=' + encodeURIComponent(query || '') + '"><i class="fas fa-book-open me-1"></i>阅读全文</a>',
                         '</div>'
                     ].join('');
                     container.appendChild(col);

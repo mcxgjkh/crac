@@ -651,10 +651,10 @@
                     }
                 } catch(e) {}
 
-                if (file.endsWith('.doc')) {
-                    titleEl.textContent = file.replace('.doc', '');
-                    metaEl.textContent = 'DOC 文档（含表格）';
-                    loadingBox.innerHTML = '<i class="fas fa-table" style="font-size:3rem;color:var(--primary-blue);"></i><p style="max-width:500px;margin:15px auto;line-height:1.8;">此文件为 DOC 格式，内含复杂表格，无法在线解码预览。<br>请在政策法规页面搜索关键词定位相关内容后，下载原文件对照查看。</p><a href="' + file + '" download class="btn btn-primary mt-2"><i class="fas fa-download me-2"></i>下载原文件</a><br><a href="index.html" class="back-link mt-3 d-inline-block"><i class="fas fa-arrow-left me-1"></i>返回政策法规</a>';
+                if (file.endsWith('.docx')) {
+                    titleEl.textContent = file.replace('.docx', '');
+                    metaEl.textContent = 'DOCX 文档（含表格）';
+                    loadingBox.innerHTML = '<i class="fas fa-table" style="font-size:3rem;color:var(--primary-blue);"></i><p style="max-width:500px;margin:15px auto;line-height:1.8;">此文件为 DOCX 格式，内含复杂表格，不支持在线预览。<br>请下载原文件查看。</p><a href="' + file + '" download class="btn btn-primary mt-2"><i class="fas fa-download me-2"></i>下载原文件</a><br><a href="index.html" class="back-link mt-3 d-inline-block"><i class="fas fa-arrow-left me-1"></i>返回政策法规</a>';
                     return;
                 }
 
