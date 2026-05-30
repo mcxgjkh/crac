@@ -9,6 +9,7 @@
     <style>
         :root {
             --primary-blue: #1a5faf;
+            --secondary-blue: #0d4a8d;
             --dark-gray: #333;
             --light-gray: #f5f5f5;
         }
@@ -16,7 +17,6 @@
         body {
             font-family: "Microsoft YaHei", sans-serif;
             color: #333;
-            background-color: #fafafa;
             line-height: 1.6;
         }
 
@@ -59,28 +59,51 @@
             background-color: var(--primary-blue);
         }
 
+        .section-title {
+            position: relative;
+            margin-bottom: 30px;
+            padding-bottom: 15px;
+            font-weight: bold;
+            color: var(--primary-blue);
+        }
+
+        .section-title::after {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            width: 60px;
+            height: 3px;
+            background-color: var(--primary-blue);
+        }
+
         .page-header {
-            padding: 80px 0 40px;
-            background: linear-gradient(180deg, rgba(26, 95, 175, 0.12), rgba(255, 255, 255, 0.95));
+            padding: 80px 0 50px;
+            background: linear-gradient(135deg, var(--primary-blue) 0%, var(--secondary-blue) 100%);
+            color: white;
         }
 
         .page-header h1 {
             font-size: 2.8rem;
-            margin-bottom: 20px;
-            color: var(--primary-blue);
+            font-weight: bold;
+            margin-bottom: 15px;
         }
 
         .page-header p {
-            color: #555;
-            max-width: 720px;
+            font-size: 1.1rem;
+            opacity: 0.9;
         }
 
         .search-box {
-            border-radius: 12px;
-            border: 1px solid #d8dee6;
-            padding: 16px;
-            background-color: white;
-            box-shadow: 0 8px 20px rgba(24, 64, 123, 0.05);
+            background: white;
+            border-radius: 8px;
+            padding: 20px;
+            box-shadow: 0 3px 10px rgba(0, 0, 0, 0.1);
+        }
+
+        .search-box label {
+            font-weight: 600;
+            color: var(--primary-blue);
         }
 
         .search-box input {
@@ -90,17 +113,21 @@
             width: 100%;
         }
 
+        .main-content {
+            padding: 40px 0;
+        }
+
         .law-card {
-            background-color: white;
-            border: 1px solid #e6ecf3;
-            border-radius: 12px;
+            background: white;
+            border-radius: 8px;
             padding: 24px;
-            transition: transform 0.2s ease, box-shadow 0.2s ease;
+            box-shadow: 0 3px 10px rgba(0, 0, 0, 0.1);
+            transition: transform 0.3s;
+            height: 100%;
         }
 
         .law-card:hover {
-            transform: translateY(-4px);
-            box-shadow: 0 10px 30px rgba(24, 64, 123, 0.08);
+            transform: translateY(-5px);
         }
 
         .law-card h3 {
@@ -118,18 +145,20 @@
             font-weight: 600;
         }
 
-        .footer-bottom {
-            border-top: 1px solid #444;
-            padding-top: 20px;
-            margin-top: 30px;
-            font-size: 0.9rem;
-            color: #ccc;
+        .law-card a:hover {
+            color: var(--secondary-blue);
         }
 
         footer {
-            background-color: #333;
+            background-color: var(--dark-gray);
             color: white;
             padding: 40px 0 20px;
+        }
+
+        footer h5 {
+            color: #fff;
+            margin-bottom: 20px;
+            font-weight: 600;
         }
 
         footer a {
@@ -139,6 +168,13 @@
 
         footer a:hover {
             color: white;
+        }
+
+        .footer-bottom {
+            border-top: 1px solid #444;
+            padding-top: 20px;
+            margin-top: 30px;
+            font-size: 0.9rem;
         }
 
         .theme-switch {
@@ -419,6 +455,121 @@
             border-bottom: 2px solid #03a9f4;
             -webkit-text-stroke: 1px var(--ani-color);
         }
+
+        .dark-theme {
+            background-color: #121212;
+            color: #e0e0e0;
+        }
+
+        .dark-theme .top-bar {
+            background-color: #1e1e1e;
+            color: #e0e0e0;
+        }
+
+        .dark-theme .top-bar a {
+            color: #b0b0b0;
+        }
+
+        .dark-theme .navbar {
+            background-color: #1e1e1e;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.3);
+        }
+
+        .dark-theme .nav-link {
+            color: #e0e0e0 !important;
+        }
+
+        .dark-theme .nav-link:hover {
+            color: #64b5f6 !important;
+        }
+
+        .dark-theme .nav-link:hover::after {
+            background-color: #64b5f6;
+        }
+
+        .dark-theme .button_BH6RKW {
+            --stroke-color: #ffffff7c;
+        }
+
+        .dark-theme .page-header {
+            background: linear-gradient(135deg, #0d3b6e 0%, #082444 100%);
+        }
+
+        .dark-theme .section-title {
+            color: #64b5f6;
+        }
+
+        .dark-theme .section-title::after {
+            background-color: #64b5f6;
+        }
+
+        .dark-theme .search-box {
+            background: #1e1e1e;
+            color: #e0e0e0;
+            box-shadow: 0 3px 10px rgba(0, 0, 0, 0.3);
+        }
+
+        .dark-theme .search-box label {
+            color: #64b5f6;
+        }
+
+        .dark-theme .search-box input {
+            background-color: #2a2a2a;
+            border-color: #444;
+            color: #e0e0e0;
+        }
+
+        .dark-theme .search-box .form-text {
+            color: #aaa;
+        }
+
+        .dark-theme .law-card {
+            background: #1e1e1e;
+            color: #e0e0e0;
+            box-shadow: 0 3px 10px rgba(0, 0, 0, 0.3);
+        }
+
+        .dark-theme .law-card h3 {
+            color: #64b5f6;
+        }
+
+        .dark-theme .law-card p {
+            color: #bbb;
+        }
+
+        .dark-theme .law-card a {
+            color: #64b5f6;
+        }
+
+        .dark-theme .law-card a:hover {
+            color: #90caf9;
+        }
+
+        .dark-theme .alert-light {
+            background-color: #2a2a2a;
+            color: #e0e0e0;
+            border-color: #444;
+        }
+
+        .dark-theme footer {
+            background-color: #0a0a0a;
+        }
+
+        .dark-theme footer h5 {
+            color: #fff;
+        }
+
+        .dark-theme footer a {
+            color: #aaa;
+        }
+
+        .dark-theme footer a:hover {
+            color: #fff;
+        }
+
+        .dark-theme .footer-bottom {
+            border-top: 1px solid #333;
+        }
     </style>
 </head>
 <body>
@@ -541,6 +692,43 @@
     </footer>
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const themeSwitch = document.querySelector('.theme-switch__checkbox');
+
+            function switchToDarkTheme() {
+                document.body.classList.add('dark-theme');
+            }
+
+            function switchToLightTheme() {
+                document.body.classList.remove('dark-theme');
+            }
+
+            function applyLocalTime() {
+                const hour = new Date().getHours();
+                if (themeSwitch) {
+                    themeSwitch.checked = !(hour >= 6 && hour < 18);
+                }
+                if (hour >= 6 && hour < 18) {
+                    switchToLightTheme();
+                } else {
+                    switchToDarkTheme();
+                }
+            }
+
+            applyLocalTime();
+
+            if (themeSwitch) {
+                themeSwitch.addEventListener('change', function() {
+                    if (this.checked) {
+                        switchToDarkTheme();
+                    } else {
+                        switchToLightTheme();
+                    }
+                });
+            }
+        });
+    </script>
     <script>
         // 离线搜索：从 laws/manifest.json 读取文件清单并建立本地索引（文本文件）
         async function loadManifest() {
