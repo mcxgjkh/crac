@@ -586,8 +586,11 @@
         .search-preview {
             color: #555;
             font-size: 0.92rem;
-            line-height: 1.5;
-            max-height: 80px;
+            line-height: 1.6;
+            display: -webkit-box;
+            -webkit-line-clamp: 4;
+            line-clamp: 4;
+            -webkit-box-orient: vertical;
             overflow: hidden;
         }
 
@@ -753,6 +756,11 @@
             const container = document.getElementById('lawList');
             const searchInput = document.getElementById('lawSearch');
             const PDF_FILES = ['业余无线电台呼号编制和核发要求.pdf', '业余无线电台操作技术能力验证暂行办法.pdf', '中华人民共和国无线电频率划分规定.pdf'];
+            const TEXT_FILES = [
+                {file:'业余无线电台管理办法.txt', title:'业余无线电台管理办法'},
+                {file:'中华人民共和国无线电管理条例.txt', title:'中华人民共和国无线电管理条例'},
+                {file:'中华人民共和国电信条例.txt', title:'中华人民共和国电信条例'}
+            ];
 
             async function extractPdfText(url) {
                 try {
@@ -761,9 +769,18 @@
                     for (let i = 1; i <= pdf.numPages; i++) {
                         const page = await pdf.getPage(i);
                         const content = await page.getTextContent();
-                        text += content.items.map(item => item.str).join(' ') + '\n';
+                        var lastY = null;
+                        for (var j = 0; j < content.items.length; j++) {
+                            var item = content.items[j];
+                            if (lastY !== null && Math.abs(item.transform[5] - lastY) > 3) {
+                                text += '\n';
+                            }
+                            text += item.str;
+                            lastY = item.transform[5];
+                        }
+                        text += '\n';
                     }
-                    return text.replace(/\s+/g, ' ').trim();
+                    return text.trim();
                 } catch (e) {
                     console.warn('PDF 解析失败:', url, e);
                     return '';
@@ -773,22 +790,78 @@
             function highlightText(text, query) {
                 if (!query) return text;
                 const escaped = query.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
-                const regex = new RegExp(`(${escaped})`, 'gi');
+                const regex = new RegExp('(' + escaped + ')', 'gi');
                 return text.replace(regex, '<mark>$1</mark>');
             }
 
-            function getPreview(content, query, maxLen) {
-                maxLen = maxLen || 200;
+            function getPreview(content, query) {
+                var maxLen = 300;
                 if (!query) {
-                    return content.slice(0, maxLen).replace(/\n/g, ' ') + (content.length > maxLen ? '…' : '');
+                    var first = content.replace(/\n+/g, ' ').slice(0, maxLen);
+                    return first + (content.length > maxLen ? '…' : '');
                 }
-                const idx = content.toLowerCase().indexOf(query.toLowerCase());
-                if (idx === -1) return content.slice(0, maxLen) + '…';
-                const start = Math.max(0, idx - 40);
-                const end = Math.min(content.length, idx + query.length + maxLen);
-                let snippet = (start > 0 ? '…' : '') + content.slice(start, end) + (end < content.length ? '…' : '');
-                return highlightText(snippet, query);
+                var idx = content.toLowerCase().indexOf(query.toLowerCase());
+                if (idx === -1) {
+                    return content.replace(/\n+/g, ' ').slice(0, maxLen) + '…';
+                }
+                var start = Math.max(0, idx - 50);
+                var end = Math.min(content.length, idx + query.length + maxLen);
+                var snippet = (start > 0 ? '…' : '') + content.slice(start, end) + (end < content.length ? '…' : '');
+                return highlightText(snippet.replace(/\n+/g, ' '), query);
             }
+
+            var lawIndex = [];
+            var lawIndexMap = {};
+
+            function initTextLaws() {
+                for (var i = 0; i < TEXT_FILES.length; i++) {
+                    var entry = {
+                        file: TEXT_FILES[i].file,
+                        title: TEXT_FILES[i].title,
+                        type: 'text',
+                        content: ''
+                    };
+                    lawIndex.push(entry);
+                    lawIndexMap[entry.file] = entry;
+                }
+                document.getElementById('lawCount').textContent = lawIndex.length + PDF_FILES.length;
+                renderCards(lawIndex, '');
+                fetchAllTextFiles();
+            }
+
+            async function fetchAllTextFiles() {
+                for (var i = 0; i < TEXT_FILES.length; i++) {
+                    var entry = lawIndexMap[TEXT_FILES[i].file];
+                    if (!entry) continue;
+                    try {
+                        var resp = await fetch(TEXT_FILES[i].file);
+                        if (resp.ok) {
+                            entry.content = await resp.text();
+                            try { sessionStorage.setItem('lawIndex', JSON.stringify(lawIndex)); } catch(e) {}
+                        }
+                    } catch(e) {
+                        entry.content = '';
+                    }
+                }
+                document.getElementById('lawCount').textContent = lawIndex.length;
+                doSearch(searchInput.value);
+            }
+
+            async function loadPdfTexts() {
+                for (var i = 0; i < PDF_FILES.length; i++) {
+                    var title = PDF_FILES[i].replace('.pdf', '');
+                    var text = await extractPdfText(PDF_FILES[i]);
+                    var entry = {file: PDF_FILES[i], title: title, type: 'pdf', content: text || ''};
+                    lawIndex.push(entry);
+                    lawIndexMap[entry.file] = entry;
+                }
+                document.getElementById('lawCount').textContent = lawIndex.length;
+                try { sessionStorage.setItem('lawIndex', JSON.stringify(lawIndex)); } catch(e) {}
+                doSearch(searchInput.value);
+            }
+
+            initTextLaws();
+            loadPdfTexts();
 
             function renderCards(results, query) {
                 container.innerHTML = '';
@@ -821,39 +894,6 @@
                 try { sessionStorage.setItem('lawIndex', JSON.stringify(lawIndex)); } catch(e) {}
                 renderCards(results, q);
             }
-
-            var lawIndex = [];
-
-            function initTextLaws() {
-                lawIndex = lawIndex.concat([
-                    {file:'业余无线电台管理办法.txt', title:'业余无线电台管理办法', type:'text', content:'业余无线电台管理办法（2024年1月18日中华人民共和国工业和信息化部令第67号公布，自2024年3月1日起施行。）第一章 总则 第一条 为了加强业余无线电台管理，维护空中电波秩序，保证相关无线电业务的正常进行，根据《中华人民共和国无线电管理条例》和相关法律、行政法规，制定本办法。第二条 在中华人民共和国境内设置、使用业余无线电台以及实施相关的监督管理，适用本办法。本办法所称业余无线电台，是指为开展业余业务（含卫星业余业务）使用的一个或者多个发信机、收信机，或者发信机与收信机的组合（包括附属设备）。第三条 业余无线电台只能用于相互通信、技术研究和自我训练，并在业余业务频率范围内收发信号，不得用于谋取商业利益。为突发事件应急处置的需要，业余无线电台可以与非业余无线电台通信，但通信内容应当限于与突发事件应急处置直接相关的紧急事务。未经批准，业余无线电台不得以任何方式进行广播或者发射通播性质的信号。第四条 国家无线电管理机构负责全国业余无线电台设置、使用的监督管理。省、自治区、直辖市无线电管理机构依照本办法负责本行政区域业余无线电台设置、使用的监督管理。第五条 国家鼓励和支持业余无线电通信技术的科学研究、科普宣传和教育教学等活动。第二章 许可管理 第六条 设置、使用业余无线电台，应当向无线电管理机构提出申请，取得业余无线电台执照。遇有危及国家安全、公共安全、生命财产安全等紧急情况，可以不经批准临时设置、使用业余无线电台，但应当在48小时内向电台所在地的无线电管理机构报告，并在紧急情况消除后及时关闭。第七条 设置、使用业余无线电台，应当具备以下条件：（一）熟悉无线电管理规定；（二）具有相应的操作技术能力，依照本办法通过相应的操作技术能力验证；（三）使用的无线电发射设备依法取得型号核准；或者使用的自制、改装、拼装等未取得型号核准的无线电发射设备符合国家标准和国家无线电管理规定，且无线电发射频率范围仅限于业余业务频段。第八条 未成年人可以设置、使用工作在30-3000MHz频段且最大发射功率不大于25瓦的业余无线电台。第九条 设置业余中继台，其台址布局应当符合资源共享、集约的要求。第十条 设置、使用有固定台址的业余无线电台，应当向电台所在地的省、自治区、直辖市无线电管理机构提出申请。设置、使用没有固定台址的业余无线电台，应当向申请人住所地的省、自治区、直辖市无线电管理机构提出申请。设置、使用15瓦以上短波业余无线电台以及涉及国家主权、安全的其他重要业余无线电台，应当向国家无线电管理机构提出申请。第十一条 个人设置、使用业余无线电台，应当向无线电管理机构提交下列材料：（一）申请表；（二）身份证明复印件；（三）使用依法取得型号核准的无线电发射设备的，提交含有型号核准代码、出厂序列号等信息的无线电发射设备照片；使用自制、改装、拼装等未取得型号核准的无线电发射设备的，提交该设备符合本办法规定条件的说明材料。申请人为未成年人的，还应当提交其监护人身份证明复印件，以及申请人与监护人关系的说明材料。第十三条 无线电管理机构应当自受理申请之日起30个工作日作出许可或者不予许可的决定。第十五条 设置、使用业余无线电台拟使用《中华人民共和国无线电频率划分规定》确定为次要业务，或者与其他无线电业务共同划分为主要业务的业余业务频率的，无线电管理机构应当开展必要的频率协调。第十八条 无线电管理机构颁发业余无线电台执照，应当同时向申请人核发业余无线电台呼号。第十九条 业余无线电台执照应当载明电台设置、使用人，操作技术能力类别、编号，电台呼号、台址/设置区域、使用频率、发射功率，执照编号、颁发日期、有效期、发证机关等。业余无线电台执照可以采用纸质或者电子形式，有效期不超过5年。第三章 操作技术能力验证 第二十五条 业余无线电台操作技术能力分为A类、B类和C类。第二十六条 参加A类业余无线电台操作技术能力验证的人员，应当熟悉无线电管理规定。参加B类业余无线电台操作技术能力验证的人员，应当依法取得业余无线电台执照6个月以上。参加C类业余无线电台操作技术能力验证的人员，应当依法取得载明30MHz以下频段的业余无线电台执照18个月以上。第三十条 取得A类证书可以申请设置、使用工作在30-3000MHz频段且最大发射功率不大于25瓦的业余无线电台。取得B类证书可以申请设置、使用工作在30MHz以下频段且最大发射功率小于15瓦，或者30MHz以上频段且最大发射功率不大于25瓦的业余无线电台。取得C类证书可以申请设置、使用工作在30MHz以下频段且最大发射功率不大于1000瓦，或者30MHz以上频段且最大发射功率不大于25瓦的业余无线电台。第四章 设置、使用要求 第三十五条 使用业余无线电台的单位或者个人应当在通信过程中使用明语或者业余无线电领域公认的缩略语、简语。第三十六条 使用业余无线电台的单位或者个人应当如实将通信时间、通信频率、通信模式和通信对象等内容记入业余无线电台日志并保留2年以上。第三十七条 使用业余无线电台的单位或者个人应当在每次通信建立以及结束时发送本业余无线电台呼号，在通信过程中不定期（间隔不超过10分钟）发送本业余无线电台呼号。第四十三条 任何单位或者个人不得使用业余无线电台从事下列活动：（一）通过任何形式发布、传播法律、行政法规禁止发布、传播的信息；（二）违反本办法规定用于谋取商业利益；（三）故意干扰、阻碍其他无线电台（站）通信；（四）故意收发业余无线电台执照载明事项之外的无线电信号；（五）传播、公布或者利用无意接收的信息；（六）擅自编制、使用业余无线电台呼号；（七）涂改、倒卖、出租或者出借业余无线电台执照；（八）向境外组织或者个人提供涉及国家安全的境内电波参数资料。第五章 电波秩序维护 第六章 监督检查 第七章 法律责任 第八章 附则'},
-
-                    {file:'中华人民共和国无线电管理条例.txt', title:'中华人民共和国无线电管理条例', type:'text', content:'中华人民共和国无线电管理条例（1993年9月11日中华人民共和国国务院、中华人民共和国中央军事委员会令第128号发布）第一章 总则 第一条 为了加强无线电管理，维护空中电波秩序，有效利用无线电频谱资源，保证各种无线电业务的正常进行，制定本条例。第二条 在中华人民共和国境内设置、使用无线电台（站）和研制、生产、进口无线电发射设备以及使用辐射无线电波的非无线电设备，必须遵守本条例。第三条 无线电管理实行统一领导、统一规划、分工管理、分级负责的原则，贯彻科学管理、促进发展的方针。第四条 无线电频谱资源属国家所有。国家对无线电频谱实行统一规划、合理开发、科学管理、有偿使用的原则。第二章 管理机构及其职责 第六条 国家无线电管理机构在国务院、中央军事委员会的领导下负责全国无线电管理工作。第七条 中国人民解放军无线电管理机构负责军事系统的无线电管理工作。第八条 省、自治区、直辖市和设区的市无线电管理机构在上级无线电管理机构和同级人民政府领导下负责辖区内除军事系统外的无线电管理工作。第三章 无线电台（站）的设置和使用 第十一条 设置、使用无线电台（站）的单位和个人，必须提出书面申请，办理设台审批手续，领取电台执照。第十二条 设置、使用无线电台（站），应当具备下列条件：（一）无线电设备符合国家技术标准；（二）操作人员熟悉无线电管理的有关规定，并具有相应的业务技能和操作资格；（三）必要的无线电网络设计符合经济合理的原则，工作环境安全可靠；（四）设台单位或者个人有相应的管理措施。第十五条 设置业余无线电台（站），应当按照国家有关业余无线电台（站）管理的规定办理设台审批手续。第十七条 电台呼号由国家无线电管理机构编制和分配。第十八条 电台执照由国家统一印制，由国家无线电管理机构、地方无线电管理机构或者国家无线电管理机构委托的国务院有关部门核发。第十九条 遇有危及人民生命财产安全的紧急情况，可以临时动用未经批准设置使用的无线电设备，但是应当及时向无线电管理机构报告。第四章 频率管理 第二十二条 国家无线电管理机构对无线电频率实行统一划分和分配。第二十三条 指配和使用频率，必须遵守国家有关频率管理的规定。任何单位和个人未经批准，不得转让频率。禁止出租或者变相出租频率。第二十四条 因国家安全和重大任务需要实行无线电管制时，管制区域内设有无线电发射设备和其他辐射无线电波设备的单位和个人，必须遵守有关管制的规定。第二十五条 对依法设置的无线电台（站），无线电管理机构应当保护其使用的频率免受有害干扰。处理无线电频率相互有害干扰，应当遵循带外让带内、次要业务让主要业务、后用让先用、无规划让有规划的原则。第五章 无线电发射设备的研制、生产、销售、进口 第六章 非无线电设备的无线电波辐射 第七章 涉外无线电管理 第八章 无线电监测和监督检查 第九章 罚则 第四十三条 对有下列行为之一的单位和个人，可以给予警告、查封或者没收设备、没收非法所得的处罚；情节严重的，可以并处一千元以上、五千元以下的罚款或者吊销其电台执照：（一）擅自设置、使用无线电台（站）的；（二）违反本条例规定研制、生产、进口无线电发射设备的；（三）干扰无线电业务的；（四）随意变更核定项目，发送和接收与工作无关的信号的；（五）不遵守频率管理的有关规定，擅自出租、转让频率的。第十章 附则'},
-
-                    {file:'中华人民共和国电信条例.txt', title:'中华人民共和国电信条例', type:'text', content:'中华人民共和国电信条例（2000年9月25日中华人民共和国国务院令第291号公布，2014年、2016年修订）第一章 总则 第一条 为了规范电信市场秩序，维护电信用户和电信业务经营者的合法权益，保障电信网络和信息的安全，促进电信业的健康发展，制定本条例。第二条 在中华人民共和国境内从事电信活动或者与电信有关的活动，必须遵守本条例。本条例所称电信，是指利用有线、无线的电磁系统或者光电系统，传送、发射或者接收语音、文字、数据、图像以及其他任何形式信息的活动。第四条 电信监督管理遵循政企分开、破除垄断、鼓励竞争、促进发展和公开、公平、公正的原则。第二章 电信市场 第一节 电信业务许可 第七条 国家对电信业务经营按照电信业务分类，实行许可制度。经营电信业务，必须取得电信业务经营许可证。未取得电信业务经营许可证，任何组织或者个人不得从事电信业务经营活动。第八条 电信业务分为基础电信业务和增值电信业务。基础电信业务，是指提供公共网络基础设施、公共数据传送和基本话音通信服务的业务。增值电信业务，是指利用公共网络基础设施提供的电信与信息服务的业务。第九条 经营基础电信业务，须经国务院信息产业主管部门审查批准，取得《基础电信业务经营许可证》。第十条 经营基础电信业务，应当具备条件包括：经营者为依法设立的专门从事基础电信业务的公司，且公司中国有股权或者股份不少于51%。第二节 电信网间互联 第十七条 电信网之间应当按照技术可行、经济合理、公平公正、相互配合的原则，实现互联互通。主导的电信业务经营者不得拒绝其他电信业务经营者和专用网运营单位提出的互联互通要求。第三节 电信资费 第二十三条 电信资费实行市场调节价。第四节 电信资源 第二十六条 国家对电信资源统一规划、集中管理、合理分配，实行有偿使用制度。电信资源是指无线电频率、卫星轨道位置、电信网码号等用于实现电信功能且有限的资源。第三章 电信服务 第四章 电信建设 第五章 电信安全 第六章 罚则 第七章 附则'}
-                ]);
-                document.getElementById('lawCount').textContent = lawIndex.length;
-                try { sessionStorage.setItem('lawIndex', JSON.stringify(lawIndex)); } catch(e) {}
-                renderCards(lawIndex, '');
-            }
-
-            async function loadPdfTexts() {
-                for (const pdfFile of PDF_FILES) {
-                    const title = pdfFile.replace('.pdf', '');
-                    const text = await extractPdfText(pdfFile);
-                    if (text) {
-                        lawIndex.push({file: pdfFile, title: title, type: 'pdf', content: text});
-                    } else {
-                        lawIndex.push({file: pdfFile, title: title, type: 'pdf', content: ''});
-                    }
-                }
-                document.getElementById('lawCount').textContent = lawIndex.length;
-                try { sessionStorage.setItem('lawIndex', JSON.stringify(lawIndex)); } catch(e) {}
-                doSearch(searchInput.value);
-            }
-
-            initTextLaws();
-            loadPdfTexts();
 
             var searchTimer = null;
             searchInput.addEventListener('input', function() {

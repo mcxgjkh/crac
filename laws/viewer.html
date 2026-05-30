@@ -131,10 +131,7 @@
             font-size: 1.05rem;
             white-space: pre-wrap;
             word-break: break-word;
-        }
-
-        .viewer-content p {
-            margin-bottom: 1em;
+            line-height: 1.9;
         }
 
         mark {
@@ -419,14 +416,10 @@
                 return div.innerHTML;
             }
 
-            function formatContent(text) {
-                return text.split('\n').filter(line => line.trim()).map(line => '<p>' + line + '</p>').join('\n');
-            }
-
             function displayContent(title, text) {
                 titleEl.textContent = title;
                 metaEl.textContent = '字数：' + text.length + ' | ' + (query ? '搜索关键词：' + query : '全文浏览');
-                contentEl.innerHTML = formatContent(highlightAll(text, query));
+                contentEl.innerHTML = highlightAll(text, query);
                 loadingBox.style.display = 'none';
                 contentEl.style.display = 'block';
                 document.title = 'BH6RKW - ' + title;
@@ -462,11 +455,19 @@
                         for (let i = 1; i <= pdf.numPages; i++) {
                             const page = await pdf.getPage(i);
                             const content = await page.getTextContent();
-                            text += content.items.map(item => item.str).join(' ') + '\n';
+                            var lastY = null;
+                            for (var j = 0; j < content.items.length; j++) {
+                                var item = content.items[j];
+                                if (lastY !== null && Math.abs(item.transform[5] - lastY) > 3) {
+                                    text += '\n';
+                                }
+                                text += item.str;
+                                lastY = item.transform[5];
+                            }
+                            text += '\n\n';
                         }
-                        const clean = text.replace(/\s+/g, ' ').trim();
-                        if (clean) {
-                            displayContent(file.replace('.pdf', ''), clean);
+                        if (text.trim()) {
+                            displayContent(file.replace('.pdf', ''), text.trim());
                         } else {
                             showError('PDF 文件无法提取文本内容，请尝试直接下载查看。');
                         }
@@ -478,7 +479,7 @@
                         const resp = await fetch(file);
                         if (!resp.ok) throw new Error('HTTP ' + resp.status);
                         const text = await resp.text();
-                        const clean = text.replace(/\s+/g, ' ').trim();
+                        const clean = text.trim();
                         displayContent(file.replace('.txt', ''), clean || '(文件内容为空)');
                     } catch(e) {
                         showError('无法读取文件：' + e.message);
