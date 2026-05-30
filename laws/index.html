@@ -869,15 +869,11 @@
                     col.innerHTML = [
                         '<div class="law-card">',
                         '<h3>' + highlightText(entry.title, query) + '</h3>',
-                        entry.type === 'doc'
-                            ? '<p class="search-preview">文本提取内容供检索参考，完整文件含表格请下载原文档查看。</p>'
-                            : (!entry.content
-                                ? '<p class="search-preview"><i class="fas fa-spinner fa-pulse me-1"></i>内容加载中…</p>'
-                                : '<p class="search-preview">' + getPreview(entry.content, query) + '</p>'),
+                        (!entry.content)
+                            ? '<p class="search-preview"><i class="fas fa-spinner fa-pulse me-1"></i>内容加载中…</p>'
+                            : '<p class="search-preview">' + getPreview(entry.content, query) + '</p>',
                         '<p class="search-source"><i class="fas fa-file-alt me-1"></i>' + entry.title + (entry.type === 'doc' ? '（DOC）' : '') + '</p>',
-                        entry.type === 'doc'
-                            ? '<a href="' + entry.file + '" download><i class="fas fa-download me-1"></i>下载原文件</a>'
-                            : '<a href="viewer.html?file=' + encodeURIComponent(entry.file) + '&q=' + encodeURIComponent(query || '') + '"><i class="fas fa-book-open me-1"></i>阅读全文</a>',
+                        '<a href="viewer.html?file=' + encodeURIComponent(entry.file) + '&q=' + encodeURIComponent(query || '') + '"><i class="fas fa-book-open me-1"></i>阅读全文</a>',
                         '</div>'
                     ].join('');
                     container.appendChild(col);
