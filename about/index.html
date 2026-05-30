@@ -19,7 +19,6 @@
             font-family: "Microsoft YaHei", sans-serif;
             color: #333;
             line-height: 1.6;
-            background-color: #fafafa;
         }
 
         .top-bar {
@@ -66,50 +65,84 @@
             background-color: var(--primary-blue);
         }
 
+        .section-title {
+            position: relative;
+            margin-bottom: 30px;
+            padding-bottom: 15px;
+            font-weight: bold;
+            color: var(--primary-blue);
+        }
+
+        .section-title::after {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            width: 60px;
+            height: 3px;
+            background-color: var(--primary-blue);
+        }
+
         .page-header {
-            padding: 80px 0 40px;
-            background: linear-gradient(180deg, rgba(26, 95, 175, 0.12), rgba(255, 255, 255, 0.95));
+            padding: 80px 0 50px;
+            background: linear-gradient(135deg, var(--primary-blue) 0%, var(--secondary-blue) 100%);
+            color: white;
         }
 
         .page-header h1 {
             font-size: 2.8rem;
-            line-height: 1.1;
-            margin-bottom: 20px;
-            color: var(--primary-blue);
+            font-weight: bold;
+            margin-bottom: 15px;
         }
 
         .page-header p {
             max-width: 720px;
-            color: #555;
-            font-size: 1.05rem;
+            font-size: 1.1rem;
+            opacity: 0.9;
         }
 
-        .content-section {
+        .main-content {
             padding: 40px 0;
         }
 
-        .content-section h2 {
-            font-size: 1.8rem;
+        .service-card {
+            background: white;
+            border-radius: 8px;
+            overflow: hidden;
+            box-shadow: 0 3px 10px rgba(0, 0, 0, 0.1);
+            transition: transform 0.3s;
+            height: 100%;
+        }
+
+        .service-card:hover {
+            transform: translateY(-5px);
+        }
+
+        .skill-icon {
+            font-size: 2rem;
             color: var(--primary-blue);
-            margin-bottom: 18px;
+            margin-bottom: 10px;
         }
 
-        .content-section p {
-            color: #555;
+        .profile-card {
+            background: white;
+            border-radius: 8px;
+            padding: 30px;
+            box-shadow: 0 3px 10px rgba(0, 0, 0, 0.1);
+            text-align: center;
         }
 
-        .profile-list {
-            list-style: none;
-            padding: 0;
-        }
-
-        .profile-list li {
-            padding: 14px 0;
-            border-bottom: 1px solid #ececec;
-        }
-
-        .profile-list li:last-child {
-            border-bottom: none;
+        .profile-avatar {
+            width: 100px;
+            height: 100px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, var(--primary-blue), var(--secondary-blue));
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 20px;
+            font-size: 2.5rem;
+            color: white;
         }
 
         .footer-bottom {
@@ -140,21 +173,32 @@
             color: white;
         }
 
-        .service-card {
-            background: white;
-            border-radius: 8px;
-            overflow: hidden;
-            box-shadow: 0 3px 10px rgba(0, 0, 0, 0.1);
-            transition: transform 0.3s;
-        }
-
-        .service-card:hover {
-            transform: translateY(-5px);
-        }
-
         .dark-theme .navbar,
         .dark-theme .top-bar {
             background-color: #1e1e1e;
+        }
+
+        .dark-theme .page-header {
+            background: linear-gradient(135deg, #0d3b6e 0%, #082444 100%);
+        }
+
+        .dark-theme .section-title {
+            color: #64b5f6;
+        }
+
+        .dark-theme .section-title::after {
+            background-color: #64b5f6;
+        }
+
+        .dark-theme .service-card,
+        .dark-theme .profile-card {
+            background: #1e1e1e;
+            color: #e0e0e0;
+            box-shadow: 0 3px 10px rgba(0, 0, 0, 0.3);
+        }
+
+        .dark-theme .skill-icon {
+            color: #64b5f6;
         }
 
         .theme-switch {
@@ -509,46 +553,118 @@
     <section class="page-header">
         <div class="container">
             <h1>关于我</h1>
-            <p>我是 BH6RKW，一名来自中国湖北的业余无线电爱好者。我热爱无线电技术、QSL 卡片收藏以及无线电应急通信。</p>
+            <p>我是 BH6RKW，一名来自中国湖北的业余无线电爱好者。热爱无线电技术、QSL 卡片收藏及无线电应急通信。</p>
         </div>
     </section>
 
-    <section class="content-section">
+    <div class="main-content">
         <div class="container">
             <div class="row">
                 <div class="col-lg-8">
-                    <h2>个人简介</h2>
-                    <p>我是 BH6RKW，长期关注业余无线电文化和技术交流。业余无线电对我来说不仅是兴趣爱好，更是沟通世界、了解电磁波应用和应急通信能力的重要方式。</p>
+                    <h3 class="section-title">个人简介</h3>
+                    <p style="font-size: 1.05rem; color: #555; margin-bottom: 30px;">
+                        长期关注业余无线电文化和技术交流。业余无线电对我来说不仅是兴趣爱好，更是沟通世界、了解电磁波应用和应急通信能力的重要方式。
+                    </p>
 
-                    <h2>无线电经历</h2>
-                    <p>我参与过多次无线电活动，从 QSL 卡片设计、业余无线电台的搭建，到无线电操作证书考试的准备。通过分享经验，希望让更多人了解无线电的魅力。</p>
+                    <h3 class="section-title">无线电经历</h3>
+                    <p style="font-size: 1.05rem; color: #555; margin-bottom: 30px;">
+                        参与过多次无线电活动，从 QSL 卡片设计、业余无线电台的搭建，到无线电操作证书考试的准备。通过分享经验，希望让更多人了解无线电的魅力。
+                    </p>
 
-                    <h2>我擅长</h2>
-                    <ul class="profile-list">
-                        <li>业余无线电操作与通信（HF/VHF/UHF）</li>
-                        <li>QSL 卡片设计</li>
-                        <li>业余无线电考试题库与模拟练习</li>
-                        <li>无线电应急通信与技术规范研究</li>
-                    </ul>
-
-                    <h2>联系方式</h2>
-                    <p>如需联系我，可以发送邮件至 <a href="mailto:bh6rkw@outlook.com">bh6rkw@outlook.com</a>。</p>
-                </div>
-                <div class="col-lg-4">
-                    <div class="card p-4 mb-4">
-                        <h5>个人资料</h5>
-                        <p>呼号：BH6RKW</p>
-                        <p>位置：中国湖北</p>
-                        <p>属性：业余无线电爱好者，B类操作证</p>
+                    <h3 class="section-title">我擅长</h3>
+                    <div class="row mb-4">
+                        <div class="col-md-6 mb-3">
+                            <div class="service-card p-4 d-flex align-items-center">
+                                <div class="skill-icon me-3">
+                                    <i class="fas fa-broadcast-tower"></i>
+                                </div>
+                                <div>
+                                    <h6 class="mb-1">业余无线电操作与通信</h6>
+                                    <small class="text-muted">HF / VHF / UHF</small>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <div class="service-card p-4 d-flex align-items-center">
+                                <div class="skill-icon me-3">
+                                    <i class="fas fa-paint-brush"></i>
+                                </div>
+                                <div>
+                                    <h6 class="mb-1">QSL 卡片设计</h6>
+                                    <small class="text-muted">视觉设计与印刷</small>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <div class="service-card p-4 d-flex align-items-center">
+                                <div class="skill-icon me-3">
+                                    <i class="fas fa-book"></i>
+                                </div>
+                                <div>
+                                    <h6 class="mb-1">考试题库与模拟练习</h6>
+                                    <small class="text-muted">A / B / C 类操作证</small>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <div class="service-card p-4 d-flex align-items-center">
+                                <div class="skill-icon me-3">
+                                    <i class="fas fa-shield-alt"></i>
+                                </div>
+                                <div>
+                                    <h6 class="mb-1">应急通信与技术规范</h6>
+                                    <small class="text-muted">应急救援通信保障</small>
+                                </div>
+                            </div>
+                        </div>
                     </div>
-                    <div class="card p-4 mb-4">
-                        <h5>最新动态</h5>
-                        <p>正在更新网站内容并持续完善模拟考试与资料下载栏目。</p>
+
+                    <h3 class="section-title">联系方式</h3>
+                    <div class="service-card p-4 d-flex align-items-center mb-4">
+                        <div class="skill-icon me-3">
+                            <i class="fas fa-envelope"></i>
+                        </div>
+                        <div>
+                            <h6 class="mb-1">电子邮箱</h6>
+                            <a href="mailto:bh6rkw@outlook.com" style="color: var(--primary-blue); text-decoration: none;">bh6rkw@outlook.com</a>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="col-lg-4">
+                    <div class="profile-card mb-4">
+                        <div class="profile-avatar">
+                            <i class="fas fa-user-astronaut"></i>
+                        </div>
+                        <h5 style="color: var(--primary-blue);">BH6RKW</h5>
+                        <p class="text-muted mb-2">业余无线电爱好者</p>
+                        <hr>
+                        <div class="text-start">
+                            <p class="mb-2"><i class="fas fa-map-marker-alt me-2" style="color: var(--primary-blue);"></i>中国湖北</p>
+                            <p class="mb-2"><i class="fas fa-id-card me-2" style="color: var(--primary-blue);"></i>操作证类别：B类</p>
+                            <p class="mb-2"><i class="fas fa-globe-asia me-2" style="color: var(--primary-blue);"></i>ITU分区：44</p>
+                            <p class="mb-0"><i class="fas fa-chart-line me-2" style="color: var(--primary-blue);"></i>状态：活跃</p>
+                        </div>
+                    </div>
+
+                    <div class="service-card p-4 mb-4">
+                        <h5 style="color: var(--primary-blue);"><i class="fas fa-rss me-2"></i>最新动态</h5>
+                        <p class="text-muted mb-0">持续完善模拟考试与资料下载栏目，QSL 卡片系统升级中。</p>
+                    </div>
+
+                    <div class="service-card p-4">
+                        <h5 style="color: var(--primary-blue);"><i class="fas fa-link me-2"></i>快速链接</h5>
+                        <ul class="list-unstyled mb-0">
+                            <li class="mb-2"><a href="https://bh6rkw.dpdns.org" style="color: var(--primary-blue); text-decoration: none;"><i class="fas fa-home me-2"></i>网站首页</a></li>
+                            <li class="mb-2"><a href="https://exam.bh6rkw.dpdns.org" style="color: var(--primary-blue); text-decoration: none;"><i class="fas fa-book me-2"></i>模拟考试</a></li>
+                            <li class="mb-2"><a href="https://bh6rkw.dpdns.org/download/index.html" style="color: var(--primary-blue); text-decoration: none;"><i class="fas fa-download me-2"></i>资料下载</a></li>
+                            <li class="mb-0"><a href="https://qrz.com/db/BH6RKW" style="color: var(--primary-blue); text-decoration: none;"><i class="fas fa-database me-2"></i>QRZ 页面</a></li>
+                        </ul>
                     </div>
                 </div>
             </div>
         </div>
-    </section>
+    </div>
 
     <footer>
         <div class="container">
