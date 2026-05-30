@@ -690,7 +690,7 @@
                     <div class="search-box">
                         <label for="lawSearch" class="form-label"><i class="fas fa-search me-2"></i>法律条文本地查询</label>
                         <input id="lawSearch" type="text" class="form-control" placeholder="输入关键词搜索法规标题或内容…">
-                        <div class="form-text mt-2">共收录 <span id="lawCount">6</span> 部法律法规，支持标题和全文检索，搜索关键词高亮标黄。</div>
+                        <div class="form-text mt-2">共收录 <span id="lawCount">6</span> 部法律法规，支持标题和全文检索，匹配到的关键词将高亮标黄。</div>
                     </div>
                 </div>
             </div>
@@ -802,11 +802,11 @@
                     col.innerHTML = [
                         '<div class="law-card">',
                         '<h3>' + highlightText(entry.title, query) + '</h3>',
-                        entry.type === 'pdf'
-                            ? '<p class="search-preview">PDF 文档 — 点击下方按钮查看或下载原文。</p>'
+                        (!entry.content)
+                            ? '<p class="search-preview"><i class="fas fa-spinner fa-pulse me-1"></i>内容加载中…</p>'
                             : '<p class="search-preview">' + getPreview(entry.content, query) + '</p>',
                         '<p class="search-source"><i class="fas fa-file-alt me-1"></i>' + entry.title + '</p>',
-                        '<a href="' + entry.file + '" target="_blank" rel="noreferrer"><i class="fas fa-external-link-alt me-1"></i>' + (entry.type === 'pdf' ? '打开 PDF' : '阅读全文') + '</a>',
+                        '<a href="viewer.html?file=' + encodeURIComponent(entry.file) + '&q=' + encodeURIComponent(query || '') + '"><i class="fas fa-book-open me-1"></i>阅读全文</a>',
                         '</div>'
                     ].join('');
                     container.appendChild(col);
@@ -818,6 +818,7 @@
                 const results = q
                     ? lawIndex.filter(e => e.title.toLowerCase().includes(q) || e.content.toLowerCase().includes(q))
                     : lawIndex;
+                try { sessionStorage.setItem('lawIndex', JSON.stringify(lawIndex)); } catch(e) {}
                 renderCards(results, q);
             }
 
@@ -832,6 +833,7 @@
                     {file:'中华人民共和国电信条例.txt', title:'中华人民共和国电信条例', type:'text', content:'中华人民共和国电信条例（2000年9月25日中华人民共和国国务院令第291号公布，2014年、2016年修订）第一章 总则 第一条 为了规范电信市场秩序，维护电信用户和电信业务经营者的合法权益，保障电信网络和信息的安全，促进电信业的健康发展，制定本条例。第二条 在中华人民共和国境内从事电信活动或者与电信有关的活动，必须遵守本条例。本条例所称电信，是指利用有线、无线的电磁系统或者光电系统，传送、发射或者接收语音、文字、数据、图像以及其他任何形式信息的活动。第四条 电信监督管理遵循政企分开、破除垄断、鼓励竞争、促进发展和公开、公平、公正的原则。第二章 电信市场 第一节 电信业务许可 第七条 国家对电信业务经营按照电信业务分类，实行许可制度。经营电信业务，必须取得电信业务经营许可证。未取得电信业务经营许可证，任何组织或者个人不得从事电信业务经营活动。第八条 电信业务分为基础电信业务和增值电信业务。基础电信业务，是指提供公共网络基础设施、公共数据传送和基本话音通信服务的业务。增值电信业务，是指利用公共网络基础设施提供的电信与信息服务的业务。第九条 经营基础电信业务，须经国务院信息产业主管部门审查批准，取得《基础电信业务经营许可证》。第十条 经营基础电信业务，应当具备条件包括：经营者为依法设立的专门从事基础电信业务的公司，且公司中国有股权或者股份不少于51%。第二节 电信网间互联 第十七条 电信网之间应当按照技术可行、经济合理、公平公正、相互配合的原则，实现互联互通。主导的电信业务经营者不得拒绝其他电信业务经营者和专用网运营单位提出的互联互通要求。第三节 电信资费 第二十三条 电信资费实行市场调节价。第四节 电信资源 第二十六条 国家对电信资源统一规划、集中管理、合理分配，实行有偿使用制度。电信资源是指无线电频率、卫星轨道位置、电信网码号等用于实现电信功能且有限的资源。第三章 电信服务 第四章 电信建设 第五章 电信安全 第六章 罚则 第七章 附则'}
                 ]);
                 document.getElementById('lawCount').textContent = lawIndex.length;
+                try { sessionStorage.setItem('lawIndex', JSON.stringify(lawIndex)); } catch(e) {}
                 renderCards(lawIndex, '');
             }
 
@@ -846,6 +848,7 @@
                     }
                 }
                 document.getElementById('lawCount').textContent = lawIndex.length;
+                try { sessionStorage.setItem('lawIndex', JSON.stringify(lawIndex)); } catch(e) {}
                 doSearch(searchInput.value);
             }
 
