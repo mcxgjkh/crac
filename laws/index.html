@@ -181,9 +181,6 @@
             position: absolute;
             right: 65px;
             --toggle-size: 10px;
-            /* the size is adjusted using font-size,
-                this is not transform scale,
-                so you can choose any size */
             --container-width: 5.625em;
             --container-height: 2.5em;
             --container-radius: 6.25em;
@@ -607,6 +604,12 @@
 
         .dark-theme .search-source {
             color: #64b5f6;
+        }
+
+        @media (max-width: 768px) {
+            .theme-switch {
+                right: 5px;
+            }
         }
     </style>
 </head>
