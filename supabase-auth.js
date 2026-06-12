@@ -15,13 +15,11 @@
     tsScript.defer = true;
     document.head.appendChild(tsScript);
 
-    document.addEventListener('DOMContentLoaded', function() {
-        injectAuthModal();
-        injectDarkModeStyles();
+    injectDarkModeStyles();
+    injectAuthModal();
+    updateAuthUI();
+    sb.auth.onAuthStateChange(function() {
         updateAuthUI();
-        sb.auth.onAuthStateChange(function() {
-            updateAuthUI();
-        });
     });
 
     function injectDarkModeStyles() {
