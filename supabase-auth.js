@@ -10,11 +10,32 @@
 
     document.addEventListener('DOMContentLoaded', function() {
         injectAuthModal();
+        injectDarkModeStyles();
         updateAuthUI();
         sb.auth.onAuthStateChange(function() {
             updateAuthUI();
         });
     });
+
+    function injectDarkModeStyles() {
+        var css = [
+            '.dark-theme #authModal .modal-content { background-color: #1e1e1e; color: #e0e0e0; border-color: #333; }',
+            '.dark-theme #authModal .modal-header { border-bottom-color: #333; }',
+            '.dark-theme #authModal .modal-title { color: #e0e0e0; }',
+            '.dark-theme #authModal .btn-close { filter: invert(1); }',
+            '.dark-theme #authModal .form-control { background-color: #2a2a2a; border-color: #444; color: #e0e0e0; }',
+            '.dark-theme #authModal .form-control::placeholder { color: #888; }',
+            '.dark-theme #authModal .form-label { color: #bbb; }',
+            '.dark-theme #authModal .btn-link { color: #64b5f6; }',
+            '.dark-theme #authModal .btn-link:hover { color: #90caf9; }',
+            '.dark-theme #authModal .btn-primary { background-color: #2a5a8a; border-color: #2a5a8a; }',
+            '.dark-theme #authModal .btn-primary:hover { background-color: #3a6a9a; }',
+            '.dark-theme #authModal .text-muted { color: #aaa !important; }'
+        ].join('');
+        var style = document.createElement('style');
+        style.textContent = css;
+        document.head.appendChild(style);
+    }
 
     function injectAuthModal() {
         var html = [
@@ -27,9 +48,10 @@
             '<div class="mb-3"><label class="form-label">邮箱</label>',
             '<input type="email" id="authEmail" class="form-control" placeholder="your@email.com"></div>',
             '<div class="mb-3"><label class="form-label">密码</label>',
-            '<input type="password" id="authPassword" class="form-control" placeholder="至少6位"></div>',
+            '<input type="password" id="authPassword" class="form-control" placeholder="至少8位，需包含字母和数字"></div>',
             '<button id="authSubmitBtn" class="btn btn-primary w-100 mb-2">登录</button>',
             '<button id="authToggleBtn" class="btn btn-link w-100">没有账号？去注册</button>',
+            '<p class="text-muted small mt-2 mb-0" style="line-height:1.5;">密码全部以哈希加密形式存储于云服务器，BH6RKW 无权也无法访问您的账号与密码，但仍不建议您使用常用密码。</p>',
             '</div></div></div></div>'
         ].join('');
         var div = document.createElement('div');
@@ -58,11 +80,24 @@
             setMode(mode === 'login' ? 'register' : 'login');
         });
 
+        function validatePassword(pwd) {
+            if (pwd.length < 8) return '密码至少需要 8 位';
+            if (!/[a-zA-Z]/.test(pwd)) return '密码需包含字母';
+            if (!/[0-9]/.test(pwd)) return '密码需包含数字';
+            return null;
+        }
+
         submitBtn.addEventListener('click', async function() {
             var email = emailEl.value.trim();
             var password = passwordEl.value;
             if (!email || !password) {
                 errorEl.textContent = '请填写邮箱和密码';
+                errorEl.classList.remove('d-none');
+                return;
+            }
+            var pwdErr = validatePassword(password);
+            if (pwdErr) {
+                errorEl.textContent = pwdErr;
                 errorEl.classList.remove('d-none');
                 return;
             }
@@ -75,13 +110,12 @@
                 result = await sb.auth.signUp({ email: email, password: password });
             }
             submitBtn.disabled = false;
-            setMode(mode);
             if (result.error) {
                 errorEl.textContent = result.error.message;
                 errorEl.classList.remove('d-none');
             } else {
                 if (mode === 'register') {
-                    errorEl.textContent = '注册成功！请检查邮箱确认（如已关闭邮箱确认则直接登录）。';
+                    errorEl.textContent = '注册成功！如已禁用邮箱验证则自动登录，否则请检查邮箱确认链接。';
                     errorEl.classList.remove('d-none');
                     errorEl.classList.remove('alert-danger');
                     errorEl.classList.add('alert-success');
@@ -111,13 +145,11 @@
         if (user) {
             navItem.innerHTML = [
                 '<div class="dropdown">',
-                '<a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown">',
-                '<i class="fas fa-user-circle me-1"></i>' + escapeHtml(user.email.split('@')[0]),
-                '</a>',
+                '<a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown">' + escapeHtml(user.email.split('@')[0]) + '</a>',
                 '<ul class="dropdown-menu dropdown-menu-end">',
                 '<li><span class="dropdown-item-text text-muted small">' + escapeHtml(user.email) + '</span></li>',
                 '<li><hr class="dropdown-divider"></li>',
-                '<li><a class="dropdown-item" href="#" id="logoutBtn"><i class="fas fa-sign-out-alt me-2"></i>退出登录</a></li>',
+                '<li><a class="dropdown-item" href="#" id="logoutBtn">退出登录</a></li>',
                 '</ul></div>'
             ].join('');
             document.getElementById('logoutBtn').addEventListener('click', async function(e) {
@@ -126,7 +158,7 @@
                 updateAuthUI();
             });
         } else {
-            navItem.innerHTML = '<a class="nav-link" href="#" id="loginNavBtn"><i class="fas fa-sign-in-alt me-1"></i>登录</a>';
+            navItem.innerHTML = '<a class="nav-link" href="#" id="loginNavBtn">登录</a>';
             document.getElementById('loginNavBtn').addEventListener('click', function(e) {
                 e.preventDefault();
                 window.showAuthModal('login');
