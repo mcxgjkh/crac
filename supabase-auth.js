@@ -52,6 +52,8 @@
             '<button type="button" class="btn-close" data-bs-dismiss="modal"></button></div>',
             '<div class="modal-body">',
             '<div id="authError" class="alert alert-danger d-none"></div>',
+            '<div class="mb-3 d-none" id="usernameGroup"><label class="form-label">用户名</label>',
+            '<input type="text" id="authUsername" class="form-control" placeholder="10位以内，选填" maxlength="10"></div>',
             '<div class="mb-3"><label class="form-label">邮箱</label>',
             '<input type="email" id="authEmail" class="form-control" placeholder="your@email.com"></div>',
             '<div class="mb-3"><label class="form-label">密码</label>',
@@ -74,6 +76,8 @@
         var errorEl = document.getElementById('authError');
         var emailEl = document.getElementById('authEmail');
         var passwordEl = document.getElementById('authPassword');
+        var usernameEl = document.getElementById('authUsername');
+        var usernameGroup = document.getElementById('usernameGroup');
         var tsWidget = document.getElementById('turnstileWidget');
         var bsModal = new bootstrap.Modal(modal);
         var tsId = null;
@@ -104,6 +108,11 @@
             submitBtn.textContent = m === 'login' ? '登录' : '注册';
             toggleBtn.textContent = m === 'login' ? '没有账号？去注册' : '已有账号？去登录';
             errorEl.classList.add('d-none');
+            if (m === 'register') {
+                usernameGroup.classList.remove('d-none');
+            } else {
+                usernameGroup.classList.add('d-none');
+            }
         }
 
         toggleBtn.addEventListener('click', function() {
@@ -120,6 +129,7 @@
         submitBtn.addEventListener('click', async function() {
             var email = emailEl.value.trim();
             var password = passwordEl.value;
+            var username = usernameEl.value.trim();
             if (!email || !password) {
                 errorEl.textContent = '请填写邮箱和密码';
                 errorEl.classList.remove('d-none');
@@ -140,6 +150,9 @@
             submitBtn.disabled = true;
             submitBtn.innerHTML = '<span class="spinner-border spinner-border-sm me-1"></span>处理中…';
             var options = { email: email, password: password, options: { captchaToken: captchaToken } };
+            if (mode === 'register' && username) {
+                options.options.data = { username: username };
+            }
             var result;
             if (mode === 'login') {
                 result = await sb.auth.signInWithPassword(options);
@@ -147,13 +160,35 @@
                 result = await sb.auth.signUp(options);
             }
             submitBtn.disabled = false;
-            turnstile.reset(tsId);
             if (result.error) {
+                turnstile.reset(tsId);
                 errorEl.textContent = result.error.message;
                 errorEl.classList.remove('d-none');
             } else {
                 if (mode === 'register') {
-                    errorEl.textContent = '注册成功！如已禁用邮箱验证则自动登录，否则请检查邮箱确认链接。';
+                    errorEl.textContent = '注册成功！请检查邮箱确认链接。';
+                    errorEl.classList.remove('d-none');
+                    errorEl.classList.remove('alert-danger');
+                    errorEl.classList.add('alert-success');
+                } else {
+                    var user = result.data.user;
+                    sb.from('login_logs').insert({ user_id: user.id, ip_address: '', logged_at: new Date().toISOString() }).then(function() {});
+                    fetch('https://api64.ipify.org?format=json').then(function(r) { return r.json(); }).then(function(d) {
+                        sb.from('login_logs').update({ ip_address: d.ip }).eq('user_id', user.id).is('ip_address', '').then(function() {});
+                    }).catch(function() {});
+                    if (user && !user.email_confirmed_at) {
+                        errorEl.textContent = '邮箱尚未验证，请检查邮箱确认链接。';
+                        errorEl.classList.remove('d-none');
+                        errorEl.classList.remove('alert-danger');
+                        errorEl.classList.add('alert-warning');
+                    } else {
+                        bsModal.hide();
+                        updateAuthUI();
+                    }
+                }
+            }
+        });
+                    errorEl.textContent = '注册成功！请检查邮箱确认链接。';
                     errorEl.classList.remove('d-none');
                     errorEl.classList.remove('alert-danger');
                     errorEl.classList.add('alert-success');
