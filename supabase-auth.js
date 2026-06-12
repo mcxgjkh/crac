@@ -188,16 +188,6 @@
                 }
             }
         });
-                    errorEl.textContent = '注册成功！请检查邮箱确认链接。';
-                    errorEl.classList.remove('d-none');
-                    errorEl.classList.remove('alert-danger');
-                    errorEl.classList.add('alert-success');
-                } else {
-                    bsModal.hide();
-                    updateAuthUI();
-                }
-            }
-        });
 
         window.showAuthModal = function(initialMode) {
             setMode(initialMode || 'login');
