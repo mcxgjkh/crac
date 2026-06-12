@@ -37,7 +37,12 @@
             '.dark-theme #authModal .btn-link:hover { color: #90caf9; }',
             '.dark-theme #authModal .btn-primary { background-color: #2a5a8a; border-color: #2a5a8a; }',
             '.dark-theme #authModal .btn-primary:hover { background-color: #3a6a9a; }',
-            '.dark-theme #authModal .text-muted { color: #aaa !important; }'
+            '.dark-theme #authModal .text-muted { color: #aaa !important; }',
+            '.dark-theme .dropdown-menu { background-color: #1e1e1e; border-color: #333; }',
+            '.dark-theme .dropdown-item { color: #e0e0e0; }',
+            '.dark-theme .dropdown-item:hover { background-color: #2a2a2a; color: #64b5f6; }',
+            '.dark-theme .dropdown-divider { border-top-color: #333; }',
+            '.dark-theme .dropdown-item-text { color: #aaa; }'
         ].join('');
         var style = document.createElement('style');
         style.textContent = css;
