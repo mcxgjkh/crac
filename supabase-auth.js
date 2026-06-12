@@ -204,10 +204,11 @@
                     errorEl.classList.add('alert-success');
                 } else {
                     var user = result.data.user;
-                    sb.from('login_logs').insert({ user_id: user.id, ip_address: '', logged_at: new Date().toISOString() }).then(function() {});
-                    getPublicIP().then(function(ip) {
-                        if (ip) sb.from('login_logs').update({ ip_address: ip }).eq('user_id', user.id).is('ip_address', '').then(function() {});
-                    }).catch(function() {});
+                    sb.from('login_logs').insert({ user_id: user.id, ip_address: '', logged_at: new Date().toISOString() }).then(function() {
+                        getPublicIP().then(function(ip) {
+                            if (ip) sb.from('login_logs').update({ ip_address: ip }).eq('user_id', user.id).is('ip_address', '').then(function() {});
+                        }).catch(function() {});
+                    });
                     if (user && !user.email_confirmed_at) {
                         errorEl.textContent = '邮箱尚未验证，请检查邮箱确认链接。';
                         errorEl.classList.remove('d-none');
@@ -237,6 +238,11 @@
         if (!navItem) return;
         var session = await sb.auth.getSession();
         var user = session.data.session ? session.data.session.user : null;
+        if (user) {
+            var accessToken = session.data.session.access_token;
+            var refreshToken = session.data.session.refresh_token;
+            setCrossDomainCookie('sb-access-token', accessToken, 7);
+            setCrossDomainCookie('sb-refresh-token', refreshToken, 7);
         if (user) {
             var displayName = (user.user_metadata && user.user_metadata.username) || user.email.split('@')[0];
             navItem.innerHTML = [
@@ -274,6 +280,31 @@
             return m;
         });
     }
+
+    function setCrossDomainCookie(name, value, days) {
+        var expires = '';
+        if (days) {
+            var d = new Date();
+            d.setTime(d.getTime() + days * 24 * 60 * 60 * 1000);
+            expires = '; expires=' + d.toUTCString();
+        }
+        document.cookie = name + '=' + encodeURIComponent(value) + expires + '; path=/; domain=.bh6rkw.dpdns.org; SameSite=Lax; Secure';
+    }
+
+    function getCookie(name) {
+        var match = document.cookie.match(new RegExp('(^| )' + name + '=([^;]+)'));
+        return match ? decodeURIComponent(match[2]) : null;
+    }
+
+    window.restoreCrossDomainSession = async function() {
+        var accessToken = getCookie('sb-access-token');
+        var refreshToken = getCookie('sb-refresh-token');
+        if (!accessToken || !refreshToken) return null;
+        var result = await sb.auth.setSession({ access_token: accessToken, refresh_token: refreshToken });
+        if (result.error) return null;
+        var session = await sb.auth.getSession();
+        return session.data.session ? session.data.session.user : null;
+    };
 
     async function getPublicIP() {
         var apis = [

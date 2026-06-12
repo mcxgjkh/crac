@@ -680,7 +680,7 @@
         document.getElementById('saveUsername').addEventListener('click', async function() {
             var name = document.getElementById('profileUsername').value.trim();
             if (!name) { showMsg('用户名不能为空', 'danger'); return; }
-            var r = await sb.auth.updateUser({ data: { username: name } });
+            var r = await sb.auth.updateUser({ data: { username: name, display_name: name } });
             if (r.error) { showMsg(r.error.message, 'danger'); }
             else { showMsg('用户名已更新', 'success'); document.getElementById('profileGreeting').textContent = '欢迎，' + name; }
         });
