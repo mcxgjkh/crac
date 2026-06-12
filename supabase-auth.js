@@ -130,8 +130,14 @@
                 errorEl.classList.remove('d-none');
                 return;
             }
+            var captchaToken = getCaptchaToken();
+            if (!captchaToken) {
+                errorEl.textContent = '请完成人机验证';
+                errorEl.classList.remove('d-none');
+                return;
+            }
             forgotBtn.disabled = true;
-            var r = await sb.auth.resetPasswordForEmail(email, { redirectTo: 'https://bh6rkw.dpdns.org/profile/index.html' });
+            var r = await sb.auth.resetPasswordForEmail(email, { redirectTo: 'https://bh6rkw.dpdns.org/profile/index.html', captchaToken: captchaToken });
             forgotBtn.disabled = false;
             if (r.error) {
                 errorEl.textContent = r.error.message;
@@ -166,17 +172,21 @@
                 errorEl.classList.remove('d-none');
                 return;
             }
-            var captchaToken = getCaptchaToken();
-            if (!captchaToken) {
-                errorEl.textContent = '请完成人机验证';
-                errorEl.classList.remove('d-none');
-                return;
+            var captchaToken = null;
+            if (mode === 'register') {
+                captchaToken = getCaptchaToken();
+                if (!captchaToken) {
+                    errorEl.textContent = '请完成人机验证';
+                    errorEl.classList.remove('d-none');
+                    return;
+                }
             }
             submitBtn.disabled = true;
             submitBtn.innerHTML = '<span class="spinner-border spinner-border-sm me-1"></span>处理中…';
-            var options = { email: email, password: password, options: { captchaToken: captchaToken } };
-            if (mode === 'register' && username) {
-                options.options.data = { username: username };
+            var options = { email: email, password: password };
+            if (mode === 'register') {
+                options.options = { captchaToken: captchaToken };
+                if (username) options.options.data = { username: username };
             }
             var result;
             if (mode === 'login') {
@@ -245,6 +255,9 @@
                 e.preventDefault();
                 await sb.auth.signOut();
                 updateAuthUI();
+                if (window.location.pathname.indexOf('/profile/') !== -1) {
+                    window.location.href = '/';
+                }
             });
         } else {
             navItem.innerHTML = '<a class="nav-link" href="#" id="loginNavBtn">登录</a>';
