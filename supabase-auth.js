@@ -94,7 +94,8 @@
             if (tsId !== null) turnstile.remove(tsId);
             tsId = turnstile.render('#turnstileWidget', {
                 sitekey: TURNSTILE_KEY,
-                theme: document.body.classList.contains('dark-theme') ? 'dark' : 'light'
+                theme: document.body.classList.contains('dark-theme') ? 'dark' : 'light',
+                size: 'flexible'
             });
         }
 
@@ -172,21 +173,17 @@
                 errorEl.classList.remove('d-none');
                 return;
             }
-            var captchaToken = null;
-            if (mode === 'register') {
-                captchaToken = getCaptchaToken();
-                if (!captchaToken) {
-                    errorEl.textContent = '请完成人机验证';
-                    errorEl.classList.remove('d-none');
-                    return;
-                }
+            var captchaToken = getCaptchaToken();
+            if (!captchaToken) {
+                errorEl.textContent = '请完成人机验证';
+                errorEl.classList.remove('d-none');
+                return;
             }
             submitBtn.disabled = true;
             submitBtn.innerHTML = '<span class="spinner-border spinner-border-sm me-1"></span>处理中…';
-            var options = { email: email, password: password };
-            if (mode === 'register') {
-                options.options = { captchaToken: captchaToken };
-                if (username) options.options.data = { username: username };
+            var options = { email: email, password: password, options: { captchaToken: captchaToken } };
+            if (mode === 'register' && username) {
+                options.options.data = { username: username };
             }
             var result;
             if (mode === 'login') {
