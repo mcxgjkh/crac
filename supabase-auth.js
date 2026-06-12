@@ -42,7 +42,8 @@
             '.dark-theme .dropdown-item { color: #e0e0e0; }',
             '.dark-theme .dropdown-item:hover { background-color: #2a2a2a; color: #64b5f6; }',
             '.dark-theme .dropdown-divider { border-top-color: #333; }',
-            '.dark-theme .dropdown-item-text { color: #aaa; }'
+            '.dark-theme .dropdown-item-text { color: #aaa; }',
+            '.dark-theme .dropdown-item-text.text-muted { color: #aaa !important; }'
         ].join('');
         var style = document.createElement('style');
         style.textContent = css;
