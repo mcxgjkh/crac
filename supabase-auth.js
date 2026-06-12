@@ -204,20 +204,23 @@
                     errorEl.classList.add('alert-success');
                 } else {
                     var user = result.data.user;
-                    console.log('[LoginLog] 插入空IP记录, user_id:', user.id);
-                    sb.from('login_logs').insert({ user_id: user.id, ip_address: '', logged_at: new Date().toISOString() }).then(function(res) {
-                        console.log('[LoginLog] 插入结果:', res.error ? '失败 ' + res.error.message : '成功');
-                        console.log('[LoginLog] 开始获取公网IP...');
-                        getPublicIP().then(function(ip) {
-                            console.log('[LoginLog] 获取到IP:', ip || '(空)');
-                            if (ip) {
-                                sb.from('login_logs').update({ ip_address: ip }).eq('user_id', user.id).is('ip_address', '').then(function(res2) {
-                                    console.log('[LoginLog] 更新IP结果:', res2.error ? '失败 ' + res2.error.message : '成功');
-                                });
-                            }
-                        }).catch(function(e) {
-                            console.error('[LoginLog] 获取IP异常:', e);
+                    console.log('[LoginLog] 开始获取公网IP...');
+                    getPublicIP().then(function(ip) {
+                        console.log('[LoginLog] 获取到IP:', ip || '(空)');
+                        sb.from('login_logs').insert({
+                            user_id: user.id,
+                            ip_address: ip || '未知',
+                            logged_at: new Date().toISOString()
+                        }).then(function(res) {
+                            console.log('[LoginLog] 写入结果:', res.error ? '失败 ' + res.error.message : '成功');
                         });
+                    }).catch(function(e) {
+                        console.error('[LoginLog] 获取IP异常:', e);
+                        sb.from('login_logs').insert({
+                            user_id: user.id,
+                            ip_address: '未知',
+                            logged_at: new Date().toISOString()
+                        }).then(function() {});
                     });
                     if (user && !user.email_confirmed_at) {
                         errorEl.textContent = '邮箱尚未验证，请检查邮箱确认链接。';
@@ -317,8 +320,6 @@
 
     async function getPublicIP() {
         var apis = [
-            { url: 'https://api.ipify.org?format=json', type: 'json', field: 'ip' },
-            { url: 'https://ip9.com.cn/get', type: 'json', field: 'ip' },
             { url: 'https://api.ip.sb/jsonip', type: 'json', field: 'ip' },
             { url: 'https://api.my-ip.io/ip.json', type: 'json', field: 'ip' },
             { url: 'https://ipinfo.io/json', type: 'json', field: 'ip' },
