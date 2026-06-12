@@ -1,14 +1,17 @@
-const SUPABASE_URL = 'https://pxhiobmdzntnxwpwtgpx.supabase.co';
-const SUPABASE_KEY = 'sb_publishable_06fy5uemh4fJnAQXIsIXdQ_79UMtlC_';
-let supabase;
-
 (function() {
-    supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+    var SUPABASE_URL = 'https://pxhiobmdzntnxwpwtgpx.supabase.co';
+    var SUPABASE_KEY = 'sb_publishable_06fy5uemh4fJnAQXIsIXdQ_79UMtlC_';
 
-    window.addEventListener('DOMContentLoaded', function() {
+    if (!window.supabase) {
+        console.error('Supabase SDK 未加载');
+        return;
+    }
+    var sb = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+
+    document.addEventListener('DOMContentLoaded', function() {
         injectAuthModal();
         updateAuthUI();
-        supabase.auth.onAuthStateChange(function(event, session) {
+        sb.auth.onAuthStateChange(function() {
             updateAuthUI();
         });
     });
@@ -67,9 +70,9 @@ let supabase;
             submitBtn.innerHTML = '<span class="spinner-border spinner-border-sm me-1"></span>处理中…';
             var result;
             if (mode === 'login') {
-                result = await supabase.auth.signInWithPassword({ email: email, password: password });
+                result = await sb.auth.signInWithPassword({ email: email, password: password });
             } else {
-                result = await supabase.auth.signUp({ email: email, password: password });
+                result = await sb.auth.signUp({ email: email, password: password });
             }
             submitBtn.disabled = false;
             setMode(mode);
@@ -103,7 +106,7 @@ let supabase;
     window.updateAuthUI = async function() {
         var navItem = document.getElementById('authNavItem');
         if (!navItem) return;
-        var session = await supabase.auth.getSession();
+        var session = await sb.auth.getSession();
         var user = session.data.session ? session.data.session.user : null;
         if (user) {
             navItem.innerHTML = [
@@ -119,7 +122,7 @@ let supabase;
             ].join('');
             document.getElementById('logoutBtn').addEventListener('click', async function(e) {
                 e.preventDefault();
-                await supabase.auth.signOut();
+                await sb.auth.signOut();
                 updateAuthUI();
             });
         } else {
