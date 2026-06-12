@@ -162,11 +162,15 @@
             font-weight: 600;
             border-bottom: 2px solid var(--primary-blue);
             padding: 10px 8px;
+            white-space: nowrap;
+            font-size: clamp(12px, 2vw, 14px);
         }
 
         .record-table td {
             padding: 8px;
             border-bottom: 1px solid #eee;
+            white-space: nowrap;
+            font-size: clamp(12px, 2vw, 14px);
         }
 
         footer {
@@ -727,7 +731,7 @@
         var html = '<table class="record-table"><tr><th>类别</th><th>得分</th><th>结果</th><th>用时</th><th>时间</th></tr>';
         r.data.forEach(function(e) {
             var dur = e.time_used_sec ? Math.floor(e.time_used_sec/60) + '分' + (e.time_used_sec%60) + '秒' : '-';
-            html += '<tr><td>' + e.exam_type + '类</td><td>' + e.score + '/' + e.total + '</td><td>' + (e.passed ? '✅合格' : '❌不合格') + '</td><td>' + dur + '</td><td>' + new Date(e.created_at).toLocaleString('zh-CN') + '</td></tr>';
+            html += '<tr><td>' + e.exam_type + '类</td><td>' + e.score + '/' + e.total + '</td><td>' + (e.passed ? '合格' : '不合格') + '</td><td>' + dur + '</td><td>' + new Date(e.created_at).toLocaleString('zh-CN') + '</td></tr>';
         });
         html += '</table>';
         container.innerHTML = html;
