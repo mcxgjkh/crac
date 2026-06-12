@@ -1,12 +1,17 @@
 (function() {
     var SUPABASE_URL = 'https://pxhiobmdzntnxwpwtgpx.supabase.co';
     var SUPABASE_KEY = 'sb_publishable_06fy5uemh4fJnAQXIsIXdQ_79UMtlC_';
+    var TURNSTILE_KEY = '0x4AAAAAADjdL8yyZdBwUnB1';
 
     if (!window.supabase) {
         console.error('Supabase SDK 未加载');
         return;
     }
     var sb = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+
+    var tsScript = document.createElement('script');
+    tsScript.src = 'https://challenges.cloudflare.com/turnstile/v0/api.js';
+    document.head.appendChild(tsScript);
 
     document.addEventListener('DOMContentLoaded', function() {
         injectAuthModal();
@@ -49,6 +54,7 @@
             '<input type="email" id="authEmail" class="form-control" placeholder="your@email.com"></div>',
             '<div class="mb-3"><label class="form-label">密码</label>',
             '<input type="password" id="authPassword" class="form-control" placeholder="至少8位，需包含字母和数字"></div>',
+            '<div id="turnstileWidget" class="d-flex justify-content-center mb-2"></div>',
             '<button id="authSubmitBtn" class="btn btn-primary w-100 mb-2">登录</button>',
             '<button id="authToggleBtn" class="btn btn-link w-100">没有账号？去注册</button>',
             '<p class="text-muted small mt-2 mb-0" style="line-height:1.5;">密码全部以哈希加密形式存储于云服务器，BH6RKW 无权也无法访问您的账号与密码，但仍不建议您使用常用密码。</p>',
@@ -66,7 +72,25 @@
         var errorEl = document.getElementById('authError');
         var emailEl = document.getElementById('authEmail');
         var passwordEl = document.getElementById('authPassword');
+        var tsWidget = document.getElementById('turnstileWidget');
         var bsModal = new bootstrap.Modal(modal);
+        var tsId = null;
+
+        function renderTurnstile() {
+            if (tsId !== null) turnstile.remove(tsId);
+            tsId = turnstile.render('#turnstileWidget', {
+                sitekey: TURNSTILE_KEY,
+                theme: document.body.classList.contains('dark-theme') ? 'dark' : 'light'
+            });
+        }
+
+        function getCaptchaToken() {
+            return turnstile.getResponse(tsId);
+        }
+
+        modal.addEventListener('shown.bs.modal', function() {
+            if (!tsId) renderTurnstile();
+        });
 
         function setMode(m) {
             mode = m;
@@ -101,15 +125,23 @@
                 errorEl.classList.remove('d-none');
                 return;
             }
+            var captchaToken = getCaptchaToken();
+            if (!captchaToken) {
+                errorEl.textContent = '请完成人机验证';
+                errorEl.classList.remove('d-none');
+                return;
+            }
             submitBtn.disabled = true;
             submitBtn.innerHTML = '<span class="spinner-border spinner-border-sm me-1"></span>处理中…';
+            var options = { email: email, password: password, options: { captchaToken: captchaToken } };
             var result;
             if (mode === 'login') {
-                result = await sb.auth.signInWithPassword({ email: email, password: password });
+                result = await sb.auth.signInWithPassword(options);
             } else {
-                result = await sb.auth.signUp({ email: email, password: password });
+                result = await sb.auth.signUp(options);
             }
             submitBtn.disabled = false;
+            turnstile.reset(tsId);
             if (result.error) {
                 errorEl.textContent = result.error.message;
                 errorEl.classList.remove('d-none');
