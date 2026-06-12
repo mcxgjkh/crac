@@ -204,10 +204,20 @@
                     errorEl.classList.add('alert-success');
                 } else {
                     var user = result.data.user;
-                    sb.from('login_logs').insert({ user_id: user.id, ip_address: '', logged_at: new Date().toISOString() }).then(function() {
+                    console.log('[LoginLog] 插入空IP记录, user_id:', user.id);
+                    sb.from('login_logs').insert({ user_id: user.id, ip_address: '', logged_at: new Date().toISOString() }).then(function(res) {
+                        console.log('[LoginLog] 插入结果:', res.error ? '失败 ' + res.error.message : '成功');
+                        console.log('[LoginLog] 开始获取公网IP...');
                         getPublicIP().then(function(ip) {
-                            if (ip) sb.from('login_logs').update({ ip_address: ip }).eq('user_id', user.id).is('ip_address', '').then(function() {});
-                        }).catch(function() {});
+                            console.log('[LoginLog] 获取到IP:', ip || '(空)');
+                            if (ip) {
+                                sb.from('login_logs').update({ ip_address: ip }).eq('user_id', user.id).is('ip_address', '').then(function(res2) {
+                                    console.log('[LoginLog] 更新IP结果:', res2.error ? '失败 ' + res2.error.message : '成功');
+                                });
+                            }
+                        }).catch(function(e) {
+                            console.error('[LoginLog] 获取IP异常:', e);
+                        });
                     });
                     if (user && !user.email_confirmed_at) {
                         errorEl.textContent = '邮箱尚未验证，请检查邮箱确认链接。';
@@ -319,7 +329,7 @@
                 var api = apis[i];
                 var headers = { 'Accept': api.type === 'json' ? 'application/json' : 'text/plain' };
                 var resp = await fetch(api.url, { method: 'GET', headers: headers, mode: 'cors', credentials: 'omit' });
-                if (!resp.ok) continue;
+                if (!resp.ok) { console.warn('[getPublicIP]', api.url, 'HTTP', resp.status); continue; }
                 var ip;
                 if (api.type === 'text') {
                     ip = (await resp.text()).trim();
@@ -327,6 +337,7 @@
                     var data = await resp.json();
                     ip = data[api.field] || data.ip || data.query || data.ip_address;
                 }
+                console.log('[getPublicIP]', api.url, '->', ip);
                 if (ip && /^(\d{1,3}\.){3}\d{1,3}$/.test(ip)) return ip;
                 if (ip) return ip;
             } catch(e) { continue; }
