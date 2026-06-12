@@ -243,7 +243,6 @@
             var refreshToken = session.data.session.refresh_token;
             setCrossDomainCookie('sb-access-token', accessToken, 7);
             setCrossDomainCookie('sb-refresh-token', refreshToken, 7);
-        if (user) {
             var displayName = (user.user_metadata && user.user_metadata.username) || user.email.split('@')[0];
             navItem.innerHTML = [
                 '<div class="dropdown">',
