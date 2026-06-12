@@ -1213,7 +1213,7 @@
     </footer>
 
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
-    <script src="/supabase-auth.js?v=1.4.2"></script>
+    <script src="/supabase-auth.js?v=1.4.3"></script>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
     <!-- Font Awesome 图标 -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/js/all.min.js"></script>
@@ -1361,76 +1361,14 @@
 
             // 获取在线时间并设置主题
             function setThemeByOnlineTime() {
-                // 只有在用户没有手动切换时才自动更新
                 if (userManuallySwitched) {
                     console.log('用户已手动切换主题，跳过自动更新');
                     return;
                 }
+                if (setThemeByBeijingTime()) return;
+                useLocalTime();
+            }
 
-                // 先尝试从隐藏的 Beijing 时间组件读取
-                if (setThemeByBeijingTime()) {
-                    return;
-                }
-                
-                // 使用重试机制获取时间
-                fetchWithRetry('https://uapis.cn/api/v1/misc/worldtime?city=Asia%2FShanghai', 10, 500)
-                    .then(response => {
-                        if (!response.ok) {
-                            throw new Error('网络响应不正常');
-                        }
-                        return response.json();
-                    })
-                    .then(data => {
-                        const onlineTime = new Date(data.datetime);
-                        const currentHour = onlineTime.getHours();
-                        
-                        // 6-18时为白天模式，18-6时为夜晚模式
-                        applyHourToTheme(currentHour, '在线时间');
-                    })
-                    .catch(error => {
-                        console.log('所有在线时间API请求失败，使用本地时间:', error);
-                        // 使用本地时间作为备选
-                        useLocalTime();
-                    });
-            }
-            
-            // 带重试机制的fetch函数
-            function fetchWithRetry(url, maxRetries, timeout) {
-                return new Promise((resolve, reject) => {
-                    let retries = 0;
-                    
-                    function attemptFetch() {
-                        console.log(`尝试获取时间 (${retries + 1}/${maxRetries})...`);
-                        
-                        // 设置超时
-                        const timeoutPromise = new Promise((_, reject) => {
-                            setTimeout(() => reject(new Error('请求超时')), timeout);
-                        });
-                        
-                        // 发起请求
-                        const fetchPromise = fetch(url);
-                        
-                        // 竞速：请求 vs 超时
-                        Promise.race([fetchPromise, timeoutPromise])
-                            .then(response => {
-                                resolve(response);
-                            })
-                            .catch(error => {
-                                retries++;
-                                if (retries < maxRetries) {
-                                    console.log(`第${retries}次尝试失败，${timeout}ms后重试...`);
-                                    setTimeout(attemptFetch, timeout);
-                                } else {
-                                    reject(new Error(`所有${maxRetries}次尝试均失败`));
-                                }
-                            });
-                    }
-                    
-                    attemptFetch();
-                });
-            }
-            
-            // 使用本地时间作为备选方案
             function useLocalTime() {
                 // 只有在用户没有手动切换时才自动更新
                 if (userManuallySwitched) {
