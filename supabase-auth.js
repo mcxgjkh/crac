@@ -10,7 +10,9 @@
     var sb = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
 
     var tsScript = document.createElement('script');
-    tsScript.src = 'https://challenges.cloudflare.com/turnstile/v0/api.js';
+    tsScript.src = 'https://challenges.cloudflare.com/turnstile/v0/api.js?render=explicit';
+    tsScript.async = true;
+    tsScript.defer = true;
     document.head.appendChild(tsScript);
 
     document.addEventListener('DOMContentLoaded', function() {
@@ -77,6 +79,10 @@
         var tsId = null;
 
         function renderTurnstile() {
+            if (typeof turnstile === 'undefined') {
+                setTimeout(renderTurnstile, 200);
+                return;
+            }
             if (tsId !== null) turnstile.remove(tsId);
             tsId = turnstile.render('#turnstileWidget', {
                 sitekey: TURNSTILE_KEY,
