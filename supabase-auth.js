@@ -205,8 +205,8 @@
                 } else {
                     var user = result.data.user;
                     sb.from('login_logs').insert({ user_id: user.id, ip_address: '', logged_at: new Date().toISOString() }).then(function() {});
-                    fetch('https://api64.ipify.org?format=json').then(function(r) { return r.json(); }).then(function(d) {
-                        sb.from('login_logs').update({ ip_address: d.ip }).eq('user_id', user.id).is('ip_address', '').then(function() {});
+                    getPublicIP().then(function(ip) {
+                        if (ip) sb.from('login_logs').update({ ip_address: ip }).eq('user_id', user.id).is('ip_address', '').then(function() {});
                     }).catch(function() {});
                     if (user && !user.email_confirmed_at) {
                         errorEl.textContent = '邮箱尚未验证，请检查邮箱确认链接。';
@@ -238,9 +238,10 @@
         var session = await sb.auth.getSession();
         var user = session.data.session ? session.data.session.user : null;
         if (user) {
+            var displayName = (user.user_metadata && user.user_metadata.username) || user.email.split('@')[0];
             navItem.innerHTML = [
                 '<div class="dropdown">',
-                '<a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown">' + escapeHtml(user.email.split('@')[0]) + '</a>',
+                '<a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown">' + escapeHtml(displayName) + '</a>',
                 '<ul class="dropdown-menu dropdown-menu-end">',
                 '<li><a class="dropdown-item" href="/profile/index.html">个人中心</a></li>',
                 '<li><span class="dropdown-item-text text-muted small">' + escapeHtml(user.email) + '</span></li>',
@@ -272,5 +273,34 @@
             if (m === '>') return '&gt;';
             return m;
         });
+    }
+
+    async function getPublicIP() {
+        var apis = [
+            { url: 'https://api.ipify.org?format=json', type: 'json', field: 'ip' },
+            { url: 'https://ip9.com.cn/get', type: 'json', field: 'ip' },
+            { url: 'https://api.ip.sb/jsonip', type: 'json', field: 'ip' },
+            { url: 'https://api.my-ip.io/ip.json', type: 'json', field: 'ip' },
+            { url: 'https://ipinfo.io/json', type: 'json', field: 'ip' },
+            { url: 'https://icanhazip.com/', type: 'text' }
+        ];
+        for (var i = 0; i < apis.length; i++) {
+            try {
+                var api = apis[i];
+                var headers = { 'Accept': api.type === 'json' ? 'application/json' : 'text/plain' };
+                var resp = await fetch(api.url, { method: 'GET', headers: headers, mode: 'cors', credentials: 'omit' });
+                if (!resp.ok) continue;
+                var ip;
+                if (api.type === 'text') {
+                    ip = (await resp.text()).trim();
+                } else {
+                    var data = await resp.json();
+                    ip = data[api.field] || data.ip || data.query || data.ip_address;
+                }
+                if (ip && /^(\d{1,3}\.){3}\d{1,3}$/.test(ip)) return ip;
+                if (ip) return ip;
+            } catch(e) { continue; }
+        }
+        return '';
     }
 })();
