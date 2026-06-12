@@ -1,0 +1,749 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>个人中心 - BH6RKW</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <style>
+        #css-detect { --css-loaded: 1; display: none; }
+        :root {
+            --primary-blue: #1a5faf;
+            --secondary-blue: #0d4a8d;
+            --dark-gray: #333;
+        }
+
+        body {
+            font-family: "Microsoft YaHei", sans-serif;
+            color: #333;
+            line-height: 1.6;
+        }
+
+        .top-bar {
+            background-color: #f8f9fa;
+            font-size: 0.9rem;
+            padding: 5px 0;
+        }
+
+        .top-bar a {
+            color: #666;
+            text-decoration: none;
+            margin: 0 10px;
+        }
+
+        .navbar {
+            background-color: white;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+            padding: 15px 0;
+        }
+
+        .nav-link {
+            color: var(--dark-gray) !important;
+            font-weight: 500;
+            margin: 0 10px;
+            position: relative;
+        }
+
+        .nav-link:hover {
+            color: var(--primary-blue) !important;
+        }
+
+        .nav-link:hover::after {
+            content: '';
+            position: absolute;
+            bottom: -5px;
+            left: 0;
+            width: 100%;
+            height: 3px;
+            background-color: var(--primary-blue);
+        }
+
+        .button_BH6RKW {
+            position: relative;
+            border: none;
+            background: transparent;
+            --stroke-color: #0000007c;
+            --ani-color: rgba(95, 3, 244, 0);
+            --color-gar: linear-gradient(90deg,#03a9f4,#f441a5,#ffeb3b,#03a9f4);
+            letter-spacing: 3px;
+            font-size: 2em;
+            text-transform: uppercase;
+            color: transparent;
+            -webkit-text-stroke: 1px var(--stroke-color);
+            cursor: pointer;
+            padding: 10px 20px;
+        }
+
+        .actual-text_BH6RKW { display: inline-block; }
+
+        .front-text_BH6RKW {
+            position: absolute;
+            top: 10px;
+            left: 0;
+            width: 100%;
+            background: var(--color-gar);
+            -webkit-background-clip: text;
+            background-clip: text;
+            background-size: 200%;
+            overflow: hidden;
+            transition: all 1s;
+            animation: 8s ani linear infinite;
+            border-bottom: 2px solid transparent;
+            clip-path: polygon(0 0, 0% 0, 0% 100%, 0 100%);
+        }
+
+        .button_BH6RKW:hover .front-text_BH6RKW {
+            clip-path: polygon(0 0, 100% 0, 100% 100%, 0 100%);
+            border-bottom: 2px solid #03a9f4;
+            -webkit-text-stroke: 1px var(--ani-color);
+        }
+
+        @keyframes ani {
+            0% { background-position: 0%; }
+            50% { background-position: 400%; }
+            100% { background-position: 0%; }
+        }
+
+        .page-header {
+            padding: 80px 0 50px;
+            background: linear-gradient(135deg, var(--primary-blue) 0%, var(--secondary-blue) 100%);
+            color: white;
+        }
+
+        .page-header h1 {
+            font-size: 2.8rem;
+            font-weight: bold;
+            margin-bottom: 10px;
+        }
+
+        .page-header p {
+            font-size: 1.1rem;
+            opacity: 0.9;
+        }
+
+        .main-content {
+            padding: 40px 0;
+        }
+
+        .section-title {
+            position: relative;
+            margin-bottom: 25px;
+            padding-bottom: 15px;
+            font-weight: bold;
+            color: var(--primary-blue);
+        }
+
+        .section-title::after {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            width: 60px;
+            height: 3px;
+            background-color: var(--primary-blue);
+        }
+
+        .profile-card {
+            background: white;
+            border-radius: 8px;
+            padding: 24px;
+            box-shadow: 0 3px 10px rgba(0, 0, 0, 0.1);
+            margin-bottom: 24px;
+        }
+
+        .record-table {
+            width: 100%;
+            font-size: 0.9rem;
+        }
+
+        .record-table th {
+            color: var(--primary-blue);
+            font-weight: 600;
+            border-bottom: 2px solid var(--primary-blue);
+            padding: 10px 8px;
+        }
+
+        .record-table td {
+            padding: 8px;
+            border-bottom: 1px solid #eee;
+        }
+
+        footer {
+            background-color: var(--dark-gray);
+            color: white;
+            padding: 40px 0 20px;
+            margin-top: 40px;
+        }
+
+        footer h5 {
+            color: #fff;
+            margin-bottom: 20px;
+            font-weight: 600;
+        }
+
+        footer a {
+            color: #ccc;
+            text-decoration: none;
+        }
+
+        footer a:hover {
+            color: white;
+        }
+
+        .footer-bottom {
+            border-top: 1px solid #444;
+            padding-top: 20px;
+            margin-top: 30px;
+            font-size: 0.9rem;
+        }
+
+        .theme-switch {
+            position: absolute;
+            right: 65px;
+            --toggle-size: 10px;
+            --container-width: 5.625em;
+            --container-height: 2.5em;
+            --container-radius: 6.25em;
+            --container-light-bg: #3D7EAE;
+            --container-night-bg: #1D1F2C;
+            --circle-container-diameter: 3.375em;
+            --sun-moon-diameter: 2.125em;
+            --sun-bg: #ECCA2F;
+            --moon-bg: #C4C9D1;
+            --spot-color: #959DB1;
+            --circle-container-offset: calc((var(--circle-container-diameter) - var(--container-height)) / 2 * -1);
+            --stars-color: #fff;
+            --clouds-color: #F3FDFF;
+            --back-clouds-color: #AACADF;
+            --transition: .5s cubic-bezier(0, -0.02, 0.4, 1.25);
+            --circle-transition: .3s cubic-bezier(0, -0.02, 0.35, 1.17);
+        }
+
+        .theme-switch, .theme-switch *, .theme-switch *::before, .theme-switch *::after {
+            -webkit-box-sizing: border-box;
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-size: var(--toggle-size);
+        }
+
+        .theme-switch__container {
+            width: var(--container-width);
+            height: var(--container-height);
+            background-color: var(--container-light-bg);
+            border-radius: var(--container-radius);
+            overflow: hidden;
+            cursor: pointer;
+            -webkit-box-shadow: 0em -0.062em 0.062em rgba(0,0,0,0.25), 0em 0.062em 0.125em rgba(255,255,255,0.94);
+            box-shadow: 0em -0.062em 0.062em rgba(0,0,0,0.25), 0em 0.062em 0.125em rgba(255,255,255,0.94);
+            -webkit-transition: var(--transition);
+            -o-transition: var(--transition);
+            transition: var(--transition);
+            position: relative;
+        }
+
+        .theme-switch__container::before {
+            content: "";
+            position: absolute;
+            z-index: 1;
+            inset: 0;
+            -webkit-box-shadow: 0em 0.05em 0.187em rgba(0,0,0,0.25) inset;
+            box-shadow: 0em 0.05em 0.187em rgba(0,0,0,0.25) inset;
+            border-radius: var(--container-radius);
+        }
+
+        .theme-switch__checkbox { display: none; }
+
+        .theme-switch__circle-container {
+            width: var(--circle-container-diameter);
+            height: var(--circle-container-diameter);
+            background-color: rgba(255,255,255,0.1);
+            position: absolute;
+            left: var(--circle-container-offset);
+            top: var(--circle-container-offset);
+            border-radius: var(--container-radius);
+            box-shadow: inset 0 0 0 3.375em rgba(255,255,255,0.1);
+            display: flex;
+            -webkit-transition: var(--circle-transition);
+            transition: var(--circle-transition);
+            pointer-events: none;
+        }
+
+        .theme-switch__sun-moon-container {
+            pointer-events: auto;
+            position: relative;
+            z-index: 2;
+            width: var(--sun-moon-diameter);
+            height: var(--sun-moon-diameter);
+            margin: auto;
+            border-radius: var(--container-radius);
+            background-color: var(--sun-bg);
+            box-shadow: 0.062em 0.062em 0.062em 0em rgba(254,255,239,0.61) inset;
+            filter: drop-shadow(0.062em 0.125em 0.125em rgba(0,0,0,0.25));
+            overflow: hidden;
+            -webkit-transition: var(--transition);
+            transition: var(--transition);
+        }
+
+        .theme-switch__moon {
+            -webkit-transform: translateX(100%);
+            transform: translateX(100%);
+            width: 100%;
+            height: 100%;
+            background-color: var(--moon-bg);
+            border-radius: inherit;
+            -webkit-transition: var(--transition);
+            transition: var(--transition);
+            position: relative;
+        }
+
+        .theme-switch__spot {
+            position: absolute;
+            top: 0.75em;
+            left: 0.312em;
+            width: 0.75em;
+            height: 0.75em;
+            border-radius: var(--container-radius);
+            background-color: var(--spot-color);
+        }
+
+        .theme-switch__spot:nth-of-type(2) {
+            width: 0.375em;
+            height: 0.375em;
+            top: 0.937em;
+            left: 1.375em;
+        }
+
+        .theme-switch__spot:nth-last-of-type(3) {
+            width: 0.25em;
+            height: 0.25em;
+            top: 0.312em;
+            left: 0.812em;
+        }
+
+        .theme-switch__clouds {
+            width: 1.25em;
+            height: 1.25em;
+            background-color: var(--clouds-color);
+            border-radius: var(--container-radius);
+            position: absolute;
+            bottom: -0.625em;
+            left: 0.312em;
+            box-shadow: 0.937em 0.312em var(--clouds-color);
+            transition: 0.5s cubic-bezier(0,-0.02,0.4,1.25);
+        }
+
+        .theme-switch__stars-container {
+            position: absolute;
+            color: var(--stars-color);
+            top: -100%;
+            left: 0.312em;
+            width: 2.75em;
+            height: auto;
+            -webkit-transition: var(--transition);
+            transition: var(--transition);
+        }
+
+        .theme-switch__checkbox:checked + .theme-switch__container {
+            background-color: var(--container-night-bg);
+        }
+
+        .theme-switch__checkbox:checked + .theme-switch__container .theme-switch__circle-container {
+            left: calc(100% - var(--circle-container-offset) - var(--circle-container-diameter));
+        }
+
+        .theme-switch__checkbox:checked + .theme-switch__container .theme-switch__moon {
+            -webkit-transform: translate(0);
+            transform: translate(0);
+        }
+
+        .theme-switch__checkbox:checked + .theme-switch__container .theme-switch__clouds {
+            bottom: -4.062em;
+        }
+
+        .theme-switch__checkbox:checked + .theme-switch__container .theme-switch__stars-container {
+            top: 50%;
+            -webkit-transform: translateY(-50%);
+            transform: translateY(-50%);
+        }
+
+        .btn-danger-outline {
+            color: #dc3545;
+            border: 1px solid #dc3545;
+            background: transparent;
+        }
+
+        .btn-danger-outline:hover {
+            background: #dc3545;
+            color: white;
+        }
+
+        .dark-theme {
+            background-color: #121212;
+            color: #e0e0e0;
+        }
+
+        .dark-theme .top-bar {
+            background-color: #1e1e1e;
+            color: #e0e0e0;
+        }
+
+        .dark-theme .top-bar a { color: #b0b0b0; }
+
+        .dark-theme .navbar {
+            background-color: #1e1e1e;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.3);
+        }
+
+        .dark-theme .nav-link { color: #e0e0e0 !important; }
+        .dark-theme .nav-link:hover { color: #64b5f6 !important; }
+        .dark-theme .nav-link:hover::after { background-color: #64b5f6; }
+
+        .dark-theme .button_BH6RKW { --stroke-color: #ffffff7c; }
+
+        .dark-theme .page-header {
+            background: linear-gradient(135deg, #0d3b6e 0%, #082444 100%);
+        }
+
+        .dark-theme .section-title { color: #64b5f6; }
+        .dark-theme .section-title::after { background-color: #64b5f6; }
+
+        .dark-theme .profile-card {
+            background: #1e1e1e;
+            color: #e0e0e0;
+            box-shadow: 0 3px 10px rgba(0,0,0,0.3);
+        }
+
+        .dark-theme .record-table th { color: #64b5f6; border-bottom-color: #64b5f6; }
+        .dark-theme .record-table td { border-bottom-color: #333; }
+        .dark-theme .record-table tr:hover { background-color: #2a2a2a; }
+
+        .dark-theme .form-control {
+            background-color: #2a2a2a;
+            border-color: #444;
+            color: #e0e0e0;
+        }
+
+        .dark-theme .form-control::placeholder { color: #888; }
+        .dark-theme .form-label { color: #bbb; }
+        .dark-theme .text-muted { color: #aaa !important; }
+
+        .dark-theme .btn-primary {
+            background-color: #2a5a8a;
+            border-color: #2a5a8a;
+        }
+        .dark-theme .btn-primary:hover {
+            background-color: #3a6a9a;
+        }
+
+        .dark-theme footer { background-color: #0a0a0a; }
+        .dark-theme footer h5 { color: #fff; }
+        .dark-theme footer a { color: #aaa; }
+        .dark-theme footer a:hover { color: #fff; }
+        .dark-theme .footer-bottom { border-top: 1px solid #333; }
+
+        .dark-theme .navbar-toggler-icon { filter: invert(1); }
+        .dark-theme .alert-info {
+            background-color: #1a3a5c;
+            color: #b3d9ff;
+            border-color: #2a5a8a;
+        }
+
+        @media (max-width: 768px) {
+            .theme-switch { right: 5px; }
+        }
+    </style>
+</head>
+<body>
+    <div id="css-detect" aria-hidden="true"></div>
+
+    <div class="top-bar">
+        <div class="container">
+            <div class="d-flex justify-content-between">
+                <div>
+                    <span>欢迎访问中国无线电爱好者BH6RKW的网页</span>
+                    <label class="theme-switch">
+                        <input type="checkbox" class="theme-switch__checkbox">
+                        <div class="theme-switch__container">
+                            <div class="theme-switch__clouds"></div>
+                            <div class="theme-switch__stars-container">
+                                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 144 55" fill="none"><path fill-rule="evenodd" clip-rule="evenodd" d="M135.831 3.00688C135.055 3.85027 134.111 4.29946 133 4.35447C134.111 4.40947 135.055 4.85867 135.831 5.71123C136.607 6.55462 136.996 7.56303 136.996 8.72727C136.996 7.95722 137.172 7.25134 137.525 6.59129C137.886 5.93124 138.372 5.39954 138.98 5.00535C139.598 4.60199 140.268 4.39114 141 4.35447C139.88 4.2903 138.936 3.85027 138.16 3.00688C137.384 2.16348 136.996 1.16425 136.996 0C136.996 1.16425 136.607 2.16348 135.831 3.00688ZM31 23.3545C32.1114 23.2995 33.0551 22.8503 33.8313 22.0069C34.6075 21.1635 34.9956 20.1642 34.9956 19C34.9956 20.1642 35.3837 21.1635 36.1599 22.0069C36.9361 22.8503 37.8798 23.2903 39 23.3545C38.2679 23.3911 37.5976 23.602 36.9802 24.0053C36.3716 24.3995 35.8864 24.9312 35.5248 25.5913C35.172 26.2513 34.9956 26.9572 34.9956 27.7273C34.9956 26.563 34.6075 25.5546 33.8313 24.7112C33.0551 23.8587 32.1114 23.4095 31 23.3545Z" fill="currentColor"/></svg>
+                            </div>
+                            <div class="theme-switch__circle-container">
+                                <div class="theme-switch__sun-moon-container">
+                                    <div class="theme-switch__moon">
+                                    <div class="theme-switch__spot"></div>
+                                    <div class="theme-switch__spot"></div>
+                                    <div class="theme-switch__spot"></div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </label>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <nav class="navbar navbar-expand-lg sticky-top">
+        <div class="container">
+            <a href="https://bh6rkw.dpdns.org">
+                <button class="button_BH6RKW" data-text="Awesome">
+                    <span class="actual-text_BH6RKW">&nbsp;BH6RKW&nbsp;</span>
+                    <span aria-hidden="true" class="front-text_BH6RKW">&nbsp;BH6RKW&nbsp;</span>
+                </button>
+            </a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav ms-auto">
+                    <li class="nav-item"><a class="nav-link" href="https://bh6rkw.dpdns.org">首页</a></li>
+                    <li class="nav-item"><a class="nav-link" href="https://bh6rkw.dpdns.org/about/index.html">关于我</a></li>
+                    <li class="nav-item"><a class="nav-link" href="https://bh6rkw.dpdns.org/laws/index.html">政策法规</a></li>
+                    <li class="nav-item"><a class="nav-link" href="https://exam.bh6rkw.dpdns.org">模拟考试</a></li>
+                    <li class="nav-item"><a class="nav-link" href="https://bh6rkw.dpdns.org/download/index.html">资料下载</a></li>
+                    <li class="nav-item" id="authNavItem"></li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+
+    <div class="page-header">
+        <div class="container">
+            <h1>个人中心</h1>
+            <p id="profileGreeting">管理您的账户与数据</p>
+        </div>
+    </div>
+
+    <div class="main-content">
+        <div class="container">
+            <div id="notLoggedIn" class="profile-card text-center" style="display:none;">
+                <i class="fas fa-user-lock" style="font-size:3rem;color:var(--primary-blue);margin-bottom:15px;"></i>
+                <h4>请先登录</h4>
+                <p class="text-muted">登录后可管理个人账户与查看做题记录。</p>
+                <button class="btn btn-primary" onclick="window.showAuthModal('login')">前往登录</button>
+            </div>
+
+            <div id="profileContent">
+                <div class="row">
+                    <div class="col-lg-8">
+                        <div class="profile-card">
+                            <h4 class="section-title">做题记录</h4>
+                            <div id="examRecords" class="table-responsive">
+                                <p class="text-muted">加载中…</p>
+                            </div>
+                        </div>
+
+                        <div class="profile-card">
+                            <h4 class="section-title">登录记录</h4>
+                            <div id="loginRecords" class="table-responsive">
+                                <p class="text-muted">加载中…</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="col-lg-4">
+                        <div class="profile-card">
+                            <h4 class="section-title">账户设置</h4>
+                            <div id="accountMsg" class="alert d-none"></div>
+
+                            <div class="mb-3">
+                                <label class="form-label">用户名</label>
+                                <div class="input-group">
+                                    <input type="text" id="profileUsername" class="form-control" maxlength="10" placeholder="设置用户名">
+                                    <button class="btn btn-primary" id="saveUsername">保存</button>
+                                </div>
+                            </div>
+
+                            <div class="mb-3">
+                                <label class="form-label">邮箱</label>
+                                <div class="input-group">
+                                    <input type="email" id="profileEmail" class="form-control" placeholder="新邮箱地址">
+                                    <button class="btn btn-primary" id="saveEmail">保存</button>
+                                </div>
+                            </div>
+
+                            <div class="mb-3">
+                                <label class="form-label">修改密码</label>
+                                <input type="password" id="profileNewPassword" class="form-control mb-2" placeholder="新密码（至少8位，含字母+数字）">
+                                <button class="btn btn-primary w-100" id="savePassword">更新密码</button>
+                            </div>
+
+                            <hr>
+                            <button class="btn btn-danger-outline w-100 mb-2" id="deleteAccount">
+                                <i class="fas fa-trash-alt me-1"></i>注销账号
+                            </button>
+                            <p class="text-muted small mb-0">注销后所有数据将被永久删除，不可恢复。</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <footer>
+        <div class="container">
+            <div class="row">
+                <div class="col-md-4 mb-4"><h5>关于我</h5><p>BH6RKW 操作证类别：B类</p></div>
+                <div class="col-md-4 mb-4"><h5>联系我</h5><p><i class="fas fa-envelope me-2"></i> bh6rkw@outlook.com</p></div>
+                <div class="col-md-4 mb-4"><h5>快速链接</h5><ul class="list-unstyled"><li><a href="https://wap.miit.gov.cn/"><i class="fas fa-angle-right me-2"></i>工业和信息化部</a></li><li><a href="https://wap.miit.gov.cn/jgsj/wgj/index.html"><i class="fas fa-angle-right me-2"></i>国家无线电管理局</a></li><li><a href="http://crac.org.cn"><i class="fas fa-angle-right me-2"></i>中国无线电协会</a></li><li><a href="https://qrz.com"><i class="fas fa-angle-right me-2"></i>QRZ</a></li></ul></div>
+            </div>
+            <div class="footer-bottom text-center"><p>版权所有 © 2025-2026 BH6RKW</p></div>
+        </div>
+    </footer>
+
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
+    <script src="/supabase-auth.js?v=1.3.0"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+    (function(){var M=3,k='cssRetry',r=parseInt(sessionStorage.getItem(k)||'0');if(r>=M){sessionStorage.removeItem(k);return}function c(){var e=document.getElementById('css-detect');if(!e)return;getComputedStyle(e).getPropertyValue('--css-loaded').trim()!=='1'?(sessionStorage.setItem(k,r+1),location.reload()):sessionStorage.removeItem(k)}document.readyState==='loading'?document.addEventListener('DOMContentLoaded',function(){setTimeout(c,300)}):setTimeout(c,100)})();
+    </script>
+    <script>
+    document.addEventListener('DOMContentLoaded', async function() {
+        var themeSwitch = document.querySelector('.theme-switch__checkbox');
+        function switchToDark() { document.body.classList.add('dark-theme'); }
+        function switchToLight() { document.body.classList.remove('dark-theme'); }
+        var hour = new Date().getHours();
+        if (themeSwitch) themeSwitch.checked = !(hour >= 6 && hour < 18);
+        (hour >= 6 && hour < 18) ? switchToLight() : switchToDark();
+        if (themeSwitch) {
+            themeSwitch.addEventListener('change', function() {
+                this.checked ? switchToDark() : switchToLight();
+            });
+        }
+
+        var SUPABASE_URL = 'https://pxhiobmdzntnxwpwtgpx.supabase.co';
+        var SUPABASE_KEY = 'sb_publishable_06fy5uemh4fJnAQXIsIXdQ_79UMtlC_';
+        if (!window.supabase) { document.getElementById('notLoggedIn').style.display = 'block'; return; }
+        var sb = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+
+        if (window.location.hash && window.location.hash.indexOf('access_token') !== -1) {
+            document.getElementById('profileContent').style.display = 'none';
+            document.getElementById('notLoggedIn').style.display = 'block';
+            document.getElementById('notLoggedIn').innerHTML = [
+                '<h4>重置密码</h4>',
+                '<p class="text-muted">请输入新密码。</p>',
+                '<div class="mb-3"><input type="password" id="resetPassword" class="form-control" placeholder="新密码（至少8位，含字母+数字）" style="max-width:300px;margin:0 auto;"></div>',
+                '<div id="resetMsg" class="alert d-none" style="max-width:300px;margin:10px auto;"></div>',
+                '<button class="btn btn-primary" id="resetPasswordBtn">更新密码</button>'
+            ].join('');
+            document.getElementById('resetPasswordBtn').addEventListener('click', async function() {
+                var pwd = document.getElementById('resetPassword').value;
+                var msg = document.getElementById('resetMsg');
+                if (pwd.length < 8 || !/[a-zA-Z]/.test(pwd) || !/[0-9]/.test(pwd)) {
+                    msg.textContent = '密码需至少8位且包含字母和数字';
+                    msg.className = 'alert alert-danger';
+                    msg.classList.remove('d-none');
+                    return;
+                }
+                var r = await sb.auth.updateUser({ password: pwd });
+                if (r.error) {
+                    msg.textContent = r.error.message;
+                    msg.className = 'alert alert-danger';
+                    msg.classList.remove('d-none');
+                } else {
+                    msg.textContent = '密码已重置，即将跳转到首页…';
+                    msg.className = 'alert alert-success';
+                    msg.classList.remove('d-none');
+                    setTimeout(function() { window.location.href = 'https://bh6rkw.dpdns.org'; }, 2000);
+                }
+            });
+            return;
+        }
+
+        var session = await sb.auth.getSession();
+        var user = session.data.session ? session.data.session.user : null;
+
+        if (!user) {
+            document.getElementById('notLoggedIn').style.display = 'block';
+            document.getElementById('profileContent').style.display = 'none';
+            return;
+        }
+
+        document.getElementById('profileGreeting').textContent = '欢迎，' + (user.user_metadata && user.user_metadata.username ? user.user_metadata.username : user.email.split('@')[0]);
+        document.getElementById('profileUsername').value = (user.user_metadata && user.user_metadata.username) || '';
+        document.getElementById('profileEmail').value = user.email || '';
+
+        loadExamRecords(sb, user);
+        loadLoginRecords(sb, user);
+
+        var msgEl = document.getElementById('accountMsg');
+        function showMsg(text, type) {
+            msgEl.textContent = text;
+            msgEl.className = 'alert alert-' + type;
+            msgEl.classList.remove('d-none');
+            setTimeout(function() { msgEl.classList.add('d-none'); }, 4000);
+        }
+
+        document.getElementById('saveUsername').addEventListener('click', async function() {
+            var name = document.getElementById('profileUsername').value.trim();
+            if (!name) { showMsg('用户名不能为空', 'danger'); return; }
+            var r = await sb.auth.updateUser({ data: { username: name } });
+            if (r.error) { showMsg(r.error.message, 'danger'); }
+            else { showMsg('用户名已更新', 'success'); document.getElementById('profileGreeting').textContent = '欢迎，' + name; }
+        });
+
+        document.getElementById('saveEmail').addEventListener('click', async function() {
+            var email = document.getElementById('profileEmail').value.trim();
+            if (!email) { showMsg('邮箱不能为空', 'danger'); return; }
+            var r = await sb.auth.updateUser({ email: email });
+            if (r.error) { showMsg(r.error.message, 'danger'); }
+            else { showMsg('验证邮件已发送至新邮箱，请查收确认', 'success'); }
+        });
+
+        document.getElementById('savePassword').addEventListener('click', async function() {
+            var pwd = document.getElementById('profileNewPassword').value;
+            if (pwd.length < 8 || !/[a-zA-Z]/.test(pwd) || !/[0-9]/.test(pwd)) {
+                showMsg('密码需至少8位且包含字母和数字', 'danger');
+                return;
+            }
+            var r = await sb.auth.updateUser({ password: pwd });
+            if (r.error) { showMsg(r.error.message, 'danger'); }
+            else { showMsg('密码已更新', 'success'); document.getElementById('profileNewPassword').value = ''; }
+        });
+
+        document.getElementById('deleteAccount').addEventListener('click', async function() {
+            if (!confirm('确定要注销账号吗？所有数据将被永久删除，不可恢复！')) return;
+            if (!confirm('再次确认：注销后所有数据将被删除。')) return;
+            showMsg('正在处理注销请求…', 'info');
+            var r = await sb.rpc('delete_user');
+            if (r.error) {
+                showMsg('注销失败，请尝试在 Supabase 后台手动删除。错误：' + r.error.message, 'danger');
+            } else {
+                await sb.auth.signOut();
+                showMsg('账号已注销', 'success');
+                setTimeout(function() { location.reload(); }, 2000);
+            }
+        });
+    });
+
+    async function loadExamRecords(sb, user) {
+        var container = document.getElementById('examRecords');
+        var r = await sb.from('exam_progress').select('*').eq('user_id', user.id).order('answered_at', { ascending: false }).limit(50);
+        if (r.error) { container.innerHTML = '<p class="text-muted">加载失败：' + r.error.message + '</p>'; return; }
+        if (!r.data.length) { container.innerHTML = '<p class="text-muted">暂无做题记录</p>'; return; }
+        var html = '<table class="record-table"><tr><th>考试类型</th><th>题目ID</th><th>是否正确</th><th>答题时间</th></tr>';
+        r.data.forEach(function(e) {
+            html += '<tr><td>' + e.exam_type + '</td><td>' + e.question_id + '</td><td>' + (e.is_correct ? '✅' : '❌') + '</td><td>' + new Date(e.answered_at).toLocaleString('zh-CN') + '</td></tr>';
+        });
+        html += '</table>';
+        container.innerHTML = html;
+    }
+
+    async function loadLoginRecords(sb, user) {
+        var container = document.getElementById('loginRecords');
+        var r = await sb.from('login_logs').select('*').eq('user_id', user.id).order('logged_at', { ascending: false }).limit(20);
+        if (r.error) { container.innerHTML = '<p class="text-muted">加载失败：' + r.error.message + '</p>'; return; }
+        if (!r.data.length) { container.innerHTML = '<p class="text-muted">暂无登录记录</p>'; return; }
+        var html = '<table class="record-table"><tr><th>登录时间</th><th>IP 地址</th></tr>';
+        r.data.forEach(function(e) {
+            html += '<tr><td>' + new Date(e.logged_at).toLocaleString('zh-CN') + '</td><td>' + (e.ip_address || '未知') + '</td></tr>';
+        });
+        html += '</table>';
+        container.innerHTML = html;
+    }
+    </script>
+</body>
+</html>

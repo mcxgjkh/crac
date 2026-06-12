@@ -60,7 +60,10 @@
             '<input type="password" id="authPassword" class="form-control" placeholder="至少8位，需包含字母和数字"></div>',
             '<div id="turnstileWidget" class="d-flex justify-content-center mb-2"></div>',
             '<button id="authSubmitBtn" class="btn btn-primary w-100 mb-2">登录</button>',
-            '<button id="authToggleBtn" class="btn btn-link w-100">没有账号？去注册</button>',
+            '<div id="authExtraLinks" class="d-flex justify-content-between mb-2">',
+            '<button id="authToggleBtn" class="btn btn-link p-0">没有账号？去注册</button>',
+            '<button id="authForgotBtn" class="btn btn-link p-0">忘记密码？</button>',
+            '</div>',
             '<p class="text-muted small mt-2 mb-0" style="line-height:1.5;">密码全部以哈希加密形式存储于云服务器，BH6RKW 无权也无法访问您的账号与密码，但仍不建议您使用常用密码。</p>',
             '</div></div></div></div>'
         ].join('');
@@ -73,6 +76,7 @@
         var titleEl = document.getElementById('authModalTitle');
         var submitBtn = document.getElementById('authSubmitBtn');
         var toggleBtn = document.getElementById('authToggleBtn');
+        var forgotBtn = document.getElementById('authForgotBtn');
         var errorEl = document.getElementById('authError');
         var emailEl = document.getElementById('authEmail');
         var passwordEl = document.getElementById('authPassword');
@@ -117,6 +121,27 @@
 
         toggleBtn.addEventListener('click', function() {
             setMode(mode === 'login' ? 'register' : 'login');
+        });
+
+        forgotBtn.addEventListener('click', async function() {
+            var email = emailEl.value.trim();
+            if (!email) {
+                errorEl.textContent = '请先输入邮箱地址再点击忘记密码';
+                errorEl.classList.remove('d-none');
+                return;
+            }
+            forgotBtn.disabled = true;
+            var r = await sb.auth.resetPasswordForEmail(email, { redirectTo: 'https://bh6rkw.dpdns.org/profile/index.html' });
+            forgotBtn.disabled = false;
+            if (r.error) {
+                errorEl.textContent = r.error.message;
+                errorEl.classList.remove('d-none');
+            } else {
+                errorEl.textContent = '密码重置链接已发送到 ' + email + '，请检查邮箱。';
+                errorEl.classList.remove('d-none');
+                errorEl.classList.remove('alert-danger');
+                errorEl.classList.add('alert-success');
+            }
         });
 
         function validatePassword(pwd) {
@@ -210,6 +235,7 @@
                 '<div class="dropdown">',
                 '<a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown">' + escapeHtml(user.email.split('@')[0]) + '</a>',
                 '<ul class="dropdown-menu dropdown-menu-end">',
+                '<li><a class="dropdown-item" href="/profile/index.html">个人中心</a></li>',
                 '<li><span class="dropdown-item-text text-muted small">' + escapeHtml(user.email) + '</span></li>',
                 '<li><hr class="dropdown-divider"></li>',
                 '<li><a class="dropdown-item" href="#" id="logoutBtn">退出登录</a></li>',
