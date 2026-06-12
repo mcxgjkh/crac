@@ -15,13 +15,6 @@
     tsScript.defer = true;
     document.head.appendChild(tsScript);
 
-    injectDarkModeStyles();
-    injectAuthModal();
-    updateAuthUI();
-    sb.auth.onAuthStateChange(function() {
-        updateAuthUI();
-    });
-
     function injectDarkModeStyles() {
         var css = [
             '.dark-theme #authModal .modal-content { background-color: #1e1e1e; color: #e0e0e0; border-color: #333; }',
@@ -349,4 +342,11 @@
         }
         return '';
     }
+
+    injectDarkModeStyles();
+    injectAuthModal();
+    updateAuthUI();
+    sb.auth.onAuthStateChange(function() {
+        updateAuthUI();
+    });
 })();
