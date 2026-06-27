@@ -650,14 +650,6 @@
                                                 <label class="form-label">请输入 <strong>DELETE</strong> 确认：</label>
                                                 <input type="text" id="deleteConfirmInput" class="form-control" placeholder="DELETE">
                                             </div>
-                                            <div class="mb-3 d-flex justify-content-center" id="deleteTsWidget"></div>
-                                            <div class="mb-3">
-                                                <label class="form-label">邮箱验证码</label>
-                                                <div class="input-group">
-                                                    <input type="text" id="deleteCodeInput" class="form-control" placeholder="8位验证码" maxlength="8">
-                                                    <button class="btn btn-outline-secondary" id="sendDeleteCode">发送验证码</button>
-                                                </div>
-                                            </div>
                                         </div>
                                         <div class="modal-footer">
                                             <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">取消</button>
@@ -816,94 +808,28 @@
             else { showMsg('密码已更新', 'success'); document.getElementById('profileNewPassword').value = ''; }
         });
 
-        // ---- 注销账号（二次验证 + 邮箱验证码 + Turnstile） ----
+        // ---- 注销账号（DELETE 文字确认） ----
         var deleteModal = new bootstrap.Modal(document.getElementById('deleteModal'));
         var deleteMsgEl = document.getElementById('deleteMsg');
         var deleteConfirmInput = document.getElementById('deleteConfirmInput');
-        var deleteCodeInput = document.getElementById('deleteCodeInput');
-        var sendDeleteCodeBtn = document.getElementById('sendDeleteCode');
         var confirmDeleteBtn = document.getElementById('confirmDelete');
-        var deleteTsWidget = document.getElementById('deleteTsWidget');
-        var deleteTsId = null;
 
-        function renderDeleteTs() {
-            if (typeof turnstile === 'undefined') { setTimeout(renderDeleteTs, 200); return; }
-            if (deleteTsId !== null) turnstile.remove(deleteTsId);
-            deleteTsId = turnstile.render('#deleteTsWidget', {
-                sitekey: '0x4AAAAAADjdL8yyZdBwUnB1',
-                theme: document.body.classList.contains('dark-theme') ? 'dark' : 'light',
-                size: 'flexible'
-            });
-        }
-
-        document.getElementById('deleteModal').addEventListener('shown.bs.modal', function() {
-            if (!deleteTsId) renderDeleteTs();
+        deleteConfirmInput.addEventListener('input', function() {
+            confirmDeleteBtn.disabled = deleteConfirmInput.value.trim() !== 'DELETE';
         });
-
-        function checkDeleteForm() {
-            confirmDeleteBtn.disabled = !(
-                deleteConfirmInput.value.trim() === 'DELETE' &&
-                deleteCodeInput.value.trim().length === 8
-            );
-        }
-        deleteConfirmInput.addEventListener('input', checkDeleteForm);
-        deleteCodeInput.addEventListener('input', checkDeleteForm);
 
         document.getElementById('deleteAccount').addEventListener('click', function() {
             deleteConfirmInput.value = '';
-            deleteCodeInput.value = '';
             confirmDeleteBtn.disabled = true;
             deleteMsgEl.classList.add('d-none');
             deleteMsgEl.className = 'alert d-none';
             deleteModal.show();
         });
 
-        sendDeleteCodeBtn.addEventListener('click', async function() {
-            sendDeleteCodeBtn.disabled = true;
-            sendDeleteCodeBtn.textContent = '发送中…';
-            var captchaToken = turnstile.getResponse(deleteTsId);
-            if (!captchaToken) {
-                deleteMsgEl.textContent = '请先完成人机验证';
-                deleteMsgEl.className = 'alert alert-danger';
-                deleteMsgEl.classList.remove('d-none');
-                sendDeleteCodeBtn.disabled = false;
-                sendDeleteCodeBtn.textContent = '发送验证码';
-                return;
-            }
-            var r = await sb.auth.signInWithOtp({ email: user.email, options: { captchaToken: captchaToken } });
-            sendDeleteCodeBtn.disabled = false;
-            sendDeleteCodeBtn.textContent = '发送验证码';
-            if (r.error) {
-                deleteMsgEl.textContent = '发送失败：' + r.error.message;
-                deleteMsgEl.className = 'alert alert-danger';
-                deleteMsgEl.classList.remove('d-none');
-            } else {
-                deleteMsgEl.textContent = '验证码已发送至 ' + user.email;
-                deleteMsgEl.className = 'alert alert-success';
-                deleteMsgEl.classList.remove('d-none');
-            }
-        });
-
         confirmDeleteBtn.addEventListener('click', async function() {
             if (deleteConfirmInput.value.trim() !== 'DELETE') return;
             confirmDeleteBtn.disabled = true;
             confirmDeleteBtn.innerHTML = '<span class="spinner-border spinner-border-sm me-1"></span>注销中…';
-
-            var vr = await sb.auth.verifyOtp({
-                email: user.email,
-                token: deleteCodeInput.value.trim(),
-                type: 'email'
-            });
-
-            if (vr.error) {
-                turnstile.reset(deleteTsId);
-                deleteMsgEl.textContent = '验证码错误：' + vr.error.message;
-                deleteMsgEl.className = 'alert alert-danger';
-                deleteMsgEl.classList.remove('d-none');
-                confirmDeleteBtn.disabled = false;
-                confirmDeleteBtn.textContent = '确认注销';
-                return;
-            }
 
             var r = await sb.rpc('delete_user');
             if (r.error) {
