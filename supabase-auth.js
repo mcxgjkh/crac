@@ -1,12 +1,19 @@
 (function() {
     var SUPABASE_URL = 'https://pxhiobmdzntnxwpwtgpx.supabase.co';
     var SUPABASE_KEY = 'sb_publishable_06fy5uemh4fJnAQXIsIXdQ_79UMtlC_';
+    var TURNSTILE_KEY = '0x4AAAAAADjdL8yyZdBwUnB1';
 
     if (!window.supabase) {
         console.error('Supabase SDK 未加载');
         return;
     }
     var sb = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+
+    var tsScript = document.createElement('script');
+    tsScript.src = 'https://challenges.cloudflare.com/turnstile/v0/api.js?render=explicit';
+    tsScript.async = true;
+    tsScript.defer = true;
+    document.head.appendChild(tsScript);
 
     function injectDarkModeStyles() {
         var css = [
@@ -48,6 +55,7 @@
             '<input type="email" id="authEmail" class="form-control" placeholder="your@email.com"></div>',
             '<div class="mb-3"><label class="form-label">密码</label>',
             '<input type="password" id="authPassword" class="form-control" placeholder="至少8位，需包含字母和数字"></div>',
+            '<div id="turnstileWidget" class="d-flex justify-content-center mb-2"></div>',
             '<button id="authSubmitBtn" class="btn btn-primary w-100 mb-2">登录</button>',
             '<div id="authExtraLinks" class="d-flex justify-content-between mb-2">',
             '<button id="authToggleBtn" class="btn btn-link p-0">没有账号？去注册</button>',
@@ -71,7 +79,30 @@
         var passwordEl = document.getElementById('authPassword');
         var usernameEl = document.getElementById('authUsername');
         var usernameGroup = document.getElementById('usernameGroup');
+        var tsWidget = document.getElementById('turnstileWidget');
         var bsModal = new bootstrap.Modal(modal);
+        var tsId = null;
+
+        function renderTurnstile() {
+            if (typeof turnstile === 'undefined') {
+                setTimeout(renderTurnstile, 200);
+                return;
+            }
+            if (tsId !== null) turnstile.remove(tsId);
+            tsId = turnstile.render('#turnstileWidget', {
+                sitekey: TURNSTILE_KEY,
+                theme: document.body.classList.contains('dark-theme') ? 'dark' : 'light',
+                size: 'flexible'
+            });
+        }
+
+        function getCaptchaToken() {
+            return turnstile.getResponse(tsId);
+        }
+
+        modal.addEventListener('shown.bs.modal', function() {
+            if (!tsId) renderTurnstile();
+        });
 
         function setMode(m) {
             mode = m;
@@ -98,7 +129,14 @@
                 return;
             }
             forgotBtn.disabled = true;
-            var r = await sb.auth.resetPasswordForEmail(email, { redirectTo: 'https://bh6rkw.dpdns.org/profile/index.html' });
+            var captchaToken = getCaptchaToken();
+            if (!captchaToken) {
+                errorEl.textContent = '请完成人机验证';
+                errorEl.classList.remove('d-none');
+                forgotBtn.disabled = false;
+                return;
+            }
+            var r = await sb.auth.resetPasswordForEmail(email, { redirectTo: 'https://bh6rkw.dpdns.org/profile/index.html', captchaToken: captchaToken });
             forgotBtn.disabled = false;
             if (r.error) {
                 errorEl.textContent = r.error.message;
@@ -135,9 +173,17 @@
             }
             submitBtn.disabled = true;
             submitBtn.innerHTML = '<span class="spinner-border spinner-border-sm me-1"></span>处理中…';
-            var options = { email: email, password: password };
+            var captchaToken = getCaptchaToken();
+            if (!captchaToken) {
+                errorEl.textContent = '请完成人机验证';
+                errorEl.classList.remove('d-none');
+                submitBtn.disabled = false;
+                submitBtn.innerHTML = mode === 'login' ? '登录' : '注册';
+                return;
+            }
+            var options = { email: email, password: password, options: { captchaToken: captchaToken } };
             if (mode === 'register' && username) {
-                options.options = { data: { username: username } };
+                options.options.data = { username: username };
             }
             var result;
             if (mode === 'login') {
@@ -147,6 +193,7 @@
             }
             submitBtn.disabled = false;
             if (result.error) {
+                turnstile.reset(tsId);
                 errorEl.textContent = result.error.message;
                 errorEl.classList.remove('d-none');
             } else {
