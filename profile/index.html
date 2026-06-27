@@ -454,6 +454,46 @@
             border-color: #2a5a8a;
         }
 
+        /* 注销弹窗暗色模式 */
+        .dark-theme #deleteModal .modal-content {
+            background-color: #1e1e1e;
+            color: #e0e0e0;
+            border-color: #333;
+        }
+        .dark-theme #deleteModal .modal-header {
+            border-bottom-color: #333;
+        }
+        .dark-theme #deleteModal .modal-footer {
+            border-top-color: #333;
+        }
+        .dark-theme #deleteModal .btn-close {
+            filter: invert(1);
+        }
+        .dark-theme #deleteModal .form-control {
+            background-color: #2a2a2a;
+            border-color: #444;
+            color: #e0e0e0;
+        }
+        .dark-theme #deleteModal .form-control::placeholder {
+            color: #888;
+        }
+        .dark-theme .btn-outline-danger {
+            color: #f87171;
+            border-color: #f87171;
+        }
+        .dark-theme .btn-outline-danger:hover {
+            background-color: #dc3545;
+            color: #fff;
+        }
+        .dark-theme .btn-outline-secondary {
+            color: #b0b0b0;
+            border-color: #555;
+        }
+        .dark-theme .btn-outline-secondary:hover {
+            background-color: #555;
+            color: #fff;
+        }
+
         @media (max-width: 768px) {
             .theme-switch { right: 5px; }
         }
@@ -576,10 +616,55 @@
                             </div>
 
                             <hr>
+                            <h5 class="mb-3">数据管理</h5>
+                            <div class="d-grid gap-2 mb-3">
+                                <button class="btn btn-outline-danger btn-sm" id="clearRecords">
+                                    <i class="fas fa-history me-1"></i>清除做题记录
+                                </button>
+                                <button class="btn btn-outline-danger btn-sm" id="clearWrongs">
+                                    <i class="fas fa-times-circle me-1"></i>清除错题记录
+                                </button>
+                                <button class="btn btn-outline-danger btn-sm" id="clearFavorites">
+                                    <i class="fas fa-star me-1"></i>清除收藏记录
+                                </button>
+                            </div>
+
+                            <hr>
                             <button class="btn btn-danger-outline w-100 mb-2" id="deleteAccount">
                                 <i class="fas fa-trash-alt me-1"></i>注销账号
                             </button>
                             <p class="text-muted small mb-0">注销后所有数据将被永久删除，不可恢复。</p>
+
+                            <!-- 注销确认弹窗 -->
+                            <div class="modal fade" id="deleteModal" tabindex="-1">
+                                <div class="modal-dialog modal-dialog-centered">
+                                    <div class="modal-content">
+                                        <div class="modal-header">
+                                            <h5 class="modal-title text-danger">注销账号</h5>
+                                            <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                                        </div>
+                                        <div class="modal-body">
+                                            <div id="deleteMsg" class="alert d-none"></div>
+                                            <p class="text-danger fw-bold">此操作不可撤销！所有数据（做题记录、错题、收藏、登录记录）将被永久删除。</p>
+                                            <div class="mb-3">
+                                                <label class="form-label">请输入 <strong>DELETE</strong> 确认：</label>
+                                                <input type="text" id="deleteConfirmInput" class="form-control" placeholder="DELETE">
+                                            </div>
+                                            <div class="mb-3">
+                                                <label class="form-label">邮箱验证码</label>
+                                                <div class="input-group">
+                                                    <input type="text" id="deleteCodeInput" class="form-control" placeholder="8位验证码" maxlength="8">
+                                                    <button class="btn btn-outline-secondary" id="sendDeleteCode">发送验证码</button>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="modal-footer">
+                                            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">取消</button>
+                                            <button type="button" class="btn btn-danger" id="confirmDelete" disabled>确认注销</button>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -600,7 +685,7 @@
 
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
-    <script src="/supabase-auth.js?v=1.4.9"></script>
+    <script src="/supabase-auth.js?v=1.5.0"></script>
     <script>
     (function(){var M=3,k='cssRetry',r=parseInt(sessionStorage.getItem(k)||'0');if(r>=M){sessionStorage.removeItem(k);return}function c(){var e=document.getElementById('css-detect');if(!e)return;getComputedStyle(e).getPropertyValue('--css-loaded').trim()!=='1'?(sessionStorage.setItem(k,r+1),location.reload()):sessionStorage.removeItem(k)}document.readyState==='loading'?document.addEventListener('DOMContentLoaded',function(){setTimeout(c,300)}):setTimeout(c,100)})();
     </script>
@@ -681,6 +766,28 @@
             setTimeout(function() { msgEl.classList.add('d-none'); }, 4000);
         }
 
+        // ---- 数据清除 ----
+        document.getElementById('clearRecords').addEventListener('click', async function() {
+            if (!confirm('确定清除所有做题记录吗？此操作不可恢复。')) return;
+            var r = await sb.from('exam_sessions').delete().eq('user_id', user.id);
+            if (r.error) { showMsg('清除失败：' + r.error.message, 'danger'); }
+            else { showMsg('做题记录已清除', 'success'); loadExamRecords(sb, user); }
+        });
+
+        document.getElementById('clearWrongs').addEventListener('click', async function() {
+            if (!confirm('确定清除所有错题记录吗？此操作不可恢复。')) return;
+            var r = await sb.from('exam_progress').delete().eq('user_id', user.id).eq('is_correct', false);
+            if (r.error) { showMsg('清除失败：' + r.error.message, 'danger'); }
+            else { showMsg('错题记录已清除', 'success'); }
+        });
+
+        document.getElementById('clearFavorites').addEventListener('click', async function() {
+            if (!confirm('确定清除所有收藏记录吗？此操作不可恢复。')) return;
+            var r = await sb.from('exam_progress').delete().eq('user_id', user.id).eq('is_favorite', true);
+            if (r.error) { showMsg('清除失败：' + r.error.message, 'danger'); }
+            else { showMsg('收藏记录已清除', 'success'); }
+        });
+
         document.getElementById('saveUsername').addEventListener('click', async function() {
             var name = document.getElementById('profileUsername').value.trim();
             if (!name) { showMsg('用户名不能为空', 'danger'); return; }
@@ -708,17 +815,81 @@
             else { showMsg('密码已更新', 'success'); document.getElementById('profileNewPassword').value = ''; }
         });
 
-        document.getElementById('deleteAccount').addEventListener('click', async function() {
-            if (!confirm('确定要注销账号吗？所有数据将被永久删除，不可恢复！')) return;
-            if (!confirm('再次确认：注销后所有数据将被删除。')) return;
-            showMsg('正在处理注销请求…', 'info');
+        // ---- 注销账号（二次验证 + 邮箱验证码） ----
+        var deleteModal = new bootstrap.Modal(document.getElementById('deleteModal'));
+        var deleteMsgEl = document.getElementById('deleteMsg');
+        var deleteConfirmInput = document.getElementById('deleteConfirmInput');
+        var deleteCodeInput = document.getElementById('deleteCodeInput');
+        var sendDeleteCodeBtn = document.getElementById('sendDeleteCode');
+        var confirmDeleteBtn = document.getElementById('confirmDelete');
+
+        function checkDeleteForm() {
+            confirmDeleteBtn.disabled = !(
+                deleteConfirmInput.value.trim() === 'DELETE' &&
+                deleteCodeInput.value.trim().length === 8
+            );
+        }
+        deleteConfirmInput.addEventListener('input', checkDeleteForm);
+        deleteCodeInput.addEventListener('input', checkDeleteForm);
+
+        document.getElementById('deleteAccount').addEventListener('click', function() {
+            deleteConfirmInput.value = '';
+            deleteCodeInput.value = '';
+            confirmDeleteBtn.disabled = true;
+            deleteMsgEl.classList.add('d-none');
+            deleteMsgEl.className = 'alert d-none';
+            deleteModal.show();
+        });
+
+        sendDeleteCodeBtn.addEventListener('click', async function() {
+            sendDeleteCodeBtn.disabled = true;
+            sendDeleteCodeBtn.textContent = '发送中…';
+            var r = await sb.auth.signInWithOtp({ email: user.email });
+            sendDeleteCodeBtn.disabled = false;
+            sendDeleteCodeBtn.textContent = '发送验证码';
+            if (r.error) {
+                deleteMsgEl.textContent = '发送失败：' + r.error.message;
+                deleteMsgEl.className = 'alert alert-danger';
+                deleteMsgEl.classList.remove('d-none');
+            } else {
+                deleteMsgEl.textContent = '验证码已发送至 ' + user.email;
+                deleteMsgEl.className = 'alert alert-success';
+                deleteMsgEl.classList.remove('d-none');
+            }
+        });
+
+        confirmDeleteBtn.addEventListener('click', async function() {
+            if (deleteConfirmInput.value.trim() !== 'DELETE') return;
+            confirmDeleteBtn.disabled = true;
+            confirmDeleteBtn.innerHTML = '<span class="spinner-border spinner-border-sm me-1"></span>注销中…';
+
+            var vr = await sb.auth.verifyOtp({
+                email: user.email,
+                token: deleteCodeInput.value.trim(),
+                type: 'email'
+            });
+
+            if (vr.error) {
+                deleteMsgEl.textContent = '验证码错误：' + vr.error.message;
+                deleteMsgEl.className = 'alert alert-danger';
+                deleteMsgEl.classList.remove('d-none');
+                confirmDeleteBtn.disabled = false;
+                confirmDeleteBtn.textContent = '确认注销';
+                return;
+            }
+
             var r = await sb.rpc('delete_user');
             if (r.error) {
-                showMsg('注销失败，请尝试在 Supabase 后台手动删除。错误：' + r.error.message, 'danger');
+                deleteMsgEl.textContent = '注销失败：' + r.error.message;
+                deleteMsgEl.className = 'alert alert-danger';
+                deleteMsgEl.classList.remove('d-none');
+                confirmDeleteBtn.disabled = false;
+                confirmDeleteBtn.textContent = '确认注销';
             } else {
+                deleteModal.hide();
                 await sb.auth.signOut();
-                showMsg('账号已注销', 'success');
-                setTimeout(function() { location.reload(); }, 2000);
+                alert('账号已注销，即将返回首页。');
+                window.location.href = 'https://bh6rkw.dpdns.org';
             }
         });
     });
