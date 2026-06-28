@@ -1,4 +1,6 @@
 {
-  "installCommand": "git lfs pull",
-  "outputDirectory": "."
+  "installCommand": "git lfs install && git lfs pull",
+  "buildCommand": "echo 'Build complete'",
+  "outputDirectory": ".",
+  "trailingSlash": true
 }
