@@ -1,0 +1,4 @@
+{
+  "installCommand": "git lfs pull",
+  "outputDirectory": "."
+}
