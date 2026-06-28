@@ -5,7 +5,7 @@ from datetime import datetime
 # ========== 配置 ==========
 download_dir = os.path.dirname(os.path.abspath(__file__))
 images_dir = os.path.normpath(os.path.join(download_dir, '..', 'images'))
-exclude_filenames = {'index.html', 'index - 副本.html', 'files.json', 'update_files_json.py', 'generate_files_json.py'}
+exclude_filenames = {'index.html', 'index - 副本.html', 'files.json', 'update_files_json.py', 'generate_files_json.py', 'lfs_upload.py'}
 json_path = os.path.join(download_dir, 'files.json')
 
 def normalize_key(url):

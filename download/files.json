@@ -128,20 +128,20 @@
     "protected": false
   },
   {
-    "name": "HMCL_JDK20.z01",
-    "size": 104857600,
-    "modified": "2026-05-17 00:44:56",
-    "url": "./HMCL_JDK20.z01",
-    "ext": "z01",
+    "name": "HMCL-3.13.2.exe",
+    "size": 9766649,
+    "modified": "2026-05-16 23:39:54",
+    "url": "./HMCL-3.13.2.exe",
+    "ext": "exe",
     "protected": true,
     "password": "114514"
   },
   {
-    "name": "HMCL_JDK20.zip",
-    "size": 69885172,
-    "modified": "2026-05-17 00:44:56",
-    "url": "./HMCL_JDK20.zip",
-    "ext": "zip",
+    "name": "jdk-20.0.2_windows-x64_bin.exe",
+    "size": 167900272,
+    "modified": "2026-05-17 00:41:19",
+    "url": "./jdk-20.0.2_windows-x64_bin.exe",
+    "ext": "exe",
     "protected": true,
     "password": "114514"
   },
@@ -171,5 +171,21 @@
     "ext": "jar",
     "protected": true,
     "password": "114514"
+  },
+  {
+    "name": "业余无线电台呼号编制和核发要求.webp",
+    "size": 63526,
+    "modified": "2026-05-30 23:15:54",
+    "url": "./../images/业余无线电台呼号编制和核发要求.webp",
+    "ext": "webp",
+    "protected": false
+  },
+  {
+    "name": "global-security.instructions.md",
+    "size": 3415,
+    "modified": "2026-06-28 19:24:43",
+    "url": "./global-security.instructions.md",
+    "ext": "md",
+    "protected": false
   }
 ]
