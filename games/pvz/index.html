@@ -1,0 +1,1689 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+    <title>植物大战僵尸</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        body {
+            background: #1a1a2e;
+            font-family: Arial, Helvetica, sans-serif;
+            display: -webkit-box;
+            display: -moz-box;
+            display: box;
+            -webkit-box-pack: center;
+            -webkit-box-align: center;
+            min-height: 100vh;
+            padding: 10px;
+            touch-action: manipulation;
+        }
+        .container {
+            background: #2d5a27;
+            padding: 15px 15px 20px 15px;
+            border-radius: 20px;
+            border: 3px solid #4a7a44;
+            max-width: 960px;
+            width: 100%;
+            position: relative;
+            -webkit-box-shadow: 0 10px 30px rgba(0,0,0,0.7);
+        }
+        #menuScreen {
+            background: #3d6b37;
+            border-radius: 16px;
+            padding: 20px 15px 30px 15px;
+            text-align: center;
+            color: #f5e9c4;
+            display: block;
+        }
+        #menuScreen h1 {
+            font-size: 36px;
+            text-shadow: 0 4px 0 #1f3a1a;
+            margin-bottom: 5px;
+        }
+        .version {
+            font-size: 14px;
+            color: #aaa;
+            margin-bottom: 15px;
+        }
+        .level-grid {
+            display: -webkit-box;
+            display: -moz-box;
+            display: box;
+            -webkit-box-pack: center;
+            -webkit-box-lines: multiple;
+            -moz-box-lines: multiple;
+            box-lines: multiple;
+            flex-wrap: wrap;
+            justify-content: center;
+            gap: 12px;
+            max-width: 600px;
+            margin: 0 auto;
+        }
+        .level-btn {
+            background: #5a3f26;
+            border: 3px solid #8b6b44;
+            border-radius: 16px;
+            color: #f5e9c4;
+            font-size: 22px;
+            font-weight: bold;
+            width: 70px;
+            height: 70px;
+            cursor: pointer;
+            -webkit-box-shadow: 0 6px 0 #2f1f10;
+            text-shadow: 0 2px 0 #2f1f10;
+            touch-action: manipulation;
+            margin: 4px;
+            display: -webkit-inline-box;
+            display: -moz-inline-box;
+            display: inline-box;
+            -webkit-box-pack: center;
+            -webkit-box-align: center;
+            text-align: center;
+            line-height: 70px;
+        }
+        .level-btn.locked {
+            background: #3d3d3d;
+            border-color: #555;
+            color: #777;
+            -webkit-box-shadow: 0 4px 0 #222;
+            cursor: not-allowed;
+            pointer-events: none;
+            opacity: 0.6;
+        }
+        .level-btn:active {
+            -webkit-transform: translateY(4px);
+            -webkit-box-shadow: 0 2px 0 #2f1f10;
+        }
+        #menuScreen .info {
+            margin-top: 20px;
+            font-size: 18px;
+            background: #2b241a;
+            padding: 8px 20px;
+            border-radius: 30px;
+            display: inline-block;
+            border: 1px solid #6b5a44;
+        }
+        #gameScreen {
+            display: none;
+            position: relative;
+        }
+        canvas {
+            display: block;
+            margin: 0 auto;
+            border-radius: 12px;
+            background: #7ec87e;
+            width: 100%;
+            height: auto;
+            aspect-ratio: 900 / 600;
+            touch-action: none;
+            cursor: crosshair;
+        }
+        .game-ui {
+            display: -webkit-box;
+            display: -moz-box;
+            display: box;
+            -webkit-box-pack: justify;
+            -webkit-box-align: center;
+            margin-top: 10px;
+            padding: 0 4px;
+            color: #f5e9c4;
+            font-weight: bold;
+            font-size: 16px;
+            flex-wrap: wrap;
+        }
+        .plant-bar {
+            display: -webkit-box;
+            display: -moz-box;
+            display: box;
+            -webkit-box-lines: multiple;
+            -moz-box-lines: multiple;
+            box-lines: multiple;
+            gap: 4px;
+            flex-wrap: wrap;
+            -webkit-box-flex: 1;
+        }
+        .plant-btn {
+            background: #3d2b1a;
+            border: 2px solid #6b4f32;
+            border-radius: 10px;
+            color: #f5e9c4;
+            padding: 4px 10px;
+            font-size: 13px;
+            font-weight: bold;
+            cursor: pointer;
+            -webkit-box-shadow: 0 3px 0 #1f150a;
+            touch-action: manipulation;
+            min-width: 54px;
+            text-align: center;
+            margin: 2px;
+        }
+        .plant-btn.active {
+            border-color: #ffd966;
+            background: #5a3f26;
+            -webkit-transform: translateY(-2px);
+            -webkit-box-shadow: 0 5px 0 #1f150a;
+        }
+        .plant-btn:disabled {
+            opacity: 0.4;
+            -webkit-transform: translateY(2px);
+            -webkit-box-shadow: 0 1px 0 #1f150a;
+            cursor: not-allowed;
+            pointer-events: none;
+        }
+        .plant-btn.tool-btn {
+            background: #4a2f1a;
+            border-color: #8b6b44;
+        }
+        .game-actions {
+            display: -webkit-box;
+            display: -moz-box;
+            display: box;
+            -webkit-box-align: center;
+            gap: 10px;
+            flex-wrap: wrap;
+            -webkit-box-pack: end;
+        }
+        .game-actions span {
+            background: #2b241a;
+            padding: 4px 16px;
+            border-radius: 20px;
+            border: 1px solid #6b5a44;
+            margin: 2px;
+            white-space: nowrap;
+        }
+        .game-actions .wave-info {
+            background: #2b241a;
+            padding: 4px 16px;
+            border-radius: 20px;
+            border: 1px solid #6b5a44;
+            margin: 2px;
+            white-space: nowrap;
+            font-size: 14px;
+        }
+        .btn {
+            background: #a53f3f;
+            border: none;
+            border-radius: 20px;
+            color: #fff;
+            font-weight: bold;
+            padding: 6px 18px;
+            font-size: 15px;
+            cursor: pointer;
+            -webkit-box-shadow: 0 4px 0 #5f2626;
+            touch-action: manipulation;
+            margin: 2px;
+        }
+        .btn:active {
+            -webkit-transform: translateY(4px);
+            -webkit-box-shadow: none;
+        }
+        .btn-green {
+            background: #3d8f3d;
+            -webkit-box-shadow: 0 4px 0 #1f5a1f;
+        }
+        @media (max-width: 700px) {
+            .plant-btn { font-size: 11px; padding: 3px 6px; min-width: 44px; }
+            .game-actions span { font-size: 13px; padding: 2px 10px; }
+            .btn { font-size: 13px; padding: 4px 12px; }
+            .level-btn { width: 60px; height: 60px; line-height: 60px; font-size: 18px; }
+            .game-actions .wave-info { font-size: 12px; padding: 2px 10px; }
+        }
+    </style>
+</head>
+<body>
+<div class="container">
+    <div id="menuScreen">
+        <h1>植物大战僵尸</h1>
+        <div class="version">v3.2</div>
+        <div class="level-grid" id="levelGrid"></div>
+        <div class="info" id="menuInfo">加载图片中...</div>
+        <p class="info">mcxgjkh 制作</p>
+    </div>
+    <div id="gameScreen">
+        <canvas id="gameCanvas" width="900" height="600"></canvas>
+        <div class="game-ui">
+            <div class="plant-bar" id="plantBar"></div>
+            <div class="game-actions">
+                <span>☀️ <span id="sunDisplay">50</span></span>
+                <span id="levelDisplay">第 1 关</span>
+                <span class="wave-info" id="waveInfo">波次 0/0 下一波 --</span>
+                <button class="btn btn-green" id="pauseBtn">⏸ 暂停</button>
+                <button class="btn" id="menuBtn">菜单</button>
+                <p class="info">mcxgjkh 制作</p>
+            </div>
+        </div>
+    </div>
+</div>
+<script>
+    /* ---------- 全局变量 ---------- */
+    var canvas, ctx, W, H, ROWS, COLS, CELL_W, CELL_H, OFFSET_X, OFFSET_Y;
+    var game = {};
+    var paused = false;
+    var menuScreen, gameScreen, levelGrid, plantBar;
+
+    /* ---------- 植物定义 ---------- */
+    var PLANT_TYPES = [
+        { id: 'sunflower', name: '向日葵', cost: 50, hp: 300, cooldown: 450, attack: 0, fireRate: 0, emoji: '向日葵' },
+        { id: 'peashooter', name: '豌豆射手', cost: 100, hp: 300, cooldown: 450, attack: 20, fireRate: 84, emoji: '豌豆' },
+        { id: 'snowpea', name: '寒冰射手', cost: 175, hp: 300, cooldown: 450, attack: 20, fireRate: 84, emoji: '寒冰' },
+        { id: 'wallnut', name: '坚果墙', cost: 50, hp: 4000, cooldown: 1800, attack: 0, fireRate: 0, emoji: '坚果' },
+        { id: 'cherrybomb', name: '樱桃炸弹', cost: 150, hp: 300, cooldown: 1800, attack: 1800, fireRate: 0, emoji: '炸弹' },
+        { id: 'repeater', name: '双重射手', cost: 200, hp: 300, cooldown: 450, attack: 20, fireRate: 84, emoji: '双发' },
+        { id: 'fumeshroom', name: '大喷菇', cost: 125, hp: 300, cooldown: 450, attack: 20, fireRate: 84, emoji: '大喷' },
+        { id: 'cactus', name: '仙人掌', cost: 125, hp: 300, cooldown: 450, attack: 20, fireRate: 84, emoji: '仙人掌' },
+        { id: 'squash', name: '窝瓜', cost: 50, hp: 300, cooldown: 1800, attack: 1800, fireRate: 0, emoji: '窝瓜' },
+        { id: 'torchwood', name: '火炬树桩', cost: 175, hp: 300, cooldown: 450, attack: 0, fireRate: 0, emoji: '火炬' }
+    ];
+
+    /* ---------- 僵尸定义 ---------- */
+    var ZOMBIE_TYPES = [
+        { id: 'basic', name: '普通僵尸', hp: 270, speed: 0.08, attack: 100, attackRate: 60, color: '#5d4037', score: 10 },
+        { id: 'cone', name: '路障僵尸', hp: 640, speed: 0.08, attack: 100, attackRate: 60, color: '#ef6c00', score: 20 },
+        { id: 'bucket', name: '铁桶僵尸', hp: 1370, speed: 0.08, attack: 100, attackRate: 60, color: '#616161', score: 30 },
+        { id: 'flag', name: '旗帜僵尸', hp: 270, speed: 0.12, attack: 100, attackRate: 60, color: '#c62828', score: 15 },
+        { id: 'zomboni', name: '冰车僵尸', hp: 1350, speed: 0.02, attack: 100, attackRate: 60, color: '#00838f', score: 50, special: 'ice' },
+        { id: 'football', name: '橄榄球僵尸', hp: 1670, speed: 0.18, attack: 100, attackRate: 60, color: '#1a237e', score: 40 },
+        { id: 'screendoor', name: '铁门僵尸', hp: 500, speed: 0.08, attack: 100, attackRate: 60, color: '#795548', score: 35, special: 'shield' },
+        { id: 'bungee', name: '蹦极僵尸', hp: 450, speed: 0.0, attack: 0, attackRate: 0, color: '#4e342e', score: 25, special: 'bungee' },
+        { id: 'jackbox', name: '小丑僵尸', hp: 500, speed: 0.20, attack: 100, attackRate: 60, color: '#e65100', score: 30, special: 'jackbox' },
+        { id: 'imp', name: '小鬼僵尸', hp: 270, speed: 0.15, attack: 100, attackRate: 60, color: '#5d4037', score: 15 }
+    ];
+
+    /* ---------- 工具函数 ---------- */
+    function getPlantDef(id) {
+        for (var i = 0; i < PLANT_TYPES.length; i++) {
+            if (PLANT_TYPES[i].id === id) return PLANT_TYPES[i];
+        }
+        return null;
+    }
+    function getZombieDef(id) {
+        for (var i = 0; i < ZOMBIE_TYPES.length; i++) {
+            if (ZOMBIE_TYPES[i].id === id) return ZOMBIE_TYPES[i];
+        }
+        return null;
+    }
+
+    /* ==============================================================
+       图片加载 —— 使用相对路径，提取GIF第一帧
+       ============================================================== */
+    var images = {};
+    var imagesLoaded = 0;
+    var totalImages = 0;
+
+    var plantFileMap = {
+        'sunflower': '向日葵.gif',
+        'peashooter': '豌豆射手.gif',
+        'snowpea': '寒冰射手.gif',
+        'wallnut': '坚果.gif',
+        'cherrybomb': '樱桃炸弹.gif',
+        'repeater': '双重射手.gif',
+        'fumeshroom': '大喷菇.gif',
+        'cactus': '仙人掌.gif',
+        'squash': '窝瓜.gif',
+        'torchwood': '火炬树桩.gif'
+    };
+    var zombieFileMap = {
+        'basic': 'basic.gif',
+        'bucket': 'bucket.gif',
+        'cone': 'cone.gif',
+        'flag': 'flag.gif',
+        'zomboni': '冰车僵尸.gif',
+        'football': '橄榄球僵尸.gif',
+        'screendoor': '铁门僵尸.gif',
+        'bungee': '蹦极僵尸.gif',
+        'jackbox': '小丑僵尸.gif',
+        'imp': '小鬼僵尸.gif'
+    };
+    var extraFileMap = {
+        'sun': '太阳.gif',
+        'lawnmower': '小推车.png',
+        'shovel': '铲子.png',
+        'pea': '豆.gif',
+        'icepea': '冰豆.gif',
+        'firepea': '火豆.gif'
+    };
+
+    function convertToStatic(img, id, callback) {
+        var c = document.createElement('canvas');
+        c.width = img.naturalWidth || 100;
+        c.height = img.naturalHeight || 100;
+        var ctx2 = c.getContext('2d');
+        ctx2.drawImage(img, 0, 0);
+        var dataUrl = c.toDataURL('image/png');
+        var newImg = new Image();
+        newImg.onload = function() {
+            images[id] = newImg;
+            callback();
+        };
+        newImg.onerror = function() {
+            // 如果转换失败，也继续，使用占位
+            callback();
+        };
+        newImg.src = dataUrl;
+    }
+
+    function preloadImages(callback) {
+        var list = [];
+        for (var pid in plantFileMap) {
+            list.push({ id: pid, src: './static/plants/' + plantFileMap[pid] });
+        }
+        for (var zid in zombieFileMap) {
+            list.push({ id: zid, src: './static/zombies/' + zombieFileMap[zid] });
+        }
+        for (var eid in extraFileMap) {
+            list.push({ id: eid, src: './static/' + extraFileMap[eid] });
+        }
+        totalImages = list.length;
+        imagesLoaded = 0;
+
+        if (totalImages === 0) { callback(); return; }
+
+        for (var k = 0; k < list.length; k++) {
+            var item = list[k];
+            var img = new Image();
+            (function(id, src) {
+                img.onload = function() {
+                    convertToStatic(this, id, function() {
+                        imagesLoaded++;
+                        if (imagesLoaded >= totalImages) callback();
+                    });
+                };
+                img.onerror = function() {
+                    // 加载失败，打印警告，使用占位
+                    console.warn('图片加载失败: ' + src);
+                    imagesLoaded++;
+                    if (imagesLoaded >= totalImages) callback();
+                };
+            })(item.id, item.src);
+            img.src = item.src;
+        }
+    }
+
+    /* ---------- 画布初始化 ---------- */
+    function initCanvas() {
+        canvas = document.getElementById('gameCanvas');
+        ctx = canvas.getContext('2d');
+        W = 900; H = 600;
+        ROWS = 5; COLS = 9;
+        CELL_W = 80; CELL_H = 90;
+        OFFSET_X = 60; OFFSET_Y = 60;
+    }
+
+    /* ---------- 游戏初始化 ---------- */
+    function initGame(level) {
+        game = {
+            level: level || 1,
+            sun: 150,
+            plants: [],
+            zombies: [],
+            bullets: [],
+            particles: [],
+            suns: [],
+            selectedPlant: null,
+            selectedTool: null,
+            cooldowns: {},
+            frame: 0,
+            gameOver: false,
+            victory: false,
+            score: 0,
+            lawnMowers: [],
+            waves: 0,
+            currentWave: 0,
+            waveZombieCount: 0,
+            zombiesSpawnedInWave: 0,
+            waveCooldown: 0,
+            zombieSpawnTimer: 0,
+            zombieSpawnInterval: 30,
+            sunDropTimer: 0,
+            sunDropInterval: 600
+        };
+        for (var i = 0; i < PLANT_TYPES.length; i++) {
+            game.cooldowns[PLANT_TYPES[i].id] = 0;
+        }
+        for (var r = 0; r < ROWS; r++) {
+            game.lawnMowers.push({ active: true });
+        }
+        var lv = game.level;
+        if (lv <= 3) game.waves = 3;
+        else if (lv <= 6) game.waves = 4;
+        else game.waves = 5;
+        var total = getLevelZombieCount(lv);
+        game.waveZombieCount = Math.ceil(total / game.waves);
+        game.waveCooldown = 0;
+        game.currentWave = 0;
+        game.zombiesSpawnedInWave = 0;
+        buildLevelConfig();
+        game.sunDropTimer = 0;
+        game.zombieSpawnTimer = 0;
+        game.frame = 0;
+        game.gameOver = false;
+        game.victory = false;
+        paused = false;
+        document.getElementById('pauseBtn').textContent = '⏸ 暂停';
+        updateUI();
+    }
+
+    /* ---------- 构建关卡僵尸类型池 ---------- */
+    function buildLevelConfig() {
+        var pools = {
+            easy: [ ['basic', 5], ['cone', 3], ['flag', 2] ],
+            medium: [ ['basic', 4], ['cone', 3], ['bucket', 2], ['flag', 2], ['screendoor', 2] ],
+            hard: [ ['basic', 3], ['bucket', 3], ['football', 2], ['zomboni', 2], ['jackbox', 2], ['imp', 2], ['screendoor', 2] ],
+            insane: [ ['bucket', 3], ['football', 3], ['zomboni', 2], ['jackbox', 2], ['imp', 2], ['screendoor', 2], ['bungee', 1] ]
+        };
+        var configs = [
+            { pool: 'easy', count: 6 }, { pool: 'easy', count: 8 },
+            { pool: 'medium', count: 8 }, { pool: 'medium', count: 10 },
+            { pool: 'medium', count: 12 }, { pool: 'hard', count: 10 },
+            { pool: 'hard', count: 12 }, { pool: 'hard', count: 14 },
+            { pool: 'insane', count: 12 }, { pool: 'insane', count: 15 }
+        ];
+        var idx = game.level - 1;
+        if (idx < 0) idx = 0;
+        if (idx >= configs.length) idx = configs.length - 1;
+        var cfg = configs[idx];
+        var pool = pools[cfg.pool];
+        var list = [];
+        for (var i = 0; i < cfg.count; i++) {
+            var wIdx = weightedRandom(pool);
+            list.push(pool[wIdx][0]);
+        }
+        game.levelConfig = list;
+    }
+
+    function weightedRandom(arr) {
+        var total = 0;
+        for (var i = 0; i < arr.length; i++) total += arr[i][1];
+        var r = Math.random() * total;
+        for (var j = 0; j < arr.length; j++) {
+            r -= arr[j][1];
+            if (r <= 0) return j;
+        }
+        return arr.length - 1;
+    }
+
+    function getLevelZombieCount(level) {
+        var counts = [6, 8, 8, 10, 12, 10, 12, 14, 12, 15];
+        var idx = level - 1;
+        if (idx < 0) idx = 0;
+        if (idx >= counts.length) idx = counts.length - 1;
+        return counts[idx];
+    }
+
+    /* ---------- 创建对象 ---------- */
+    function createPlant(typeId, row, col) {
+        var def = getPlantDef(typeId);
+        return {
+            typeId: typeId,
+            row: row,
+            col: col,
+            x: OFFSET_X + col * CELL_W + CELL_W / 2,
+            y: OFFSET_Y + row * CELL_H + CELL_H / 2,
+            hp: def.hp,
+            maxHp: def.hp,
+            attack: def.attack,
+            fireRate: def.fireRate,
+            fireTimer: 0,
+            sunTimer: 0,
+            alive: true
+        };
+    }
+
+    function createZombie(typeId, row) {
+        var def = getZombieDef(typeId);
+        var z = {
+            typeId: typeId,
+            row: row,
+            x: W + 30 + Math.random() * 80,
+            y: OFFSET_Y + row * CELL_H + CELL_H / 2,
+            hp: def.hp,
+            maxHp: def.hp,
+            speed: def.speed + (Math.random() - 0.5) * 0.02,
+            attack: def.attack,
+            attackRate: def.attackRate,
+            attackTimer: 0,
+            color: def.color,
+            score: def.score,
+            name: def.name,
+            alive: true,
+            eating: false,
+            slowTimer: 0,
+            special: def.special || null
+        };
+        if (def.special === 'bungee') {
+            z.x = OFFSET_X + (Math.floor(Math.random() * COLS)) * CELL_W + CELL_W/2;
+            z.y = -30;
+            z.falling = true;
+            z.fallSpeed = 2;
+            z.hasStolen = false;
+        }
+        if (def.special === 'jackbox') {
+            z.explodeTimer = Math.floor(Math.random() * 300) + 300;
+        }
+        if (def.special === 'shield') {
+            z.shieldHP = 1100;
+        }
+        if (def.special === 'ice') {
+            z.immuneSlow = true;
+        }
+        return z;
+    }
+
+    function createBullet(plant, type) {
+        type = type || 'normal';
+        var damage = 20;
+        var color = '#66bb6a';
+        var id = 'pea';
+        if (type === 'ice') { damage = 20; color = '#81d4fa'; id = 'icepea'; }
+        else if (type === 'fire') { damage = 40; color = '#ff6d00'; id = 'firepea'; }
+        else { damage = plant.attack || 20; }
+        return {
+            x: plant.x + 20,
+            y: plant.y - 4,
+            row: plant.row,
+            speed: 5,
+            damage: damage,
+            color: color,
+            alive: true,
+            isSnow: (type === 'ice'),
+            isFire: (type === 'fire'),
+            radius: 6,
+            imgId: id,
+            isFume: (plant.typeId === 'fumeshroom')
+        };
+    }
+
+    function createParticle(x, y, color, count) {
+        count = count || 12;
+        for (var i = 0; i < count; i++) {
+            var angle = Math.random() * 2 * Math.PI;
+            var speed = 1 + Math.random() * 4;
+            game.particles.push({
+                x: x, y: y,
+                vx: Math.cos(angle) * speed,
+                vy: Math.sin(angle) * speed - 1,
+                life: 30 + Math.random() * 30,
+                maxLife: 60,
+                color: color,
+                radius: 3 + Math.random() * 5,
+                alive: true
+            });
+        }
+    }
+
+    function createSun(x, y) {
+        return {
+            x: x,
+            y: y,
+            value: 25,
+            radius: 20,
+            alive: true,
+            falling: true,
+            collected: false
+        };
+    }
+
+    /* ---------- 辅助 ---------- */
+    function plantAt(row, col) {
+        for (var i = 0; i < game.plants.length; i++) {
+            var p = game.plants[i];
+            if (p.alive && p.row === row && p.col === col) return p;
+        }
+        return null;
+    }
+    function canPlace(row, col) {
+        if (row < 0 || row >= ROWS || col < 0 || col >= COLS) return false;
+        return plantAt(row, col) === null;
+    }
+
+    /* ---------- 种植逻辑 ---------- */
+    function placePlant(typeId, row, col) {
+        if (!canPlace(row, col)) return false;
+        var def = getPlantDef(typeId);
+        if (!def) return false;
+        if (game.sun < def.cost) return false;
+        if (game.cooldowns[typeId] > 0) return false;
+
+        game.sun -= def.cost;
+        var plant = createPlant(typeId, row, col);
+        game.plants.push(plant);
+        game.cooldowns[typeId] = def.cooldown;
+
+        if (typeId === 'cherrybomb') {
+            setTimeout(function() {
+                explodePlant(plant);
+            }, 500);
+        }
+        if (typeId === 'squash') {
+            squashAttack(plant);
+        }
+        updateUI();
+        return true;
+    }
+
+    function explodePlant(plant) {
+        if (!plant.alive) return;
+        var cx = plant.x, cy = plant.y;
+        createParticle(cx, cy, '#ff6f00', 30);
+        createParticle(cx, cy, '#ffab00', 25);
+        var range = 1.5 * CELL_W;
+        for (var i = 0; i < game.zombies.length; i++) {
+            var z = game.zombies[i];
+            if (!z.alive) continue;
+            var dx = z.x - cx;
+            var dy = (z.row - plant.row) * CELL_H;
+            if (Math.abs(dx) < range && Math.abs(dy) < range) {
+                z.hp -= 1800;
+                if (z.hp <= 0) {
+                    z.alive = false;
+                    game.score += z.score || 10;
+                    createParticle(z.x, z.y, z.color, 15);
+                }
+            }
+        }
+        plant.alive = false;
+    }
+
+    function squashAttack(plant) {
+        if (!plant.alive) return;
+        var cx = plant.x, cy = plant.y;
+        createParticle(cx, cy, '#7b1fa2', 20);
+        var range = 1.5 * CELL_W;
+        var hit = false;
+        for (var i = 0; i < game.zombies.length; i++) {
+            var z = game.zombies[i];
+            if (!z.alive) continue;
+            var dx = z.x - cx;
+            var dy = (z.row - plant.row) * CELL_H;
+            if (Math.abs(dx) < range && Math.abs(dy) < CELL_H/2) {
+                z.hp -= 1800;
+                if (z.hp <= 0) {
+                    z.alive = false;
+                    game.score += z.score || 10;
+                    createParticle(z.x, z.y, z.color, 15);
+                }
+                hit = true;
+            }
+        }
+        plant.alive = false;
+        if (hit) createParticle(cx, cy, '#ce93d8', 20);
+    }
+
+    /* ---------- 铲子功能 ---------- */
+    function useShovel(row, col) {
+        var p = plantAt(row, col);
+        if (p) {
+            p.alive = false;
+            createParticle(p.x, p.y, '#8d6e63', 10);
+            return true;
+        }
+        return false;
+    }
+
+    /* ---------- 生成僵尸 ---------- */
+    function spawnZombie() {
+        if (game.gameOver || game.victory) return;
+        if (game.zombiesSpawnedInWave >= game.waveZombieCount) return;
+        if (game.zombies.length > 20) return;
+
+        var row = Math.floor(Math.random() * ROWS);
+        var idx = game.zombiesSpawnedInWave % game.levelConfig.length;
+        var typeId = game.levelConfig[idx] || 'basic';
+        var zombie = createZombie(typeId, row);
+        game.zombies.push(zombie);
+        game.zombiesSpawnedInWave++;
+    }
+
+    /* ---------- 更新游戏 ---------- */
+    function updateGame() {
+        if (game.gameOver || game.victory || paused) return;
+        game.frame++;
+
+        // 阳光掉落
+        game.sunDropTimer++;
+        if (game.sunDropTimer >= game.sunDropInterval) {
+            game.sunDropTimer = 0;
+            var sx = 30 + Math.random() * (W - 60);
+            var sy = -30;
+            var sun = createSun(sx, sy);
+            game.suns.push(sun);
+        }
+
+        // 向日葵产阳光（24秒）
+        for (var i = 0; i < game.plants.length; i++) {
+            var p = game.plants[i];
+            if (!p.alive) continue;
+            if (p.typeId === 'sunflower') {
+                p.sunTimer++;
+                if (p.sunTimer >= 1440) {
+                    p.sunTimer = 0;
+                    var sun2 = createSun(p.x - 15, p.y - 20);
+                    sun2.falling = false;
+                    sun2.y = p.y + 10;
+                    game.suns.push(sun2);
+                }
+            }
+        }
+
+        updateSuns();
+
+        // 波次控制
+        if (game.zombiesSpawnedInWave >= game.waveZombieCount &&
+            game.zombies.length === 0 &&
+            game.currentWave < game.waves - 1) {
+            if (game.waveCooldown === 0) {
+                // 根据关卡计算间隔，关卡越小间隔越短，最短15秒
+                var baseInterval = Math.max(15, 30 - game.level * 2); // 秒
+                var randomOffset = (Math.random() - 0.5) * 10; // ±5秒
+                var intervalSec = Math.max(15, baseInterval + randomOffset);
+                game.waveCooldown = Math.floor(intervalSec * 60);
+            }
+        }
+        if (game.waveCooldown > 0) {
+            game.waveCooldown--;
+            if (game.waveCooldown === 0) {
+                game.currentWave++;
+                game.zombiesSpawnedInWave = 0;
+                var remainWaves = game.waves - game.currentWave;
+                var remainZombies = getLevelZombieCount(game.level) - (game.currentWave * game.waveZombieCount);
+                if (remainWaves > 0) {
+                    game.waveZombieCount = Math.ceil(remainZombies / remainWaves);
+                } else {
+                    game.waveZombieCount = 0;
+                }
+            }
+        }
+
+        // 生成僵尸
+        if (game.waveCooldown === 0 && game.currentWave < game.waves) {
+            game.zombieSpawnTimer++;
+            var interval = Math.max(20, game.zombieSpawnInterval - game.level * 1);
+            if (game.zombieSpawnTimer >= interval) {
+                game.zombieSpawnTimer = 0;
+                if (game.zombiesSpawnedInWave < game.waveZombieCount) {
+                    spawnZombie();
+                    if (game.level > 5 && Math.random() < 0.15) spawnZombie();
+                }
+            }
+        }
+
+        // 冷却
+        for (var key in game.cooldowns) {
+            if (game.cooldowns[key] > 0) game.cooldowns[key]--;
+        }
+
+        updatePlants();
+        updateBullets();
+        updateZombies();
+        updateParticles();
+        checkLawnMowers();
+        checkVictory();
+        updateUI();
+    }
+
+    function updateSuns() {
+        for (var i = 0; i < game.suns.length; i++) {
+            var s = game.suns[i];
+            if (!s.alive) continue;
+            if (s.falling) {
+                s.y += 0.2;
+                if (s.y >= H - 30) {
+                    s.y = H - 30;
+                    s.falling = false;
+                }
+            }
+        }
+        var newSuns = [];
+        for (var j = 0; j < game.suns.length; j++) {
+            if (game.suns[j].alive) newSuns.push(game.suns[j]);
+        }
+        game.suns = newSuns;
+    }
+
+    function updatePlants() {
+        for (var i = 0; i < game.plants.length; i++) {
+            var p = game.plants[i];
+            if (!p.alive) continue;
+            if (p.fireRate > 0) {
+                p.fireTimer++;
+                var hasTarget = false;
+                for (var j = 0; j < game.zombies.length; j++) {
+                    var z = game.zombies[j];
+                    if (z.alive && z.row === p.row && z.x > p.x - 20) {
+                        hasTarget = true;
+                        break;
+                    }
+                }
+                if (hasTarget && p.fireTimer >= p.fireRate) {
+                    p.fireTimer = 0;
+                    var torch = false;
+                    for (var k = 0; k < game.plants.length; k++) {
+                        var t = game.plants[k];
+                        if (t.alive && t.typeId === 'torchwood' && t.row === p.row && t.col > p.col) {
+                            torch = true;
+                            break;
+                        }
+                    }
+                    var bulletType = 'normal';
+                    if (p.typeId === 'snowpea') {
+                        bulletType = 'ice';
+                        if (torch) bulletType = 'normal';
+                    } else if (torch && (p.typeId === 'peashooter' || p.typeId === 'repeater')) {
+                        bulletType = 'fire';
+                    }
+                    var b = createBullet(p, bulletType);
+                    game.bullets.push(b);
+                    if (p.typeId === 'repeater') {
+                        var b2 = createBullet(p, bulletType);
+                        b2.y = p.y + 8;
+                        game.bullets.push(b2);
+                    }
+                }
+            }
+        }
+    }
+
+    function updateBullets() {
+        for (var i = 0; i < game.bullets.length; i++) {
+            var b = game.bullets[i];
+            if (!b.alive) continue;
+            b.x += b.speed;
+            if (b.x > W + 50) { b.alive = false; continue; }
+
+            var hit = false;
+            for (var j = 0; j < game.zombies.length; j++) {
+                var z = game.zombies[j];
+                if (!z.alive) continue;
+                if (z.row !== b.row) continue;
+                if (Math.abs(z.x - b.x) < 20 && Math.abs((z.y) - (b.y)) < 25) {
+                    if (b.isFume && z.special === 'shield') {
+                        z.hp -= b.damage;
+                        if (b.isSnow) z.slowTimer = 600;
+                        createParticle(b.x, b.y, b.color, 6);
+                        if (z.hp <= 0) {
+                            z.alive = false;
+                            game.score += z.score || 10;
+                            createParticle(z.x, z.y, z.color, 18);
+                        }
+                        continue;
+                    }
+                    if (z.special === 'shield' && z.shieldHP > 0) {
+                        z.shieldHP -= b.damage;
+                        if (z.shieldHP < 0) z.shieldHP = 0;
+                        createParticle(b.x, b.y, '#8d6e63', 5);
+                        b.alive = false;
+                        hit = true;
+                        break;
+                    }
+                    z.hp -= b.damage;
+                    if (b.isSnow) z.slowTimer = 600;
+                    if (b.isFire) z.hp -= 15;
+                    createParticle(b.x, b.y, b.color, 6);
+                    if (z.hp <= 0) {
+                        z.alive = false;
+                        game.score += z.score || 10;
+                        createParticle(z.x, z.y, z.color, 18);
+                    }
+                    b.alive = false;
+                    hit = true;
+                    break;
+                }
+            }
+            if (hit) continue;
+        }
+        var newBullets = [];
+        for (var k = 0; k < game.bullets.length; k++) {
+            if (game.bullets[k].alive) newBullets.push(game.bullets[k]);
+        }
+        game.bullets = newBullets;
+    }
+
+    function updateZombies() {
+        for (var i = 0; i < game.zombies.length; i++) {
+            var z = game.zombies[i];
+            if (!z.alive) continue;
+
+            if (z.special === 'bungee' && z.falling) {
+                z.y += z.fallSpeed;
+                if (z.y >= OFFSET_Y + z.row * CELL_H + CELL_H/2) {
+                    z.y = OFFSET_Y + z.row * CELL_H + CELL_H/2;
+                    z.falling = false;
+                    var col = Math.round((z.x - OFFSET_X) / CELL_W);
+                    if (col >= 0 && col < COLS) {
+                        var target = plantAt(z.row, col);
+                        if (target) {
+                            target.alive = false;
+                            createParticle(target.x, target.y, '#4e342e', 15);
+                            z.hasStolen = true;
+                        }
+                    }
+                    z.alive = false;
+                    continue;
+                }
+                continue;
+            }
+
+            if (z.special === 'jackbox') {
+                z.explodeTimer--;
+                if (z.explodeTimer <= 0) {
+                    createParticle(z.x, z.y, '#ff6f00', 30);
+                    for (var j = 0; j < game.plants.length; j++) {
+                        var p = game.plants[j];
+                        if (p.alive && Math.abs(p.x - z.x) < 1.5*CELL_W && Math.abs(p.y - z.y) < 1.5*CELL_H) {
+                            p.hp -= 500;
+                            if (p.hp <= 0) p.alive = false;
+                        }
+                    }
+                    z.alive = false;
+                    continue;
+                }
+            }
+
+            if (!z.immuneSlow) {
+                if (z.slowTimer > 0) z.slowTimer--;
+                var speedFactor = z.slowTimer > 0 ? 0.5 : 1;
+            } else {
+                var speedFactor = 1;
+            }
+
+            var eating = false;
+            for (var k = 0; k < game.plants.length; k++) {
+                var p2 = game.plants[k];
+                if (!p2.alive) continue;
+                if (p2.row !== z.row) continue;
+                if (Math.abs(z.x - p2.x) < 30) {
+                    eating = true;
+                    z.attackTimer++;
+                    if (z.attackTimer >= z.attackRate) {
+                        z.attackTimer = 0;
+                        p2.hp -= z.attack;
+                        if (p2.hp <= 0) {
+                            p2.alive = false;
+                            createParticle(p2.x, p2.y, p2.color, 10);
+                        }
+                    }
+                    break;
+                }
+            }
+            z.eating = eating;
+
+            if (!eating) {
+                z.attackTimer = 0;
+                if (z.special === 'ice') {
+                    for (var m = 0; m < game.plants.length; m++) {
+                        var pp = game.plants[m];
+                        if (pp.alive && pp.row === z.row && Math.abs(z.x - pp.x) < 30) {
+                            pp.alive = false;
+                            createParticle(pp.x, pp.y, '#00bcd4', 10);
+                        }
+                    }
+                }
+                z.x -= z.speed * speedFactor;
+            }
+
+            if (z.hp <= 0) {
+                z.alive = false;
+                game.score += z.score || 10;
+                createParticle(z.x, z.y, z.color, 15);
+            }
+        }
+        var newZombies = [];
+        for (var n = 0; n < game.zombies.length; n++) {
+            if (game.zombies[n].alive) newZombies.push(game.zombies[n]);
+        }
+        game.zombies = newZombies;
+    }
+
+    function updateParticles() {
+        for (var i = 0; i < game.particles.length; i++) {
+            var p = game.particles[i];
+            if (!p.alive) continue;
+            p.x += p.vx;
+            p.y += p.vy;
+            p.vy += 0.08;
+            p.life--;
+            if (p.life <= 0) p.alive = false;
+        }
+        var newParts = [];
+        for (var j = 0; j < game.particles.length; j++) {
+            if (game.particles[j].alive) newParts.push(game.particles[j]);
+        }
+        game.particles = newParts;
+    }
+
+    function checkLawnMowers() {
+        for (var r = 0; r < ROWS; r++) {
+            var mower = game.lawnMowers[r];
+            if (!mower.active) continue;
+            var triggered = false;
+            for (var i = 0; i < game.zombies.length; i++) {
+                var z = game.zombies[i];
+                if (z.alive && z.row === r && z.x < 40) {
+                    triggered = true;
+                    break;
+                }
+            }
+            if (triggered) {
+                mower.active = false;
+                for (var j = 0; j < game.zombies.length; j++) {
+                    var z2 = game.zombies[j];
+                    if (z2.alive && z2.row === r) {
+                        z2.alive = false;
+                        game.score += z2.score || 10;
+                        createParticle(z2.x, z2.y, '#ff6f00', 15);
+                    }
+                }
+                var newZ = [];
+                for (var k = 0; k < game.zombies.length; k++) {
+                    if (game.zombies[k].alive) newZ.push(game.zombies[k]);
+                }
+                game.zombies = newZ;
+                createParticle(80, OFFSET_Y + r * CELL_H + CELL_H / 2, '#ffab00', 25);
+            }
+        }
+
+        for (var r2 = 0; r2 < ROWS; r2++) {
+            var m = game.lawnMowers[r2];
+            if (!m.active) {
+                for (var l = 0; l < game.zombies.length; l++) {
+                    var z3 = game.zombies[l];
+                    if (z3.alive && z3.row === r2 && z3.x < 10) {
+                        game.gameOver = true;
+                        return;
+                    }
+                }
+            }
+        }
+    }
+
+    function checkVictory() {
+        if (game.victory || game.gameOver) return;
+        if (game.currentWave >= game.waves &&
+            game.zombies.length === 0 &&
+            game.zombiesSpawnedInWave >= game.waveZombieCount) {
+            game.victory = true;
+            var unlocked = parseInt(localStorage.getItem('pvz_unlocked') || '1');
+            if (game.level >= unlocked) {
+                var next = game.level + 1;
+                if (next > 10) next = 10;
+                localStorage.setItem('pvz_unlocked', String(next));
+            }
+            if (game.level >= 10) {
+                // 全部通关
+            } else {
+                setTimeout(function() {
+                    game.plants = [];
+                    game.bullets = [];
+                    game.particles = [];
+                    game.suns = [];
+                    game.zombies = [];
+                    game.zombiesSpawnedInWave = 0;
+                    game.currentWave = 0;
+                    game.level++;
+                    if (game.level > 10) {
+                        game.victory = true;
+                        updateUI();
+                        return;
+                    }
+                    var lv = game.level;
+                    if (lv <= 3) game.waves = 3;
+                    else if (lv <= 6) game.waves = 4;
+                    else game.waves = 5;
+                    var total = getLevelZombieCount(lv);
+                    game.waveZombieCount = Math.ceil(total / game.waves);
+                    game.waveCooldown = 0;
+                    game.currentWave = 0;
+                    game.zombiesSpawnedInWave = 0;
+                    game.gameOver = false;
+                    game.victory = false;
+                    buildLevelConfig();
+                    for (var r = 0; r < ROWS; r++) {
+                        game.lawnMowers[r].active = true;
+                    }
+                    for (var key in game.cooldowns) {
+                        game.cooldowns[key] = 0;
+                    }
+                    game.sun += 50;
+                    updateUI();
+                }, 1000);
+            }
+        }
+    }
+
+    /* ==============================================================
+       绘制（使用图片资源，fallback 增强）
+       ============================================================== */
+    function draw() {
+        ctx.clearRect(0, 0, W, H);
+
+        // 草地
+        for (var r = 0; r < ROWS; r++) {
+            for (var c = 0; c < COLS; c++) {
+                var x = OFFSET_X + c * CELL_W;
+                var y = OFFSET_Y + r * CELL_H;
+                ctx.fillStyle = (r + c) % 2 === 0 ? '#7ec87e' : '#6abf6a';
+                ctx.fillRect(x, y, CELL_W, CELL_H);
+                ctx.strokeStyle = '#5a9e5a';
+                ctx.lineWidth = 0.5;
+                ctx.strokeRect(x, y, CELL_W, CELL_H);
+            }
+        }
+
+        // 小推车
+        for (var r2 = 0; r2 < ROWS; r2++) {
+            var m = game.lawnMowers[r2];
+            if (m.active) {
+                var img = images['lawnmower'];
+                if (img && img.complete && img.naturalWidth > 0) {
+                    ctx.drawImage(img, 10, OFFSET_Y + r2 * CELL_H + 10, 50, 60);
+                } else {
+                    ctx.fillStyle = '#f44336';
+                    ctx.fillRect(10, OFFSET_Y + r2 * CELL_H + 10, 40, 50);
+                    ctx.fillStyle = '#fff';
+                    ctx.font = '20px sans-serif';
+                    ctx.fillText('🚜', 18, OFFSET_Y + r2 * CELL_H + 48);
+                }
+            }
+        }
+
+        // 植物
+        for (var i = 0; i < game.plants.length; i++) {
+            var p = game.plants[i];
+            if (!p.alive) continue;
+            var img = images[p.typeId];
+            if (img && img.complete && img.naturalWidth > 0) {
+                ctx.drawImage(img, p.x - 30, p.y - 30, 60, 60);
+            } else {
+                // 强占位
+                ctx.beginPath();
+                ctx.arc(p.x, p.y, 26, 0, 2 * Math.PI);
+                ctx.fillStyle = '#6a8e6a';
+                ctx.fill();
+                ctx.strokeStyle = '#3e5a3e';
+                ctx.lineWidth = 2;
+                ctx.stroke();
+                ctx.fillStyle = '#fff';
+                ctx.font = '32px sans-serif';
+                ctx.textAlign = 'center';
+                ctx.textBaseline = 'middle';
+                ctx.fillText(p.emoji || '🌱', p.x, p.y);
+            }
+            if (p.hp < p.maxHp) {
+                var bw = 40;
+                ctx.fillStyle = '#333';
+                ctx.fillRect(p.x - bw/2, p.y - 42, bw, 5);
+                ctx.fillStyle = '#4caf50';
+                ctx.fillRect(p.x - bw/2, p.y - 42, bw * (p.hp / p.maxHp), 5);
+            }
+        }
+
+        // 僵尸
+        for (var j = 0; j < game.zombies.length; j++) {
+            var z = game.zombies[j];
+            if (!z.alive) continue;
+            if (z.special === 'bungee' && z.falling) {
+                ctx.fillStyle = '#4e342e';
+                ctx.beginPath();
+                ctx.arc(z.x, z.y, 20, 0, 2 * Math.PI);
+                ctx.fill();
+                ctx.fillStyle = '#fff';
+                ctx.font = '16px sans-serif';
+                ctx.fillText('🪂', z.x, z.y);
+                continue;
+            }
+            var img2 = images[z.typeId];
+            if (img2 && img2.complete && img2.naturalWidth > 0) {
+                ctx.drawImage(img2, z.x - 28, z.y - 28, 56, 56);
+            } else {
+                ctx.beginPath();
+                ctx.arc(z.x, z.y, 24, 0, 2 * Math.PI);
+                ctx.fillStyle = z.color;
+                ctx.fill();
+                ctx.strokeStyle = '#3e2723';
+                ctx.lineWidth = 2;
+                ctx.stroke();
+                ctx.fillStyle = '#fff';
+                ctx.font = '18px sans-serif';
+                ctx.textAlign = 'center';
+                ctx.fillText('🧟', z.x, z.y);
+            }
+            if (z.special === 'shield' && z.shieldHP > 0) {
+                var bw3 = 40;
+                ctx.fillStyle = '#333';
+                ctx.fillRect(z.x - bw3/2, z.y - 52, bw3, 4);
+                ctx.fillStyle = '#ffa726';
+                ctx.fillRect(z.x - bw3/2, z.y - 52, bw3 * (z.shieldHP / 1100), 4);
+            }
+            var bw2 = 44;
+            ctx.fillStyle = '#222';
+            ctx.fillRect(z.x - bw2/2, z.y - 44, bw2, 5);
+            ctx.fillStyle = z.hp / z.maxHp > 0.3 ? '#4caf50' : '#e53935';
+            ctx.fillRect(z.x - bw2/2, z.y - 44, bw2 * (z.hp / z.maxHp), 5);
+            if (z.slowTimer > 0 && !z.immuneSlow) {
+                ctx.fillStyle = '#81d4fa';
+                ctx.font = '16px sans-serif';
+                ctx.fillText('❄️', z.x + 30, z.y - 20);
+            }
+            if (z.special === 'ice') {
+                ctx.fillStyle = '#00bcd4';
+                ctx.font = '14px sans-serif';
+                ctx.fillText('🧊', z.x + 30, z.y + 10);
+            }
+        }
+
+        // 子弹
+        for (var k = 0; k < game.bullets.length; k++) {
+            var b = game.bullets[k];
+            if (!b.alive) continue;
+            var imgBullet = images[b.imgId] || images['pea'];
+            if (imgBullet && imgBullet.complete && imgBullet.naturalWidth > 0) {
+                ctx.drawImage(imgBullet, b.x - 10, b.y - 10, 20, 20);
+            } else {
+                ctx.beginPath();
+                ctx.arc(b.x, b.y, b.radius || 6, 0, 2 * Math.PI);
+                ctx.fillStyle = b.color;
+                ctx.fill();
+            }
+        }
+
+        // 阳光
+        for (var s = 0; s < game.suns.length; s++) {
+            var sun = game.suns[s];
+            if (!sun.alive) continue;
+            var imgSun = images['sun'];
+            if (imgSun && imgSun.complete && imgSun.naturalWidth > 0) {
+                ctx.drawImage(imgSun, sun.x - 20, sun.y - 20, 40, 40);
+            } else {
+                ctx.beginPath();
+                ctx.arc(sun.x, sun.y, 20, 0, 2 * Math.PI);
+                ctx.fillStyle = '#ffeb3b';
+                ctx.fill();
+                ctx.strokeStyle = '#f9a825';
+                ctx.lineWidth = 2;
+                ctx.stroke();
+                // 光芒
+                for (var a = 0; a < 8; a++) {
+                    var angle = a * Math.PI / 4;
+                    var dx = Math.cos(angle) * 28;
+                    var dy = Math.sin(angle) * 28;
+                    ctx.beginPath();
+                    ctx.arc(sun.x + dx, sun.y + dy, 6, 0, 2 * Math.PI);
+                    ctx.fillStyle = '#ffeb3b';
+                    ctx.fill();
+                }
+            }
+        }
+
+        // 粒子
+        for (var p2 = 0; p2 < game.particles.length; p2++) {
+            var pt = game.particles[p2];
+            if (!pt.alive) continue;
+            var alpha = pt.life / pt.maxLife;
+            ctx.globalAlpha = alpha;
+            ctx.beginPath();
+            ctx.arc(pt.x, pt.y, pt.radius * alpha, 0, 2 * Math.PI);
+            ctx.fillStyle = pt.color;
+            ctx.fill();
+        }
+        ctx.globalAlpha = 1;
+
+        // 暂停/结束/胜利
+        if (paused) {
+            ctx.fillStyle = 'rgba(0,0,0,0.6)';
+            ctx.fillRect(0, 0, W, H);
+            ctx.fillStyle = '#fff';
+            ctx.font = 'bold 48px sans-serif';
+            ctx.textAlign = 'center';
+            ctx.textBaseline = 'middle';
+            ctx.fillText('⏸ 暂停中', W/2, H/2);
+        }
+        if (game.gameOver) {
+            ctx.fillStyle = 'rgba(0,0,0,0.7)';
+            ctx.fillRect(0, 0, W, H);
+            ctx.fillStyle = '#ff1744';
+            ctx.font = 'bold 56px sans-serif';
+            ctx.textAlign = 'center';
+            ctx.fillText('💀 失败', W/2, H/2 - 20);
+            ctx.fillStyle = '#fff';
+            ctx.font = '22px sans-serif';
+            ctx.fillText('点击"菜单"重新挑战', W/2, H/2 + 60);
+        }
+        if (game.victory) {
+            ctx.fillStyle = 'rgba(0,0,0,0.6)';
+            ctx.fillRect(0, 0, W, H);
+            ctx.fillStyle = '#ffd740';
+            ctx.font = 'bold 56px sans-serif';
+            ctx.textAlign = 'center';
+            var msg = (game.level >= 10) ? '🏆 全部通关！' : ('🎉 第 ' + game.level + ' 关通过！');
+            ctx.fillText(msg, W/2, H/2 - 20);
+            if (game.level < 10) {
+                ctx.fillStyle = '#fff';
+                ctx.font = '22px sans-serif';
+                ctx.fillText('即将进入下一关...', W/2, H/2 + 60);
+            } else {
+                ctx.fillStyle = '#ffd740';
+                ctx.font = '26px sans-serif';
+                ctx.fillText('恭喜你打败了所有僵尸！', W/2, H/2 + 60);
+            }
+        }
+    }
+
+    /* ==============================================================
+       交互处理
+       ============================================================== */
+    function handleCanvasClick(e) {
+        if (game.gameOver || game.victory || paused) return;
+        var rect = canvas.getBoundingClientRect();
+        var scaleX = canvas.width / rect.width;
+        var scaleY = canvas.height / rect.height;
+        var clientX, clientY;
+        if (e.touches) {
+            clientX = e.touches[0].clientX;
+            clientY = e.touches[0].clientY;
+            e.preventDefault();
+        } else {
+            clientX = e.clientX;
+            clientY = e.clientY;
+        }
+        var mx = (clientX - rect.left) * scaleX;
+        var my = (clientY - rect.top) * scaleY;
+
+        // 收集阳光
+        for (var i = 0; i < game.suns.length; i++) {
+            var s = game.suns[i];
+            if (!s.alive) continue;
+            var dx = mx - s.x;
+            var dy = my - s.y;
+            if (dx * dx + dy * dy < 30 * 30) {
+                game.sun += s.value;
+                s.alive = false;
+                createParticle(s.x, s.y, '#ffeb3b', 8);
+                updateUI();
+                return;
+            }
+        }
+
+        // 铲子
+        if (game.selectedTool === 'shovel') {
+            var col = Math.floor((mx - OFFSET_X) / CELL_W);
+            var row = Math.floor((my - OFFSET_Y) / CELL_H);
+            if (row >= 0 && row < ROWS && col >= 0 && col < COLS) {
+                if (useShovel(row, col)) {
+                    game.selectedTool = null;
+                    updateUI();
+                }
+            }
+            return;
+        }
+
+        // 种植
+        if (!game.selectedPlant) return;
+        var col2 = Math.floor((mx - OFFSET_X) / CELL_W);
+        var row2 = Math.floor((my - OFFSET_Y) / CELL_H);
+        if (row2 >= 0 && row2 < ROWS && col2 >= 0 && col2 < COLS) {
+            placePlant(game.selectedPlant, row2, col2);
+        }
+    }
+
+    /* ==============================================================
+       UI更新
+       ============================================================== */
+    function updateUI() {
+        document.getElementById('sunDisplay').textContent = game.sun;
+        document.getElementById('levelDisplay').textContent = '第 ' + game.level + ' 关';
+
+        // 更新波次信息
+        var waveText = '';
+        if (game.gameOver || game.victory) {
+            waveText = '--';
+        } else {
+            var current = game.currentWave + 1;
+            var total = game.waves;
+            waveText = '波次 ' + current + '/' + total;
+            if (game.waveCooldown > 0 && game.currentWave < game.waves - 1) {
+                var sec = Math.ceil(game.waveCooldown / 60);
+                waveText += ' 下一波 ' + sec + 's';
+            } else if (game.currentWave < game.waves) {
+                waveText += ' 即将来袭';
+            } else {
+                waveText += ' 最终波';
+            }
+        }
+        document.getElementById('waveInfo').textContent = waveText;
+
+        var btns = document.querySelectorAll('.plant-btn');
+        for (var i = 0; i < btns.length; i++) {
+            var btn = btns[i];
+            var id = btn.getAttribute('data-id');
+            var isTool = btn.getAttribute('data-tool') === 'true';
+            if (isTool) {
+                if (game.selectedTool === 'shovel') {
+                    btn.className = 'plant-btn active tool-btn';
+                } else {
+                    btn.className = 'plant-btn tool-btn';
+                }
+                continue;
+            }
+            var def = getPlantDef(id);
+            if (!def) continue;
+            var canAfford = game.sun >= def.cost;
+            var isReady = game.cooldowns[id] <= 0;
+            var isActive = game.selectedPlant === id;
+            btn.className = 'plant-btn' + (isActive ? ' active' : '');
+            if (!(canAfford && isReady && !game.gameOver && !game.victory)) {
+                btn.disabled = true;
+            } else {
+                btn.disabled = false;
+            }
+            if (!isReady) {
+                btn.textContent = def.emoji + ' ' + Math.ceil(game.cooldowns[id]/10) + 's';
+            } else {
+                btn.textContent = def.emoji + ' ' + def.cost + '☀';
+            }
+        }
+    }
+
+    /* ==============================================================
+       选关界面
+       ============================================================== */
+    function buildMenu() {
+        var unlocked = parseInt(localStorage.getItem('pvz_unlocked') || '1');
+        var grid = document.getElementById('levelGrid');
+        grid.innerHTML = '';
+        for (var i = 1; i <= 10; i++) {
+            var btn = document.createElement('button');
+            btn.className = 'level-btn';
+            if (i > unlocked) {
+                btn.className += ' locked';
+                btn.textContent = '🔒';
+            } else {
+                btn.textContent = String(i);
+            }
+            btn.setAttribute('data-level', String(i));
+            (function(level) {
+                btn.addEventListener('click', function() {
+                    if (level > parseInt(localStorage.getItem('pvz_unlocked') || '1')) return;
+                    startGame(level);
+                });
+                btn.addEventListener('touchend', function(e) {
+                    e.preventDefault();
+                    if (level > parseInt(localStorage.getItem('pvz_unlocked') || '1')) return;
+                    startGame(level);
+                });
+            })(i);
+            grid.appendChild(btn);
+        }
+        var info = document.getElementById('menuInfo');
+        if (unlocked > 10) unlocked = 10;
+        info.textContent = '已解锁 ' + unlocked + ' / 10 关';
+    }
+
+    function startGame(level) {
+        document.getElementById('menuScreen').style.display = 'none';
+        document.getElementById('gameScreen').style.display = 'block';
+        initCanvas();
+        initGame(level);
+        buildPlantBar();
+        canvas.addEventListener('click', handleCanvasClick);
+        canvas.addEventListener('touchstart', handleCanvasClick, { passive: false });
+        if (!window._loopStarted) {
+            window._loopStarted = true;
+            gameLoop();
+        }
+    }
+
+    function buildPlantBar() {
+        var bar = document.getElementById('plantBar');
+        bar.innerHTML = '';
+        for (var i = 0; i < PLANT_TYPES.length; i++) {
+            var p = PLANT_TYPES[i];
+            var btn = document.createElement('button');
+            btn.className = 'plant-btn';
+            btn.setAttribute('data-id', p.id);
+            btn.textContent = p.emoji + ' ' + p.cost + '☀';
+            btn.title = p.name;
+            (function(id) {
+                btn.addEventListener('click', function() {
+                    if (game.gameOver || game.victory) return;
+                    game.selectedTool = null;
+                    if (game.selectedPlant === id) {
+                        game.selectedPlant = null;
+                    } else {
+                        var def = getPlantDef(id);
+                        if (game.sun >= def.cost && game.cooldowns[id] <= 0) {
+                            game.selectedPlant = id;
+                        } else {
+                            game.selectedPlant = null;
+                        }
+                    }
+                    updateUI();
+                });
+                btn.addEventListener('touchend', function(e) {
+                    e.preventDefault();
+                    if (game.gameOver || game.victory) return;
+                    game.selectedTool = null;
+                    if (game.selectedPlant === id) {
+                        game.selectedPlant = null;
+                    } else {
+                        var def = getPlantDef(id);
+                        if (game.sun >= def.cost && game.cooldowns[id] <= 0) {
+                            game.selectedPlant = id;
+                        } else {
+                            game.selectedPlant = null;
+                        }
+                    }
+                    updateUI();
+                });
+            })(p.id);
+            bar.appendChild(btn);
+        }
+        // 铲子
+        var shovelBtn = document.createElement('button');
+        shovelBtn.className = 'plant-btn tool-btn';
+        shovelBtn.setAttribute('data-tool', 'true');
+        shovelBtn.textContent = '铲子';
+        shovelBtn.title = '铲除植物';
+        shovelBtn.addEventListener('click', function() {
+            if (game.gameOver || game.victory) return;
+            game.selectedPlant = null;
+            if (game.selectedTool === 'shovel') {
+                game.selectedTool = null;
+            } else {
+                game.selectedTool = 'shovel';
+            }
+            updateUI();
+        });
+        shovelBtn.addEventListener('touchend', function(e) {
+            e.preventDefault();
+            if (game.gameOver || game.victory) return;
+            game.selectedPlant = null;
+            if (game.selectedTool === 'shovel') {
+                game.selectedTool = null;
+            } else {
+                game.selectedTool = 'shovel';
+            }
+            updateUI();
+        });
+        bar.appendChild(shovelBtn);
+    }
+
+    /* ---------- 主循环 ---------- */
+    function gameLoop() {
+        updateGame();
+        draw();
+        requestAnimationFrame(gameLoop);
+    }
+
+    /* ---------- 暂停 ---------- */
+    function togglePause() {
+        paused = !paused;
+        document.getElementById('pauseBtn').textContent = paused ? '▶ 继续' : '⏸ 暂停';
+    }
+
+    /* ---------- 返回菜单 ---------- */
+    function goToMenu() {
+        document.getElementById('gameScreen').style.display = 'none';
+        document.getElementById('menuScreen').style.display = 'block';
+        buildMenu();
+        paused = false;
+        document.getElementById('pauseBtn').textContent = '⏸ 暂停';
+    }
+
+    /* ---------- 响应式 ---------- */
+    function resizeCanvas() {
+        var c = document.getElementById('gameCanvas');
+        if (!c) return;
+        var maxW = Math.min(window.innerWidth - 40, 900);
+        var ratio = 600 / 900;
+        if (window.innerWidth < 960) {
+            c.style.width = maxW + 'px';
+            c.style.height = (maxW * ratio) + 'px';
+        } else {
+            c.style.width = '900px';
+            c.style.height = '600px';
+        }
+    }
+
+    /* ==============================================================
+       启动
+       ============================================================== */
+    window.onload = function() {
+        menuScreen = document.getElementById('menuScreen');
+        gameScreen = document.getElementById('gameScreen');
+        levelGrid = document.getElementById('levelGrid');
+        plantBar = document.getElementById('plantBar');
+
+        document.getElementById('menuInfo').textContent = '正在加载图片...';
+
+        preloadImages(function() {
+            buildMenu();
+
+            document.getElementById('pauseBtn').addEventListener('click', togglePause);
+            document.getElementById('menuBtn').addEventListener('click', goToMenu);
+            document.getElementById('menuBtn').addEventListener('touchend', function(e) {
+                e.preventDefault();
+                goToMenu();
+            });
+
+            if (!localStorage.getItem('pvz_unlocked')) {
+                localStorage.setItem('pvz_unlocked', '1');
+            }
+
+            resizeCanvas();
+            window.addEventListener('resize', resizeCanvas);
+        });
+    };
+
+    if (!window.requestAnimationFrame) {
+        window.requestAnimationFrame = function(callback) {
+            return setTimeout(callback, 1000 / 60);
+        };
+    }
+</script>
+</body>
+</html>
