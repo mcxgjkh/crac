@@ -281,7 +281,7 @@
 <div class="container">
     <div id="menuScreen">
         <h1>植物大战僵尸</h1>
-        <div class="version">v3.4.1</div>
+        <div class="version">v3.4.2</div>
         <div class="level-grid" id="levelGrid"></div>
         <div class="info" id="menuInfo">加载图片中...</div>
         <p class="info">mcxgjkh 制作</p>
@@ -351,7 +351,7 @@
     }
 
     /* ==============================================================
-       图片加载 —— 使用相对路径，提取GIF第一帧
+       图片加载
        ============================================================== */
     var images = {};
     var imagesLoaded = 0;
@@ -710,7 +710,7 @@
         return plantAt(row, col) === null;
     }
 
-    /* ---------- 种植逻辑 ---------- */
+    /* ---------- 种植逻辑 (种植后自动取消选中) ---------- */
     function placePlant(typeId, row, col) {
         if (!canPlace(row, col)) return false;
         var def = getPlantDef(typeId);
@@ -731,6 +731,8 @@
         if (typeId === 'squash') {
             squashAttack(plant);
         }
+
+        game.selectedPlant = null;
         updateUI();
         return true;
     }
@@ -813,7 +815,6 @@
         if (game.gameOver || game.victory || paused) return;
         game.frame++;
 
-        // 阳光掉落
         game.sunDropTimer++;
         if (game.sunDropTimer >= game.sunDropInterval) {
             game.sunDropTimer = 0;
@@ -823,7 +824,6 @@
             game.suns.push(sun);
         }
 
-        // 向日葵产阳光
         for (var i = 0; i < game.plants.length; i++) {
             var p = game.plants[i];
             if (!p.alive) continue;
@@ -841,7 +841,6 @@
 
         updateSuns();
 
-        // 波次控制
         if (game.zombiesSpawnedInWave >= game.waveZombieCount &&
             game.zombies.length === 0 &&
             game.currentWave < game.waves - 1) {
@@ -867,7 +866,6 @@
             }
         }
 
-        // 生成僵尸
         if (game.waveCooldown === 0 && game.currentWave < game.waves) {
             game.zombieSpawnTimer++;
             var interval = Math.max(20, game.zombieSpawnInterval - game.level * 1);
@@ -880,7 +878,6 @@
             }
         }
 
-        // 冷却
         for (var key in game.cooldowns) {
             if (game.cooldowns.hasOwnProperty(key) && game.cooldowns[key] > 0) game.cooldowns[key]--;
         }
@@ -1166,7 +1163,6 @@
 
     function checkVictory() {
         if (game.victory || game.gameOver) return;
-        // 修正胜利条件：当前波次索引 >= 总波数-1 且本波已生成全部僵尸且无存活僵尸
         if (game.currentWave >= game.waves - 1 &&
             game.zombiesSpawnedInWave >= game.waveZombieCount &&
             game.zombies.length === 0) {
@@ -1178,7 +1174,6 @@
                 setStoredLevel(next);
             }
             if (game.level >= 10) {
-                // 全部通关
             } else {
                 setTimeout(function() {
                     game.plants = [];
@@ -1225,7 +1220,6 @@
     function draw() {
         ctx.clearRect(0, 0, W, H);
 
-        // 草地
         for (var r = 0; r < ROWS; r++) {
             for (var c = 0; c < COLS; c++) {
                 var x = OFFSET_X + c * CELL_W;
@@ -1238,7 +1232,6 @@
             }
         }
 
-        // 小推车
         for (var r2 = 0; r2 < ROWS; r2++) {
             var m = game.lawnMowers[r2];
             if (m.active) {
@@ -1255,7 +1248,6 @@
             }
         }
 
-        // 植物
         for (var i = 0; i < game.plants.length; i++) {
             var p = game.plants[i];
             if (!p.alive) continue;
@@ -1285,7 +1277,6 @@
             }
         }
 
-        // 僵尸
         for (var j = 0; j < game.zombies.length; j++) {
             var z = game.zombies[j];
             if (!z.alive) continue;
@@ -1339,7 +1330,6 @@
             }
         }
 
-        // 子弹
         for (var k = 0; k < game.bullets.length; k++) {
             var b = game.bullets[k];
             if (!b.alive) continue;
@@ -1354,7 +1344,6 @@
             }
         }
 
-        // 阳光
         for (var s = 0; s < game.suns.length; s++) {
             var sun = game.suns[s];
             if (!sun.alive) continue;
@@ -1381,7 +1370,6 @@
             }
         }
 
-        // 粒子
         for (var p2 = 0; p2 < game.particles.length; p2++) {
             var pt = game.particles[p2];
             if (!pt.alive) continue;
@@ -1454,7 +1442,6 @@
         var mx = (clientX - rect.left) * scaleX;
         var my = (clientY - rect.top) * scaleY;
 
-        // 收集阳光
         for (var i = 0; i < game.suns.length; i++) {
             var s = game.suns[i];
             if (!s.alive) continue;
@@ -1469,7 +1456,6 @@
             }
         }
 
-        // 铲子
         if (game.selectedTool === 'shovel') {
             var col = Math.floor((mx - OFFSET_X) / CELL_W);
             var row = Math.floor((my - OFFSET_Y) / CELL_H);
@@ -1482,7 +1468,6 @@
             return;
         }
 
-        // 种植
         if (!game.selectedPlant) return;
         var col2 = Math.floor((mx - OFFSET_X) / CELL_W);
         var row2 = Math.floor((my - OFFSET_Y) / CELL_H);
