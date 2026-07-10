@@ -51,16 +51,7 @@
             margin-bottom: 15px;
         }
         .level-grid {
-            display: -webkit-box;
-            display: -moz-box;
-            display: box;
-            -webkit-box-pack: center;
-            -webkit-box-lines: multiple;
-            -moz-box-lines: multiple;
-            box-lines: multiple;
-            flex-wrap: wrap;
-            justify-content: center;
-            gap: 12px;
+            text-align: center;
             max-width: 600px;
             margin: 0 auto;
         }
@@ -78,13 +69,10 @@
             text-shadow: 0 2px 0 #2f1f10;
             touch-action: manipulation;
             margin: 4px;
-            display: -webkit-inline-box;
-            display: -moz-inline-box;
-            display: inline-box;
-            -webkit-box-pack: center;
-            -webkit-box-align: center;
-            text-align: center;
+            display: inline-block;
             line-height: 70px;
+            text-align: center;
+            vertical-align: top;
         }
         .level-btn.locked {
             background: #3d3d3d;
@@ -97,6 +85,7 @@
         }
         .level-btn:active {
             -webkit-transform: translateY(4px);
+            transform: translateY(4px);
             -webkit-box-shadow: 0 2px 0 #2f1f10;
         }
         #menuScreen .info {
@@ -119,58 +108,51 @@
             background: #7ec87e;
             width: 100%;
             height: auto;
-            aspect-ratio: 900 / 600;
+            /* 移除 aspect-ratio，使用宽高自适应 */
             touch-action: none;
             cursor: crosshair;
         }
         .game-ui {
-            display: -webkit-box;
-            display: -moz-box;
-            display: box;
-            -webkit-box-pack: justify;
-            -webkit-box-align: center;
             margin-top: 10px;
             padding: 0 4px;
             color: #f5e9c4;
             font-weight: bold;
             font-size: 16px;
-            flex-wrap: wrap;
         }
         .plant-bar {
-            display: -webkit-box;
-            display: -moz-box;
-            display: box;
-            -webkit-box-lines: multiple;
-            -moz-box-lines: multiple;
-            box-lines: multiple;
-            gap: 4px;
-            flex-wrap: wrap;
-            -webkit-box-flex: 1;
+            display: block;
+            text-align: left;
+            margin-bottom: 6px;
         }
         .plant-btn {
             background: #3d2b1a;
             border: 2px solid #6b4f32;
             border-radius: 10px;
             color: #f5e9c4;
-            padding: 4px 10px;
+            padding: 4px 8px;
             font-size: 13px;
             font-weight: bold;
             cursor: pointer;
             -webkit-box-shadow: 0 3px 0 #1f150a;
             touch-action: manipulation;
-            min-width: 54px;
+            min-width: 50px;
             text-align: center;
             margin: 2px;
+            display: inline-block;
+            vertical-align: top;
+            line-height: 1.4;
         }
         .plant-btn.active {
             border-color: #ffd966;
             background: #5a3f26;
             -webkit-transform: translateY(-2px);
+            transform: translateY(-2px);
             -webkit-box-shadow: 0 5px 0 #1f150a;
         }
         .plant-btn:disabled {
             opacity: 0.4;
             -webkit-transform: translateY(2px);
+            transform: translateY(2px);
             -webkit-box-shadow: 0 1px 0 #1f150a;
             cursor: not-allowed;
             pointer-events: none;
@@ -180,30 +162,29 @@
             border-color: #8b6b44;
         }
         .game-actions {
-            display: -webkit-box;
-            display: -moz-box;
-            display: box;
-            -webkit-box-align: center;
-            gap: 10px;
-            flex-wrap: wrap;
-            -webkit-box-pack: end;
+            display: block;
+            text-align: right;
+            font-size: 14px;
+        }
+        .game-actions > * {
+            display: inline-block;
+            vertical-align: middle;
+            margin: 2px 4px;
         }
         .game-actions span {
             background: #2b241a;
-            padding: 4px 16px;
+            padding: 4px 12px;
             border-radius: 20px;
             border: 1px solid #6b5a44;
-            margin: 2px;
             white-space: nowrap;
         }
         .game-actions .wave-info {
             background: #2b241a;
-            padding: 4px 16px;
+            padding: 4px 12px;
             border-radius: 20px;
             border: 1px solid #6b5a44;
-            margin: 2px;
             white-space: nowrap;
-            font-size: 14px;
+            font-size: 13px;
         }
         .btn {
             background: #a53f3f;
@@ -211,27 +192,90 @@
             border-radius: 20px;
             color: #fff;
             font-weight: bold;
-            padding: 6px 18px;
-            font-size: 15px;
+            padding: 6px 16px;
+            font-size: 14px;
             cursor: pointer;
             -webkit-box-shadow: 0 4px 0 #5f2626;
             touch-action: manipulation;
             margin: 2px;
+            display: inline-block;
+            vertical-align: middle;
         }
         .btn:active {
             -webkit-transform: translateY(4px);
+            transform: translateY(4px);
             -webkit-box-shadow: none;
         }
         .btn-green {
             background: #3d8f3d;
             -webkit-box-shadow: 0 4px 0 #1f5a1f;
         }
+        .game-actions .info {
+            display: inline-block;
+            margin: 0 4px;
+            font-size: 13px;
+            color: #aaa;
+            vertical-align: middle;
+        }
+
+        /* 窄屏适配 */
         @media (max-width: 700px) {
-            .plant-btn { font-size: 11px; padding: 3px 6px; min-width: 44px; }
-            .game-actions span { font-size: 13px; padding: 2px 10px; }
-            .btn { font-size: 13px; padding: 4px 12px; }
-            .level-btn { width: 60px; height: 60px; line-height: 60px; font-size: 18px; }
-            .game-actions .wave-info { font-size: 12px; padding: 2px 10px; }
+            .plant-btn {
+                font-size: 11px;
+                padding: 3px 6px;
+                min-width: 42px;
+                margin: 1px;
+            }
+            .game-actions {
+                text-align: left;
+                font-size: 13px;
+            }
+            .game-actions > * {
+                margin: 2px 3px;
+            }
+            .game-actions span, .game-actions .wave-info {
+                padding: 3px 10px;
+                font-size: 12px;
+            }
+            .btn {
+                padding: 4px 12px;
+                font-size: 12px;
+            }
+            .level-btn {
+                width: 60px;
+                height: 60px;
+                line-height: 60px;
+                font-size: 18px;
+            }
+            .game-actions .info {
+                font-size: 11px;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .plant-btn {
+                font-size: 10px;
+                padding: 2px 5px;
+                min-width: 36px;
+                margin: 1px;
+            }
+            .game-actions span, .game-actions .wave-info {
+                font-size: 11px;
+                padding: 2px 8px;
+            }
+            .btn {
+                font-size: 11px;
+                padding: 3px 10px;
+            }
+            .level-btn {
+                width: 50px;
+                height: 50px;
+                line-height: 50px;
+                font-size: 16px;
+            }
+            #menuScreen h1 {
+                font-size: 28px;
+            }
         }
     </style>
 </head>
@@ -239,7 +283,7 @@
 <div class="container">
     <div id="menuScreen">
         <h1>植物大战僵尸</h1>
-        <div class="version">v3.2</div>
+        <div class="version">v3.3.1</div>
         <div class="level-grid" id="levelGrid"></div>
         <div class="info" id="menuInfo">加载图片中...</div>
         <p class="info">mcxgjkh 制作</p>
@@ -254,7 +298,7 @@
                 <span class="wave-info" id="waveInfo">波次 0/0 下一波 --</span>
                 <button class="btn btn-green" id="pauseBtn">⏸ 暂停</button>
                 <button class="btn" id="menuBtn">菜单</button>
-                <p class="info">mcxgjkh 制作</p>
+                <span class="info">mcxgjkh 制作</span>
             </div>
         </div>
     </div>
@@ -361,7 +405,6 @@
             callback();
         };
         newImg.onerror = function() {
-            // 如果转换失败，也继续，使用占位
             callback();
         };
         newImg.src = dataUrl;
@@ -394,7 +437,6 @@
                     });
                 };
                 img.onerror = function() {
-                    // 加载失败，打印警告，使用占位
                     console.warn('图片加载失败: ' + src);
                     imagesLoaded++;
                     if (imagesLoaded >= totalImages) callback();
@@ -777,9 +819,8 @@
             game.zombies.length === 0 &&
             game.currentWave < game.waves - 1) {
             if (game.waveCooldown === 0) {
-                // 根据关卡计算间隔，关卡越小间隔越短，最短15秒
-                var baseInterval = Math.max(15, 30 - game.level * 2); // 秒
-                var randomOffset = (Math.random() - 0.5) * 10; // ±5秒
+                var baseInterval = Math.max(15, 30 - game.level * 2);
+                var randomOffset = (Math.random() - 0.5) * 10;
                 var intervalSec = Math.max(15, baseInterval + randomOffset);
                 game.waveCooldown = Math.floor(intervalSec * 60);
             }
@@ -1199,7 +1240,6 @@
             if (img && img.complete && img.naturalWidth > 0) {
                 ctx.drawImage(img, p.x - 30, p.y - 30, 60, 60);
             } else {
-                // 强占位
                 ctx.beginPath();
                 ctx.arc(p.x, p.y, 26, 0, 2 * Math.PI);
                 ctx.fillStyle = '#6a8e6a';
@@ -1306,7 +1346,6 @@
                 ctx.strokeStyle = '#f9a825';
                 ctx.lineWidth = 2;
                 ctx.stroke();
-                // 光芒
                 for (var a = 0; a < 8; a++) {
                     var angle = a * Math.PI / 4;
                     var dx = Math.cos(angle) * 28;
@@ -1437,7 +1476,6 @@
         document.getElementById('sunDisplay').textContent = game.sun;
         document.getElementById('levelDisplay').textContent = '第 ' + game.level + ' 关';
 
-        // 更新波次信息
         var waveText = '';
         if (game.gameOver || game.victory) {
             waveText = '--';
