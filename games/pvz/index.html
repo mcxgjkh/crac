@@ -291,10 +291,10 @@
         <div class="game-ui">
             <div class="plant-bar" id="plantBar"></div>
             <div class="game-actions">
-                <span>☀️ <span id="sunDisplay">50</span></span>
+                <span>阳光 <span id="sunDisplay">50</span></span>
                 <span id="levelDisplay">第 1 关</span>
                 <span class="wave-info" id="waveInfo">波次 0/0 下一波 --</span>
-                <button class="btn btn-green" id="pauseBtn">⏸ 暂停</button>
+                <button class="btn btn-green" id="pauseBtn">暂停</button>
                 <button class="btn" id="menuBtn">菜单</button>
                 <span class="info">mcxgjkh 制作</span>
             </div>
@@ -322,18 +322,18 @@
         { id: 'torchwood', name: '火炬树桩', cost: 175, hp: 300, cooldown: 450, attack: 0, fireRate: 0, emoji: '火炬' }
     ];
 
-    /* ---------- 僵尸定义 ---------- */
+    /* ---------- 僵尸定义 (略微加快速度) ---------- */
     var ZOMBIE_TYPES = [
-        { id: 'basic', name: '普通僵尸', hp: 270, speed: 0.08, attack: 100, attackRate: 60, color: '#5d4037', score: 10 },
-        { id: 'cone', name: '路障僵尸', hp: 640, speed: 0.08, attack: 100, attackRate: 60, color: '#ef6c00', score: 20 },
-        { id: 'bucket', name: '铁桶僵尸', hp: 1370, speed: 0.08, attack: 100, attackRate: 60, color: '#616161', score: 30 },
-        { id: 'flag', name: '旗帜僵尸', hp: 270, speed: 0.12, attack: 100, attackRate: 60, color: '#c62828', score: 15 },
-        { id: 'zomboni', name: '冰车僵尸', hp: 1350, speed: 0.02, attack: 100, attackRate: 60, color: '#00838f', score: 50, special: 'ice' },
-        { id: 'football', name: '橄榄球僵尸', hp: 1670, speed: 0.18, attack: 100, attackRate: 60, color: '#1a237e', score: 40 },
-        { id: 'screendoor', name: '铁门僵尸', hp: 500, speed: 0.08, attack: 100, attackRate: 60, color: '#795548', score: 35, special: 'shield' },
+        { id: 'basic', name: '普通僵尸', hp: 270, speed: 0.19, attack: 100, attackRate: 60, color: '#5d4037', score: 10 },
+        { id: 'cone', name: '路障僵尸', hp: 640, speed: 0.19, attack: 100, attackRate: 60, color: '#ef6c00', score: 20 },
+        { id: 'bucket', name: '铁桶僵尸', hp: 1370, speed: 0.19, attack: 100, attackRate: 60, color: '#616161', score: 30 },
+        { id: 'flag', name: '旗帜僵尸', hp: 270, speed: 0.23, attack: 100, attackRate: 60, color: '#c62828', score: 15 },
+        { id: 'zomboni', name: '冰车僵尸', hp: 1350, speed: 0.13, attack: 100, attackRate: 60, color: '#00838f', score: 50, special: 'ice' },
+        { id: 'football', name: '橄榄球僵尸', hp: 1670, speed: 0.26, attack: 100, attackRate: 60, color: '#1a237e', score: 40 },
+        { id: 'screendoor', name: '铁门僵尸', hp: 500, speed: 0.19, attack: 100, attackRate: 60, color: '#795548', score: 35, special: 'shield' },
         { id: 'bungee', name: '蹦极僵尸', hp: 450, speed: 0.0, attack: 0, attackRate: 0, color: '#4e342e', score: 25, special: 'bungee' },
-        { id: 'jackbox', name: '小丑僵尸', hp: 500, speed: 0.20, attack: 100, attackRate: 60, color: '#e65100', score: 30, special: 'jackbox' },
-        { id: 'imp', name: '小鬼僵尸', hp: 270, speed: 0.15, attack: 100, attackRate: 60, color: '#5d4037', score: 15 }
+        { id: 'jackbox', name: '小丑僵尸', hp: 500, speed: 0.32, attack: 100, attackRate: 60, color: '#e65100', score: 30, special: 'jackbox' },
+        { id: 'imp', name: '小鬼僵尸', hp: 270, speed: 0.32, attack: 100, attackRate: 60, color: '#5d4037', score: 15 }
     ];
 
     /* ---------- 工具函数 ---------- */
@@ -351,7 +351,7 @@
     }
 
     /* ==============================================================
-       图片加载 —— 使用相对路径，提取GIF第一帧，无console，异常安全
+       图片加载
        ============================================================== */
     var images = {};
     var imagesLoaded = 0;
@@ -414,14 +414,21 @@
 
     function preloadImages(callback) {
         var list = [];
-        for (var pid in plantFileMap) {
-            list.push({ id: pid, src: './static/plants/' + plantFileMap[pid] });
+        var pid, zid, eid;
+        for (pid in plantFileMap) {
+            if (plantFileMap.hasOwnProperty(pid)) {
+                list.push({ id: pid, src: './static/plants/' + plantFileMap[pid] });
+            }
         }
-        for (var zid in zombieFileMap) {
-            list.push({ id: zid, src: './static/zombies/' + zombieFileMap[zid] });
+        for (zid in zombieFileMap) {
+            if (zombieFileMap.hasOwnProperty(zid)) {
+                list.push({ id: zid, src: './static/zombies/' + zombieFileMap[zid] });
+            }
         }
-        for (var eid in extraFileMap) {
-            list.push({ id: eid, src: './static/' + extraFileMap[eid] });
+        for (eid in extraFileMap) {
+            if (extraFileMap.hasOwnProperty(eid)) {
+                list.push({ id: eid, src: './static/' + extraFileMap[eid] });
+            }
         }
         totalImages = list.length;
         imagesLoaded = 0;
@@ -445,6 +452,28 @@
             })(item.id, item.src);
             img.src = item.src;
         }
+    }
+
+    /* ---------- localStorage 安全读写 ---------- */
+    function getStoredLevel() {
+        var unlocked = 1;
+        try {
+            if (window.localStorage) {
+                var val = localStorage.getItem('pvz_unlocked');
+                if (val !== null) {
+                    unlocked = parseInt(val, 10);
+                    if (isNaN(unlocked) || unlocked < 1) unlocked = 1;
+                }
+            }
+        } catch(e) { }
+        return unlocked;
+    }
+    function setStoredLevel(level) {
+        try {
+            if (window.localStorage) {
+                localStorage.setItem('pvz_unlocked', String(level));
+            }
+        } catch(e) { }
     }
 
     /* ---------- 画布初始化 ---------- */
@@ -507,7 +536,7 @@
         game.gameOver = false;
         game.victory = false;
         paused = false;
-        document.getElementById('pauseBtn').textContent = '⏸ 暂停';
+        document.getElementById('pauseBtn').textContent = '暂停';
         updateUI();
     }
 
@@ -684,7 +713,7 @@
         return plantAt(row, col) === null;
     }
 
-    /* ---------- 种植逻辑 ---------- */
+    /* ---------- 种植逻辑 (种植后自动取消选中) ---------- */
     function placePlant(typeId, row, col) {
         if (!canPlace(row, col)) return false;
         var def = getPlantDef(typeId);
@@ -790,7 +819,6 @@
         if (game.gameOver || game.victory || paused) return;
         game.frame++;
 
-        // 阳光掉落
         game.sunDropTimer++;
         if (game.sunDropTimer >= game.sunDropInterval) {
             game.sunDropTimer = 0;
@@ -800,7 +828,6 @@
             game.suns.push(sun);
         }
 
-        // 向日葵产阳光（24秒）
         for (var i = 0; i < game.plants.length; i++) {
             var p = game.plants[i];
             if (!p.alive) continue;
@@ -818,7 +845,6 @@
 
         updateSuns();
 
-        // 波次控制
         if (game.zombiesSpawnedInWave >= game.waveZombieCount &&
             game.zombies.length === 0 &&
             game.currentWave < game.waves - 1) {
@@ -844,7 +870,6 @@
             }
         }
 
-        // 生成僵尸
         if (game.waveCooldown === 0 && game.currentWave < game.waves) {
             game.zombieSpawnTimer++;
             var interval = Math.max(20, game.zombieSpawnInterval - game.level * 1);
@@ -857,9 +882,8 @@
             }
         }
 
-        // 冷却
         for (var key in game.cooldowns) {
-            if (game.cooldowns[key] > 0) game.cooldowns[key]--;
+            if (game.cooldowns.hasOwnProperty(key) && game.cooldowns[key] > 0) game.cooldowns[key]--;
         }
 
         updatePlants();
@@ -940,7 +964,6 @@
             b.x += b.speed;
             if (b.x > W + 50) { b.alive = false; continue; }
 
-            var hit = false;
             for (var j = 0; j < game.zombies.length; j++) {
                 var z = game.zombies[j];
                 if (!z.alive) continue;
@@ -962,7 +985,6 @@
                         if (z.shieldHP < 0) z.shieldHP = 0;
                         createParticle(b.x, b.y, '#8d6e63', 5);
                         b.alive = false;
-                        hit = true;
                         break;
                     }
                     z.hp -= b.damage;
@@ -975,11 +997,9 @@
                         createParticle(z.x, z.y, z.color, 18);
                     }
                     b.alive = false;
-                    hit = true;
                     break;
                 }
             }
-            if (hit) continue;
         }
         var newBullets = [];
         for (var k = 0; k < game.bullets.length; k++) {
@@ -1029,11 +1049,10 @@
                 }
             }
 
+            var speedFactor = 1;
             if (!z.immuneSlow) {
                 if (z.slowTimer > 0) z.slowTimer--;
-                var speedFactor = z.slowTimer > 0 ? 0.5 : 1;
-            } else {
-                var speedFactor = 1;
+                speedFactor = z.slowTimer > 0 ? 0.5 : 1;
             }
 
             var eating = false;
@@ -1049,7 +1068,7 @@
                         p2.hp -= z.attack;
                         if (p2.hp <= 0) {
                             p2.alive = false;
-                            createParticle(p2.x, p2.y, p2.color, 10);
+                            createParticle(p2.x, p2.y, '#8d6e63', 10);
                         }
                     }
                     break;
@@ -1148,18 +1167,17 @@
 
     function checkVictory() {
         if (game.victory || game.gameOver) return;
-        if (game.currentWave >= game.waves &&
-            game.zombies.length === 0 &&
-            game.zombiesSpawnedInWave >= game.waveZombieCount) {
+        if (game.currentWave >= game.waves - 1 &&
+            game.zombiesSpawnedInWave >= game.waveZombieCount &&
+            game.zombies.length === 0) {
             game.victory = true;
-            var unlocked = parseInt(localStorage.getItem('pvz_unlocked') || '1');
+            var unlocked = getStoredLevel();
             if (game.level >= unlocked) {
                 var next = game.level + 1;
                 if (next > 10) next = 10;
-                localStorage.setItem('pvz_unlocked', String(next));
+                setStoredLevel(next);
             }
             if (game.level >= 10) {
-                // 全部通关
             } else {
                 setTimeout(function() {
                     game.plants = [];
@@ -1191,7 +1209,7 @@
                         game.lawnMowers[r].active = true;
                     }
                     for (var key in game.cooldowns) {
-                        game.cooldowns[key] = 0;
+                        if (game.cooldowns.hasOwnProperty(key)) game.cooldowns[key] = 0;
                     }
                     game.sun += 50;
                     updateUI();
@@ -1201,12 +1219,11 @@
     }
 
     /* ==============================================================
-       绘制（使用图片资源，fallback 增强）
+       绘制
        ============================================================== */
     function draw() {
         ctx.clearRect(0, 0, W, H);
 
-        // 草地
         for (var r = 0; r < ROWS; r++) {
             for (var c = 0; c < COLS; c++) {
                 var x = OFFSET_X + c * CELL_W;
@@ -1219,7 +1236,6 @@
             }
         }
 
-        // 小推车
         for (var r2 = 0; r2 < ROWS; r2++) {
             var m = game.lawnMowers[r2];
             if (m.active) {
@@ -1231,18 +1247,17 @@
                     ctx.fillRect(10, OFFSET_Y + r2 * CELL_H + 10, 40, 50);
                     ctx.fillStyle = '#fff';
                     ctx.font = '20px sans-serif';
-                    ctx.fillText('🚜', 18, OFFSET_Y + r2 * CELL_H + 48);
+                    ctx.fillText('车', 18, OFFSET_Y + r2 * CELL_H + 48);
                 }
             }
         }
 
-        // 植物
         for (var i = 0; i < game.plants.length; i++) {
             var p = game.plants[i];
             if (!p.alive) continue;
-            var img = images[p.typeId];
-            if (img && img.complete && img.naturalWidth > 0) {
-                ctx.drawImage(img, p.x - 30, p.y - 30, 60, 60);
+            var imgP = images[p.typeId];
+            if (imgP && imgP.complete && imgP.naturalWidth > 0) {
+                ctx.drawImage(imgP, p.x - 30, p.y - 30, 60, 60);
             } else {
                 ctx.beginPath();
                 ctx.arc(p.x, p.y, 26, 0, 2 * Math.PI);
@@ -1255,7 +1270,7 @@
                 ctx.font = '32px sans-serif';
                 ctx.textAlign = 'center';
                 ctx.textBaseline = 'middle';
-                ctx.fillText(p.emoji || '🌱', p.x, p.y);
+                ctx.fillText(p.emoji || '植', p.x, p.y);
             }
             if (p.hp < p.maxHp) {
                 var bw = 40;
@@ -1266,7 +1281,6 @@
             }
         }
 
-        // 僵尸
         for (var j = 0; j < game.zombies.length; j++) {
             var z = game.zombies[j];
             if (!z.alive) continue;
@@ -1277,12 +1291,12 @@
                 ctx.fill();
                 ctx.fillStyle = '#fff';
                 ctx.font = '16px sans-serif';
-                ctx.fillText('🪂', z.x, z.y);
+                ctx.fillText('伞', z.x, z.y);
                 continue;
             }
-            var img2 = images[z.typeId];
-            if (img2 && img2.complete && img2.naturalWidth > 0) {
-                ctx.drawImage(img2, z.x - 28, z.y - 28, 56, 56);
+            var imgZ = images[z.typeId];
+            if (imgZ && imgZ.complete && imgZ.naturalWidth > 0) {
+                ctx.drawImage(imgZ, z.x - 28, z.y - 28, 56, 56);
             } else {
                 ctx.beginPath();
                 ctx.arc(z.x, z.y, 24, 0, 2 * Math.PI);
@@ -1294,7 +1308,7 @@
                 ctx.fillStyle = '#fff';
                 ctx.font = '18px sans-serif';
                 ctx.textAlign = 'center';
-                ctx.fillText('🧟', z.x, z.y);
+                ctx.fillText('尸', z.x, z.y);
             }
             if (z.special === 'shield' && z.shieldHP > 0) {
                 var bw3 = 40;
@@ -1311,16 +1325,15 @@
             if (z.slowTimer > 0 && !z.immuneSlow) {
                 ctx.fillStyle = '#81d4fa';
                 ctx.font = '16px sans-serif';
-                ctx.fillText('❄️', z.x + 30, z.y - 20);
+                ctx.fillText('冰', z.x + 30, z.y - 20);
             }
             if (z.special === 'ice') {
                 ctx.fillStyle = '#00bcd4';
                 ctx.font = '14px sans-serif';
-                ctx.fillText('🧊', z.x + 30, z.y + 10);
+                ctx.fillText('车', z.x + 30, z.y + 10);
             }
         }
 
-        // 子弹
         for (var k = 0; k < game.bullets.length; k++) {
             var b = game.bullets[k];
             if (!b.alive) continue;
@@ -1335,7 +1348,6 @@
             }
         }
 
-        // 阳光
         for (var s = 0; s < game.suns.length; s++) {
             var sun = game.suns[s];
             if (!sun.alive) continue;
@@ -1362,7 +1374,6 @@
             }
         }
 
-        // 粒子
         for (var p2 = 0; p2 < game.particles.length; p2++) {
             var pt = game.particles[p2];
             if (!pt.alive) continue;
@@ -1375,7 +1386,6 @@
         }
         ctx.globalAlpha = 1;
 
-        // 暂停/结束/胜利
         if (paused) {
             ctx.fillStyle = 'rgba(0,0,0,0.6)';
             ctx.fillRect(0, 0, W, H);
@@ -1383,7 +1393,7 @@
             ctx.font = 'bold 48px sans-serif';
             ctx.textAlign = 'center';
             ctx.textBaseline = 'middle';
-            ctx.fillText('⏸ 暂停中', W/2, H/2);
+            ctx.fillText('暂停中', W/2, H/2);
         }
         if (game.gameOver) {
             ctx.fillStyle = 'rgba(0,0,0,0.7)';
@@ -1391,7 +1401,7 @@
             ctx.fillStyle = '#ff1744';
             ctx.font = 'bold 56px sans-serif';
             ctx.textAlign = 'center';
-            ctx.fillText('💀 失败', W/2, H/2 - 20);
+            ctx.fillText('失败', W/2, H/2 - 20);
             ctx.fillStyle = '#fff';
             ctx.font = '22px sans-serif';
             ctx.fillText('点击"菜单"重新挑战', W/2, H/2 + 60);
@@ -1402,7 +1412,7 @@
             ctx.fillStyle = '#ffd740';
             ctx.font = 'bold 56px sans-serif';
             ctx.textAlign = 'center';
-            var msg = (game.level >= 10) ? '🏆 全部通关！' : ('🎉 第 ' + game.level + ' 关通过！');
+            var msg = (game.level >= 10) ? '全部通关！' : ('第 ' + game.level + ' 关通过！');
             ctx.fillText(msg, W/2, H/2 - 20);
             if (game.level < 10) {
                 ctx.fillStyle = '#fff';
@@ -1436,7 +1446,6 @@
         var mx = (clientX - rect.left) * scaleX;
         var my = (clientY - rect.top) * scaleY;
 
-        // 收集阳光
         for (var i = 0; i < game.suns.length; i++) {
             var s = game.suns[i];
             if (!s.alive) continue;
@@ -1451,7 +1460,6 @@
             }
         }
 
-        // 铲子
         if (game.selectedTool === 'shovel') {
             var col = Math.floor((mx - OFFSET_X) / CELL_W);
             var row = Math.floor((my - OFFSET_Y) / CELL_H);
@@ -1464,7 +1472,6 @@
             return;
         }
 
-        // 种植
         if (!game.selectedPlant) return;
         var col2 = Math.floor((mx - OFFSET_X) / CELL_W);
         var row2 = Math.floor((my - OFFSET_Y) / CELL_H);
@@ -1525,7 +1532,7 @@
             if (!isReady) {
                 btn.textContent = def.emoji + ' ' + Math.ceil(game.cooldowns[id]/10) + 's';
             } else {
-                btn.textContent = def.emoji + ' ' + def.cost + '☀';
+                btn.textContent = def.emoji + ' ' + def.cost + '阳光';
             }
         }
     }
@@ -1534,7 +1541,7 @@
        选关界面
        ============================================================== */
     function buildMenu() {
-        var unlocked = parseInt(localStorage.getItem('pvz_unlocked') || '1');
+        var unlocked = getStoredLevel();
         var grid = document.getElementById('levelGrid');
         grid.innerHTML = '';
         for (var i = 1; i <= 10; i++) {
@@ -1542,19 +1549,19 @@
             btn.className = 'level-btn';
             if (i > unlocked) {
                 btn.className += ' locked';
-                btn.textContent = '🔒';
+                btn.textContent = '锁';
             } else {
                 btn.textContent = String(i);
             }
             btn.setAttribute('data-level', String(i));
             (function(level) {
                 btn.addEventListener('click', function() {
-                    if (level > parseInt(localStorage.getItem('pvz_unlocked') || '1')) return;
+                    if (level > getStoredLevel()) return;
                     startGame(level);
                 });
                 btn.addEventListener('touchend', function(e) {
                     e.preventDefault();
-                    if (level > parseInt(localStorage.getItem('pvz_unlocked') || '1')) return;
+                    if (level > getStoredLevel()) return;
                     startGame(level);
                 });
             })(i);
@@ -1587,7 +1594,7 @@
             var btn = document.createElement('button');
             btn.className = 'plant-btn';
             btn.setAttribute('data-id', p.id);
-            btn.textContent = p.emoji + ' ' + p.cost + '☀';
+            btn.textContent = p.emoji + ' ' + p.cost + '阳光';
             btn.title = p.name;
             (function(id) {
                 btn.addEventListener('click', function() {
@@ -1624,7 +1631,6 @@
             })(p.id);
             bar.appendChild(btn);
         }
-        // 铲子
         var shovelBtn = document.createElement('button');
         shovelBtn.className = 'plant-btn tool-btn';
         shovelBtn.setAttribute('data-tool', 'true');
@@ -1664,7 +1670,7 @@
     /* ---------- 暂停 ---------- */
     function togglePause() {
         paused = !paused;
-        document.getElementById('pauseBtn').textContent = paused ? '▶ 继续' : '⏸ 暂停';
+        document.getElementById('pauseBtn').textContent = paused ? '继续' : '暂停';
     }
 
     /* ---------- 返回菜单 ---------- */
@@ -1673,7 +1679,7 @@
         document.getElementById('menuScreen').style.display = 'block';
         buildMenu();
         paused = false;
-        document.getElementById('pauseBtn').textContent = '⏸ 暂停';
+        document.getElementById('pauseBtn').textContent = '暂停';
     }
 
     /* ---------- 响应式 ---------- */
@@ -1712,8 +1718,8 @@
                 goToMenu();
             });
 
-            if (!localStorage.getItem('pvz_unlocked')) {
-                localStorage.setItem('pvz_unlocked', '1');
+            if (!getStoredLevel()) {
+                setStoredLevel(1);
             }
 
             resizeCanvas();
