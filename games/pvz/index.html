@@ -108,7 +108,6 @@
             background: #7ec87e;
             width: 100%;
             height: auto;
-            /* 移除 aspect-ratio，使用宽高自适应 */
             touch-action: none;
             cursor: crosshair;
         }
@@ -218,7 +217,6 @@
             vertical-align: middle;
         }
 
-        /* 窄屏适配 */
         @media (max-width: 700px) {
             .plant-btn {
                 font-size: 11px;
@@ -283,7 +281,7 @@
 <div class="container">
     <div id="menuScreen">
         <h1>植物大战僵尸</h1>
-        <div class="version">v3.3.1</div>
+        <div class="version">v3.4.4</div>
         <div class="level-grid" id="levelGrid"></div>
         <div class="info" id="menuInfo">加载图片中...</div>
         <p class="info">mcxgjkh 制作</p>
@@ -353,7 +351,7 @@
     }
 
     /* ==============================================================
-       图片加载 —— 使用相对路径，提取GIF第一帧
+       图片加载 —— 使用相对路径，提取GIF第一帧，无console，异常安全
        ============================================================== */
     var images = {};
     var imagesLoaded = 0;
@@ -393,21 +391,25 @@
     };
 
     function convertToStatic(img, id, callback) {
-        var c = document.createElement('canvas');
-        c.width = img.naturalWidth || 100;
-        c.height = img.naturalHeight || 100;
-        var ctx2 = c.getContext('2d');
-        ctx2.drawImage(img, 0, 0);
-        var dataUrl = c.toDataURL('image/png');
-        var newImg = new Image();
-        newImg.onload = function() {
-            images[id] = newImg;
+        try {
+            var c = document.createElement('canvas');
+            c.width = img.naturalWidth || 100;
+            c.height = img.naturalHeight || 100;
+            var ctx2 = c.getContext('2d');
+            ctx2.drawImage(img, 0, 0);
+            var dataUrl = c.toDataURL('image/png');
+            var newImg = new Image();
+            newImg.onload = function() {
+                images[id] = newImg;
+                callback();
+            };
+            newImg.onerror = function() {
+                callback();
+            };
+            newImg.src = dataUrl;
+        } catch (e) {
             callback();
-        };
-        newImg.onerror = function() {
-            callback();
-        };
-        newImg.src = dataUrl;
+        }
     }
 
     function preloadImages(callback) {
@@ -437,7 +439,6 @@
                     });
                 };
                 img.onerror = function() {
-                    console.warn('图片加载失败: ' + src);
                     imagesLoaded++;
                     if (imagesLoaded >= totalImages) callback();
                 };
@@ -704,6 +705,9 @@
         if (typeId === 'squash') {
             squashAttack(plant);
         }
+
+        // 种植成功后取消选中，实现按钮回弹
+        game.selectedPlant = null;
         updateUI();
         return true;
     }
@@ -1568,7 +1572,7 @@
         initGame(level);
         buildPlantBar();
         canvas.addEventListener('click', handleCanvasClick);
-        canvas.addEventListener('touchstart', handleCanvasClick, { passive: false });
+        canvas.addEventListener('touchstart', handleCanvasClick, false);
         if (!window._loopStarted) {
             window._loopStarted = true;
             gameLoop();
