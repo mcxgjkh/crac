@@ -1401,14 +1401,14 @@
             // 主题切换函数
             function switchToDarkTheme() {
                 document.body.classList.add('dark-theme');
-                // 更新模式标签
                 updateModeLabels('night');
+                window.dispatchEvent(new CustomEvent('theme-changed'));
             }
             
             function switchToLightTheme() {
                 document.body.classList.remove('dark-theme');
-                // 更新模式标签
                 updateModeLabels('day');
+                window.dispatchEvent(new CustomEvent('theme-changed'));
             }
             
             // 更新白天/夜晚模式标签

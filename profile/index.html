@@ -685,8 +685,8 @@
     <script>
     document.addEventListener('DOMContentLoaded', async function() {
         var themeSwitch = document.querySelector('.theme-switch__checkbox');
-        function switchToDark() { document.body.classList.add('dark-theme'); }
-        function switchToLight() { document.body.classList.remove('dark-theme'); }
+        function switchToDark() { document.body.classList.add('dark-theme'); window.dispatchEvent(new CustomEvent('theme-changed')); }
+        function switchToLight() { document.body.classList.remove('dark-theme'); window.dispatchEvent(new CustomEvent('theme-changed')); }
         var hour = new Date().getHours();
         if (themeSwitch) themeSwitch.checked = !(hour >= 6 && hour < 18);
         (hour >= 6 && hour < 18) ? switchToLight() : switchToDark();

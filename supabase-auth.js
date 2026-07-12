@@ -92,7 +92,7 @@
             tsId = turnstile.render('#turnstileWidget', {
                 sitekey: TURNSTILE_KEY,
                 theme: document.body.classList.contains('dark-theme') ? 'dark' : 'light',
-                size: 'flexible'
+                appearance: 'always'
             });
         }
 
@@ -101,7 +101,12 @@
         }
 
         modal.addEventListener('shown.bs.modal', function() {
-            if (!tsId) renderTurnstile();
+            renderTurnstile();
+        });
+
+        // 主题切换时重新渲染 Turnstile
+        window.addEventListener('theme-changed', function() {
+            if (modal.classList.contains('show') && tsId !== null) renderTurnstile();
         });
 
         function setMode(m) {
