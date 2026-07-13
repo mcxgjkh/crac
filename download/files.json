@@ -187,5 +187,21 @@
     "url": "./global-security.instructions.md",
     "ext": "md",
     "protected": false
+  },
+  {
+    "name": "三体.mobi",
+    "size": 3267272,
+    "modified": "2026-07-13 12:36:41",
+    "url": "./三体.mobi",
+    "ext": "mobi",
+    "protected": false
+  },
+  {
+    "name": "球状闪电.mobi",
+    "size": 1465092,
+    "modified": "2026-07-13 12:36:47",
+    "url": "./球状闪电.mobi",
+    "ext": "mobi",
+    "protected": false
   }
 ]
