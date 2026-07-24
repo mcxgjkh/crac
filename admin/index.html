@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>管理后台 · BH6RKW</title>
+    <link rel="stylesheet" href="admin.css?v=1.0.1">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <script src="https://challenges.cloudflare.com/turnstile/v0/api.js?render=explicit" async defer></script>
+</head>
+<body>
+    <div id="loginContainer" class="login-container">
+        <div class="login-background"></div>
+        <div class="login-card">
+            <div class="login-brand">
+                <h1>BH6RKW</h1>
+                <p>管理后台</p>
+            </div>
+            <form id="loginForm" class="login-form">
+                <div class="form-group">
+                    <label for="emailInput">邮箱</label>
+                    <input type="email" id="emailInput" placeholder="your@email.com" required>
+                </div>
+                <div class="form-group">
+                    <label for="passwordInput">密码</label>
+                    <input type="password" id="passwordInput" placeholder="密码" required>
+                </div>
+                <div id="turnstileWidget" class="turnstile-wrapper"></div>
+                <div id="loginError" class="error-message" style="display:none;"></div>
+                <button type="submit" id="loginBtn">登 录</button>
+            </form>
+            <p class="login-hint">仅限管理员账户登录</p>
+        </div>
+    </div>
+
+    <div id="dashboardContainer" class="dashboard-container" style="display:none;">
+        <header class="dashboard-header">
+            <div class="container">
+                <h1>管理后台</h1>
+                <div class="user-info">
+                    <span id="adminEmail"></span>
+                    <button id="logoutBtn" class="btn-logout"><i class="fas fa-sign-out-alt"></i> 退出</button>
+                </div>
+            </div>
+        </header>
+        <main class="dashboard-main">
+            <div class="container">
+                <div class="stats-grid">
+                    <div class="stat-card">
+                        <i class="fas fa-users"></i>
+                        <div>
+                            <h3>用户总数</h3>
+                            <p id="totalUsers">--</p>
+                        </div>
+                    </div>
+                    <div class="stat-card">
+                        <i class="fas fa-file-alt"></i>
+                        <div>
+                            <h3>文章数</h3>
+                            <p id="totalPosts">--</p>
+                        </div>
+                    </div>
+                    <div class="stat-card">
+                        <i class="fas fa-comments"></i>
+                        <div>
+                            <h3>留言</h3>
+                            <p id="totalComments">--</p>
+                        </div>
+                    </div>
+                </div>
+                <section class="welcome-section">
+                    <h2>欢迎回来，<span id="adminName"></span></h2>
+                    <p>这里是 BH6RKW 网站管理面板，您可以在此管理内容。</p>
+                </section>
+            </div>
+        </main>
+        <footer class="dashboard-footer">
+            <div class="container">
+                <p>&copy; 2025-2026 BH6RKW · 管理后台</p>
+            </div>
+        </footer>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
+    <script src="admin-auth.js?v=1.0.1"></script>
+    <script src="admin-dashboard.js?v=1.0.0"></script>
+</body>
+</html>

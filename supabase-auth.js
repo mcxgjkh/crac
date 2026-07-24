@@ -262,14 +262,21 @@
             setCrossDomainCookie('sb-access-token', accessToken, 7);
             setCrossDomainCookie('sb-refresh-token', refreshToken, 7);
             var displayName = (user.user_metadata && user.user_metadata.username) || user.email.split('@')[0];
+            var isAdmin = user.user_metadata && user.user_metadata.role === 'admin';
+            var dropdownItems = [
+                '<li><a class="dropdown-item" href="/profile/index.html">个人中心</a></li>'
+            ];
+            if (isAdmin) {
+                dropdownItems.push('<li><a class="dropdown-item" href="/admin/index.html">管理后台</a></li>');
+            }
+            dropdownItems.push('<li><span class="dropdown-item-text text-muted small">' + escapeHtml(user.email) + '</span></li>');
+            dropdownItems.push('<li><hr class="dropdown-divider"></li>');
+            dropdownItems.push('<li><a class="dropdown-item" href="#" id="logoutBtn">退出登录</a></li>');
             navItem.innerHTML = [
                 '<div class="dropdown">',
                 '<a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown">' + escapeHtml(displayName) + '</a>',
                 '<ul class="dropdown-menu dropdown-menu-end">',
-                '<li><a class="dropdown-item" href="/profile/index.html">个人中心</a></li>',
-                '<li><span class="dropdown-item-text text-muted small">' + escapeHtml(user.email) + '</span></li>',
-                '<li><hr class="dropdown-divider"></li>',
-                '<li><a class="dropdown-item" href="#" id="logoutBtn">退出登录</a></li>',
+                dropdownItems.join(''),
                 '</ul></div>'
             ].join('');
             document.getElementById('logoutBtn').addEventListener('click', async function(e) {
@@ -357,4 +364,5 @@
     sb.auth.onAuthStateChange(function() {
         updateAuthUI();
     });
+    window.__supabaseClient = sb;
 })();

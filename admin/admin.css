@@ -1,0 +1,300 @@
+/* admin.css – 兼容大多数浏览器，使用 flex/rem 布局 */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: "Microsoft YaHei", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+    background-color: #0b0e14;
+    color: #e0e0e0;
+    line-height: 1.5;
+    min-height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+/* ===== 登录界面 ===== */
+.login-container {
+    position: fixed;
+    inset: 0;
+    z-index: 1000;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: #0b0e14;
+}
+
+.login-background {
+    position: absolute;
+    inset: 0;
+    background:
+        radial-gradient(ellipse 600px 450px at 80% 20%, rgba(57,134,255,0.12), transparent 70%),
+        radial-gradient(500px circle at 20% 80%, rgba(57,134,255,0.08), transparent 65%),
+        radial-gradient(300px circle at 50% 50%, rgba(57,134,255,0.06), transparent 60%),
+        #0b0e14;
+    z-index: 0;
+}
+
+.login-card {
+    position: relative;
+    z-index: 1;
+    width: 90%;
+    max-width: 420px;
+    background: rgba(255, 255, 255, 0.05);
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
+    border-radius: 28px;
+    padding: 40px 32px;
+    box-shadow: 0 25px 60px rgba(0,0,0,0.6);
+    border: 1px solid rgba(255,255,255,0.08);
+    text-align: center;
+    transition: transform 0.3s ease;
+}
+
+.login-brand h1 {
+    font-size: 2.2rem;
+    font-weight: 700;
+    letter-spacing: -0.5px;
+    background: linear-gradient(135deg, #64b5f6, #3986ff);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    margin-bottom: 0.2em;
+}
+
+.login-brand p {
+    color: #aaa;
+    font-size: 0.95rem;
+    letter-spacing: 2px;
+    margin-bottom: 1.8rem;
+}
+
+.login-form .form-group {
+    margin-bottom: 1.2rem;
+    text-align: left;
+}
+
+.login-form label {
+    display: block;
+    font-size: 0.85rem;
+    font-weight: 500;
+    color: #ccc;
+    margin-bottom: 0.3rem;
+}
+
+.login-form input {
+    width: 100%;
+    padding: 12px 16px;
+    border-radius: 12px;
+    border: 1px solid rgba(255,255,255,0.15);
+    background: rgba(255,255,255,0.07);
+    color: #fff;
+    font-size: 1rem;
+    transition: border-color 0.2s, box-shadow 0.2s;
+    outline: none;
+}
+
+.login-form input:focus {
+    border-color: #3986ff;
+    box-shadow: 0 0 0 3px rgba(57,134,255,0.3);
+}
+
+.login-form input::placeholder {
+    color: #888;
+}
+
+.error-message {
+    color: #ff6b6b;
+    font-size: 0.9rem;
+    margin: 0.5rem 0 1rem;
+    text-align: left;
+}
+
+#loginBtn {
+    width: 100%;
+    padding: 14px;
+    border: none;
+    border-radius: 12px;
+    background: linear-gradient(135deg, #3986ff, #2563eb);
+    color: #fff;
+    font-size: 1.1rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: transform 0.15s, box-shadow 0.2s;
+    letter-spacing: 1px;
+}
+
+#loginBtn:hover {
+    transform: scale(1.02);
+    box-shadow: 0 8px 25px rgba(57,134,255,0.4);
+}
+
+#loginBtn:active {
+    transform: scale(0.97);
+}
+
+.login-hint {
+    margin-top: 1.5rem;
+    font-size: 0.8rem;
+    color: #666;
+}
+
+/* ===== 管理面板 ===== */
+.dashboard-container {
+    width: 100%;
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    background: #0b0e14;
+}
+
+.dashboard-header {
+    background: rgba(30, 34, 42, 0.8);
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+    padding: 1rem 0;
+    border-bottom: 1px solid rgba(255,255,255,0.06);
+}
+
+.dashboard-header .container {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+}
+
+.dashboard-header h1 {
+    font-size: 1.5rem;
+    font-weight: 600;
+    letter-spacing: 0.5px;
+    color: #fff;
+}
+
+.user-info {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+}
+
+.user-info span {
+    color: #ccc;
+    font-size: 0.9rem;
+}
+
+.btn-logout {
+    background: rgba(255,255,255,0.08);
+    border: none;
+    color: #eee;
+    padding: 6px 14px;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: background 0.2s;
+    font-size: 0.9rem;
+}
+
+.btn-logout:hover {
+    background: rgba(255,255,255,0.15);
+}
+
+.dashboard-main {
+    flex: 1;
+    padding: 2rem 0;
+}
+
+.container {
+    width: 90%;
+    max-width: 1200px;
+    margin: 0 auto;
+}
+
+.stats-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 1.5rem;
+    margin-bottom: 2.5rem;
+}
+
+.stat-card {
+    background: rgba(255,255,255,0.04);
+    border-radius: 16px;
+    padding: 1.5rem;
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    border: 1px solid rgba(255,255,255,0.06);
+    transition: background 0.2s;
+}
+
+.stat-card:hover {
+    background: rgba(255,255,255,0.07);
+}
+
+.stat-card i {
+    font-size: 2rem;
+    color: #3986ff;
+    width: 3rem;
+    text-align: center;
+}
+
+.stat-card h3 {
+    font-size: 0.9rem;
+    font-weight: 400;
+    color: #aaa;
+    margin-bottom: 0.2rem;
+}
+
+.stat-card p {
+    font-size: 1.8rem;
+    font-weight: 600;
+    color: #fff;
+    line-height: 1.2;
+}
+
+.welcome-section {
+    background: rgba(255,255,255,0.03);
+    border-radius: 16px;
+    padding: 2rem;
+    border: 1px solid rgba(255,255,255,0.05);
+}
+
+.welcome-section h2 {
+    font-size: 1.6rem;
+    font-weight: 500;
+    margin-bottom: 0.5rem;
+}
+
+.welcome-section h2 span {
+    color: #64b5f6;
+}
+
+.welcome-section p {
+    color: #aaa;
+    font-size: 1rem;
+}
+
+.dashboard-footer {
+    margin-top: 2rem;
+    padding: 1.5rem 0;
+    border-top: 1px solid rgba(255,255,255,0.05);
+    text-align: center;
+    color: #666;
+    font-size: 0.85rem;
+}
+
+/* 响应式 */
+@media (max-width: 640px) {
+    .login-card { padding: 30px 20px; }
+    .stats-grid { grid-template-columns: 1fr; }
+    .dashboard-header .container { flex-direction: column; align-items: stretch; }
+    .user-info { justify-content: space-between; }
+}
+
+.turnstile-wrapper {
+    display: flex;
+    justify-content: center;
+    margin: 0.8rem 0;
+}
