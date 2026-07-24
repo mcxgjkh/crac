@@ -1111,3 +1111,15 @@ body {
         grid-template-columns: 1fr;
     }
 }
+
+.dashboard-content {
+    flex: 1;
+    padding: 24px 30px;
+    overflow-y: auto;
+    overflow-x: hidden; /* 防止水平溢出 */
+}
+
+.table-container {
+    overflow-x: auto; /* 表格可水平滚动 */
+    max-width: 100%;
+}
