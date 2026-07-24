@@ -3,7 +3,6 @@
     var SUPABASE_URL = 'https://pxhiobmdzntnxwpwtgpx.supabase.co';
     var SUPABASE_KEY = 'sb_publishable_06fy5uemh4fJnAQXIsIXdQ_79UMtlC_';
 
-    // 复用主站客户端（如果存在），否则创建
     var sb = window.__supabaseClient;
     if (!sb) {
         sb = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
@@ -22,6 +21,7 @@
         loginError.textContent = msg;
         loginError.style.display = 'block';
     }
+
     function hideError() {
         loginError.style.display = 'none';
     }
@@ -60,26 +60,41 @@
         loginContainer.style.display = 'none';
         dashboardContainer.style.display = 'flex';
 
-        var email = user.email;
-        var username = user.user_metadata && user.user_metadata.username || email.split('@')[0];
+        var email = user.email || '未知邮箱';
+        var username = (user.user_metadata && user.user_metadata.username) || email.split('@')[0] || '管理员';
 
         // 顶部
-        document.getElementById('adminEmail').textContent = email;
-        document.getElementById('adminName').textContent = username;
-        document.getElementById('dashboardAdminName').textContent = username;
-        document.getElementById('headerAdminName').textContent = username;
+        var adminEmailEl = document.getElementById('adminEmail');
+        var adminNameEl = document.getElementById('adminName');
+        var dashboardAdminNameEl = document.getElementById('dashboardAdminName');
+        var headerAdminNameEl = document.getElementById('headerAdminName');
+
+        if (adminEmailEl) adminEmailEl.textContent = email;
+        if (adminNameEl) adminNameEl.textContent = username;
+        if (dashboardAdminNameEl) dashboardAdminNameEl.textContent = username;
+        if (headerAdminNameEl) headerAdminNameEl.textContent = username;
 
         // 侧边栏
-        document.getElementById('sidebarAdminName').textContent = username;
-        document.getElementById('sidebarAdminEmail').textContent = email;
+        var sidebarAdminNameEl = document.getElementById('sidebarAdminName');
+        var sidebarAdminEmailEl = document.getElementById('sidebarAdminEmail');
+
+        if (sidebarAdminNameEl) sidebarAdminNameEl.textContent = username;
+        if (sidebarAdminEmailEl) sidebarAdminEmailEl.textContent = email;
 
         // 侧边栏退出按钮
-        document.getElementById('sidebarLogoutBtn').addEventListener('click', function(e) {
-            e.preventDefault();
-            sb.auth.signOut().then(function() { window.location.reload(); });
-        });
+        var sidebarLogoutBtn = document.getElementById('sidebarLogoutBtn');
+        if (sidebarLogoutBtn) {
+            sidebarLogoutBtn.addEventListener('click', function(e) {
+                e.preventDefault();
+                sb.auth.signOut().then(function() {
+                    window.location.reload();
+                });
+            });
+        }
 
-        if (window.loadDashboardData) window.loadDashboardData(sb);
+        if (window.loadDashboardData) {
+            window.loadDashboardData(sb);
+        }
     }
 
     function setupLogout() {
