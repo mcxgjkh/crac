@@ -1,9 +1,14 @@
+// admin-auth.js – 认证模块（复用主站客户端）
 (function() {
     var SUPABASE_URL = 'https://pxhiobmdzntnxwpwtgpx.supabase.co';
     var SUPABASE_KEY = 'sb_publishable_06fy5uemh4fJnAQXIsIXdQ_79UMtlC_';
-    var TURNSTILE_SITEKEY = '0x4AAAAAADjdL8yyZdBwUnB1';
 
-    var sb = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+    // 复用主站客户端（如果存在），否则创建
+    var sb = window.__supabaseClient;
+    if (!sb) {
+        sb = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+        window.__supabaseClient = sb;
+    }
 
     var loginContainer = document.getElementById('loginContainer');
     var dashboardContainer = document.getElementById('dashboardContainer');
@@ -12,55 +17,23 @@
     var passwordInput = document.getElementById('passwordInput');
     var loginError = document.getElementById('loginError');
     var loginBtn = document.getElementById('loginBtn');
-    var turnstileWidget = document.getElementById('turnstileWidget');
-
-    var tsId = null;
-
-    function renderTurnstile() {
-        if (typeof turnstile === 'undefined') {
-            setTimeout(renderTurnstile, 200);
-            return;
-        }
-        if (tsId !== null) turnstile.remove(tsId);
-        tsId = turnstile.render(turnstileWidget, {
-            sitekey: TURNSTILE_SITEKEY,
-            theme: 'dark',
-            appearance: 'always'
-        });
-    }
-
-    function getCaptchaToken() {
-        if (tsId === null) return null;
-        return turnstile.getResponse(tsId);
-    }
 
     function showError(msg) {
         loginError.textContent = msg;
         loginError.style.display = 'block';
     }
-
     function hideError() {
         loginError.style.display = 'none';
     }
 
     async function handleLogin(email, password) {
         hideError();
-        var captchaToken = getCaptchaToken();
-        if (!captchaToken) {
-            showError('请完成人机验证');
-            return;
-        }
         loginBtn.disabled = true;
         loginBtn.textContent = '登录中...';
         try {
-            var result = await sb.auth.signInWithPassword({
-                email: email,
-                password: password,
-                options: { captchaToken: captchaToken }
-            });
+            var result = await sb.auth.signInWithPassword({ email: email, password: password });
             if (result.error) {
                 showError(result.error.message);
-                if (tsId !== null) turnstile.reset(tsId);
                 return;
             }
             var user = result.data.user;
@@ -72,7 +45,6 @@
             if (role !== 'admin') {
                 showError('该账户无管理员权限');
                 await sb.auth.signOut();
-                if (tsId !== null) turnstile.reset(tsId);
                 return;
             }
             showDashboard(user);
@@ -87,16 +59,27 @@
     function showDashboard(user) {
         loginContainer.style.display = 'none';
         dashboardContainer.style.display = 'flex';
-        var emailSpan = document.getElementById('adminEmail');
-        if (emailSpan) emailSpan.textContent = user.email;
-        var nameSpan = document.getElementById('adminName');
-        if (nameSpan) {
-            var username = user.user_metadata && user.user_metadata.username;
-            nameSpan.textContent = username || user.email.split('@')[0];
-        }
-        if (window.loadDashboardData) {
-            window.loadDashboardData(sb);
-        }
+
+        var email = user.email;
+        var username = user.user_metadata && user.user_metadata.username || email.split('@')[0];
+
+        // 顶部
+        document.getElementById('adminEmail').textContent = email;
+        document.getElementById('adminName').textContent = username;
+        document.getElementById('dashboardAdminName').textContent = username;
+        document.getElementById('headerAdminName').textContent = username;
+
+        // 侧边栏
+        document.getElementById('sidebarAdminName').textContent = username;
+        document.getElementById('sidebarAdminEmail').textContent = email;
+
+        // 侧边栏退出按钮
+        document.getElementById('sidebarLogoutBtn').addEventListener('click', function(e) {
+            e.preventDefault();
+            sb.auth.signOut().then(function() { window.location.reload(); });
+        });
+
+        if (window.loadDashboardData) window.loadDashboardData(sb);
     }
 
     function setupLogout() {
@@ -114,15 +97,9 @@
     async function checkSession() {
         var session = await sb.auth.getSession();
         var user = session.data.session ? session.data.session.user : null;
-        if (user) {
-            var role = user.user_metadata && user.user_metadata.role;
-            if (role === 'admin') {
-                showDashboard(user);
-                return true;
-            } else {
-                await sb.auth.signOut();
-                return false;
-            }
+        if (user && user.user_metadata && user.user_metadata.role === 'admin') {
+            showDashboard(user);
+            return true;
         }
         return false;
     }
@@ -143,11 +120,10 @@
             if (!isAdmin) {
                 loginContainer.style.display = 'flex';
                 dashboardContainer.style.display = 'none';
-                renderTurnstile();
             }
             setupLogout();
         });
     });
 
-    window.__adminSb = sb;
+    window.__adminAuth = { sb: sb };
 })();
