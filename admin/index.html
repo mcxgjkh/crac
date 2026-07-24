@@ -11,7 +11,103 @@
 
     <!-- ========== 登录界面 ========== -->
     <div id="loginContainer" class="login-container" data-layout="dual" data-theme="dark">
-        <!-- ... 登录界面内容与之前相同，此处省略 ... -->
+        <!-- 背景装饰 -->
+        <div class="login-bg">
+            <div class="login-bg-grid"></div>
+            <div class="login-bg-vignette"></div>
+            <div class="login-bg-shape shape-1"></div>
+            <div class="login-bg-shape shape-2"></div>
+            <div class="login-bg-shape shape-3"></div>
+            <div class="login-bg-shape shape-4"></div>
+        </div>
+
+        <!-- 工具栏 -->
+        <div class="login-toolbar">
+            <!-- 主题色 -->
+            <div class="toolbar-item theme-color-picker">
+                <button class="toolbar-trigger" id="themeColorTrigger" title="主题颜色">
+                    <i class="fas fa-palette"></i>
+                </button>
+                <div class="theme-color-popover" id="themeColorPopover">
+                    <div class="popover-header">
+                        <span>主题颜色</span>
+                        <span class="popover-desc">与主题配置预设同步</span>
+                    </div>
+                    <div class="theme-colors-grid" id="themeColorsGrid"></div>
+                    <div class="theme-color-custom">
+                        <input type="color" id="customColorPicker" value="#3986FF" />
+                        <span class="custom-hex" id="customHexDisplay">#3986FF</span>
+                    </div>
+                    <div class="theme-color-preview" id="themeColorPreview"></div>
+                </div>
+            </div>
+
+            <!-- 布局 -->
+            <div class="toolbar-item layout-picker">
+                <button class="toolbar-trigger" id="layoutTrigger" title="登录页风格">
+                    <i class="fas fa-th-large"></i>
+                </button>
+                <div class="layout-popover" id="layoutPopover">
+                    <div class="popover-header">
+                        <span>登录页风格</span>
+                        <span class="popover-desc">切换不同布局与视觉样式</span>
+                    </div>
+                    <div class="layout-grid" id="layoutGrid"></div>
+                </div>
+            </div>
+
+            <!-- 明暗切换 -->
+            <div class="toolbar-item theme-mode-toggle">
+                <button class="toolbar-trigger" id="themeModeTrigger" title="切换主题">
+                    <i class="fas fa-moon" id="themeModeIcon"></i>
+                </button>
+            </div>
+        </div>
+
+        <!-- 登录卡片 -->
+        <div class="login-card-shell">
+            <div class="login-card">
+                <!-- 品牌侧 -->
+                <div class="login-brand-side" id="brandSide">
+                    <div class="brand-logo">
+                        <h1>BH6RKW</h1>
+                        <span>管理后台</span>
+                    </div>
+                    <div class="brand-features">
+                        <ul>
+                            <li><i class="fas fa-bolt"></i> 用户列表</li>
+                            <li><i class="fas fa-dashboard"></i> 卡片管理</li>
+                            <li><i class="fas fa-shield-alt"></i> 考试服务</li>
+                        </ul>
+                    </div>
+                    <div class="brand-footer">© 2026 BH6RKW</div>
+                </div>
+
+                <!-- 表单侧 -->
+                <div class="login-form-side">
+                    <div class="login-form-header">
+                        <span class="form-badge">账号密码登录</span>
+                        <h2>登 录</h2>
+                        <p>请输入用户名和密码</p>
+                    </div>
+                    <form id="loginForm" class="login-form">
+                        <div class="form-group">
+                            <label for="emailInput">邮箱</label>
+                            <input type="email" id="emailInput" placeholder="your@email.com" required />
+                        </div>
+                        <div class="form-group">
+                            <label for="passwordInput">密码</label>
+                            <input type="password" id="passwordInput" placeholder="密码" required />
+                        </div>
+                        <div id="loginError" class="error-message" style="display:none;"></div>
+                        <button type="submit" id="loginBtn">登 录</button>
+                    </form>
+                    <div class="login-footer-note">
+                        <span>仅限管理员账户登录</span>
+                    </div>
+                </div>
+            </div>
+        </div>
     </div>
 
     <!-- ========== 管理面板（带侧边栏） ========== -->
@@ -111,7 +207,7 @@
                     </section>
                 </div>
 
-                <!-- 各表格页面（由 JS 动态渲染） -->
+                <!-- 各表格页面 -->
                 <div id="page-exam_pending" class="page-content" data-table="exam_pending">
                     <div class="page-header"><h3>待审批列表</h3></div>
                     <div class="table-container"><table><thead><tr><th>ID</th><th>用户</th><th>申请时间</th><th>状态</th><th>操作</th></tr></thead><tbody><tr><td colspan="5" class="text-center text-muted">加载中...</td></tr></tbody></table></div>
@@ -136,6 +232,7 @@
         </main>
     </div>
 
+    <!-- ========== 脚本 ========== -->
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
     <script src="admin-auth.js?v=2.1.0"></script>
     <script src="admin-theme.js?v=2.1.0"></script>
