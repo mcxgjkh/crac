@@ -1,4 +1,4 @@
-// admin-dashboard.js – 仪表盘 + 侧边栏导航 + 数据加载
+// admin-dashboard.js – 仪表盘 + 侧边栏导航 + 数据加载（无 users 表查询）
 (function() {
     // 侧边栏折叠切换
     document.querySelectorAll('.nav-group-toggle').forEach(function(toggle) {
@@ -18,12 +18,10 @@
             e.preventDefault();
             var page = this.dataset.page;
             switchPage(page);
-            // 高亮菜单
             document.querySelectorAll('.nav-group-items a').forEach(function(el) {
                 el.classList.remove('active');
             });
             this.classList.add('active');
-            // 移动端关闭侧边栏
             closeSidebar();
         });
     });
@@ -35,7 +33,6 @@
         var target = document.getElementById('page-' + pageId);
         if (target) {
             target.classList.add('active');
-            // 更新标题
             var titleMap = {
                 'exam_pending': '待审批列表',
                 'exam_progress': '考试进度',
@@ -55,7 +52,6 @@
         toggleBtn.addEventListener('click', function(e) {
             e.stopPropagation();
             sidebar.classList.toggle('open');
-            // 创建/移除遮罩
             var overlay = document.querySelector('.sidebar-overlay');
             if (!overlay) {
                 overlay = document.createElement('div');
@@ -73,13 +69,12 @@
         if (overlay) overlay.classList.remove('show');
     }
 
-    // 数据加载函数
+    // ===== 数据加载（只查业务表） =====
     window.loadDashboardData = function(sb) {
-        // 默认显示概览
         document.getElementById('pageTitle').textContent = '概览';
         document.querySelector('.page-content.active') || switchPage('overview');
 
-        // 加载统计数据（示例）
+        // 加载统计数据（从业务表计数，不查 users）
         loadStats(sb);
         // 加载各表格数据
         loadTableData(sb, 'exam_pending');
@@ -89,47 +84,74 @@
         loadTableData(sb, 'qsl_cards');
     };
 
+    // 统计数量（只从允许的表查询，不涉及 auth.users）
     function loadStats(sb) {
-        // 示例：从各表统计数量
-        Promise.all([
-            sb.from('exam_sessions').select('*', { count: 'exact', head: true }),
-            sb.from('qsl_cards').select('*', { count: 'exact', head: true }),
-            sb.from('login_logs').select('*', { count: 'exact', head: true }),
-        ]).then(function(results) {
-            var totalUsers = results[0]?.count ?? 0;
-            var totalPosts = results[1]?.count ?? 0;
-            var totalComments = results[2]?.count ?? 0;
-            document.getElementById('totalUsers').textContent = totalUsers;
-            document.getElementById('totalPosts').textContent = totalPosts;
-            document.getElementById('totalComments').textContent = totalComments;
-        }).catch(function(err) {
-            console.warn('加载统计数据失败:', err);
+        // 统计 exam_sessions 数量作为“用户总数”示例
+        sb.from('exam_sessions').select('*', { count: 'exact', head: true }).then(function(result) {
+            if (result.error) {
+                console.warn('加载统计失败:', result.error);
+                return;
+            }
+            document.getElementById('totalUsers').textContent = result.count || '0';
+        });
+
+        // 统计 qsl_cards 数量
+        sb.from('qsl_cards').select('*', { count: 'exact', head: true }).then(function(result) {
+            if (result.error) {
+                console.warn('加载统计失败:', result.error);
+                return;
+            }
+            document.getElementById('totalPosts').textContent = result.count || '0';
+        });
+
+        // 统计 login_logs 数量
+        sb.from('login_logs').select('*', { count: 'exact', head: true }).then(function(result) {
+            if (result.error) {
+                console.warn('加载统计失败:', result.error);
+                return;
+            }
+            document.getElementById('totalComments').textContent = result.count || '0';
         });
     }
 
+    // 加载表格数据
     function loadTableData(sb, tableName) {
-        sb.from(tableName).select('*').limit(20).then(function(result) {
-            var container = document.querySelector('#page-' + tableName + ' tbody');
-            if (!container) return;
+        var tbody = document.querySelector('#page-' + tableName + ' tbody');
+        if (!tbody) return;
+
+        tbody.innerHTML = '<tr><td colspan="10" class="text-center text-muted">加载中...</td></tr>';
+
+        sb.from(tableName).select('*').limit(50).then(function(result) {
             if (result.error) {
-                container.innerHTML = '<tr><td colspan="10" class="text-center text-muted">加载失败: ' + result.error.message + '</td></tr>';
+                tbody.innerHTML = '<tr><td colspan="10" class="text-center text-muted">加载失败: ' + result.error.message + '</td></tr>';
                 return;
             }
             var data = result.data;
             if (!data || data.length === 0) {
-                container.innerHTML = '<tr><td colspan="10" class="text-center text-muted">暂无数据</td></tr>';
+                tbody.innerHTML = '<tr><td colspan="10" class="text-center text-muted">暂无数据</td></tr>';
                 return;
             }
-            // 根据表结构渲染行
+            // 动态渲染表头（取第一个对象的键）
+            var headers = Object.keys(data[0]);
+            // 重新构建表头（如果希望自定义可在此处修改）
+            var thead = document.querySelector('#page-' + tableName + ' thead');
+            if (thead) {
+                thead.innerHTML = '<tr>' + headers.map(function(h) {
+                    return '<th>' + h.replace(/_/g, ' ').toUpperCase() + '</th>';
+                }).join('') + '</tr>';
+            }
+
             var rows = data.map(function(row) {
-                var cols = Object.values(row);
-                return '<tr>' + cols.map(function(val) {
-                    return '<td>' + (val === null ? '-' : String(val)) + '</td>';
+                return '<tr>' + headers.map(function(key) {
+                    var val = row[key];
+                    if (val === null || val === undefined) return '<td>-</td>';
+                    if (typeof val === 'object') val = JSON.stringify(val).substring(0, 50);
+                    return '<td>' + val + '</td>';
                 }).join('') + '</tr>';
             }).join('');
-            container.innerHTML = rows;
+            tbody.innerHTML = rows;
         }).catch(function(err) {
-            console.warn('加载表 ' + tableName + ' 失败:', err);
+            tbody.innerHTML = '<tr><td colspan="10" class="text-center text-muted">网络错误，请重试</td></tr>';
         });
     }
 
@@ -139,5 +161,12 @@
         if (firstToggle) {
             firstToggle.click();
         }
+        // 自动关闭侧边栏的遮罩点击
+        document.addEventListener('click', function(e) {
+            var overlay = document.querySelector('.sidebar-overlay');
+            if (overlay && overlay.classList.contains('show')) {
+                closeSidebar();
+            }
+        });
     });
 })();
