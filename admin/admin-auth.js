@@ -1,4 +1,4 @@
-// admin-auth.js – 认证模块（复用主站客户端）
+// admin-auth.js – 认证模块（使用 user_roles 表判断管理员）
 (function() {
     var SUPABASE_URL = 'https://pxhiobmdzntnxwpwtgpx.supabase.co';
     var SUPABASE_KEY = 'sb_publishable_06fy5uemh4fJnAQXIsIXdQ_79UMtlC_';
@@ -26,6 +26,24 @@
         loginError.style.display = 'none';
     }
 
+    // 从 user_roles 表查询用户角色
+    async function getUserRole(userId) {
+        try {
+            var result = await sb.from('user_roles')
+                .select('role')
+                .eq('user_id', userId)
+                .maybeSingle();
+            if (result.error) {
+                console.warn('查询 user_roles 失败:', result.error);
+                return null;
+            }
+            return result.data ? result.data.role : null;
+        } catch (e) {
+            console.warn('查询 user_roles 异常:', e);
+            return null;
+        }
+    }
+
     async function handleLogin(email, password) {
         hideError();
         loginBtn.disabled = true;
@@ -41,12 +59,15 @@
                 showError('登录失败，请重试');
                 return;
             }
-            var role = user.user_metadata && user.user_metadata.role;
+
+            // 检查 user_roles 表中的角色
+            var role = await getUserRole(user.id);
             if (role !== 'admin') {
                 showError('该账户无管理员权限');
                 await sb.auth.signOut();
                 return;
             }
+
             showDashboard(user);
         } catch (err) {
             showError('网络错误，请稍后重试');
@@ -63,25 +84,20 @@
         var email = user.email || '未知邮箱';
         var username = (user.user_metadata && user.user_metadata.username) || email.split('@')[0] || '管理员';
 
-        // 顶部
         var adminEmailEl = document.getElementById('adminEmail');
         var adminNameEl = document.getElementById('adminName');
         var dashboardAdminNameEl = document.getElementById('dashboardAdminName');
         var headerAdminNameEl = document.getElementById('headerAdminName');
+        var sidebarAdminNameEl = document.getElementById('sidebarAdminName');
+        var sidebarAdminEmailEl = document.getElementById('sidebarAdminEmail');
 
         if (adminEmailEl) adminEmailEl.textContent = email;
         if (adminNameEl) adminNameEl.textContent = username;
         if (dashboardAdminNameEl) dashboardAdminNameEl.textContent = username;
         if (headerAdminNameEl) headerAdminNameEl.textContent = username;
-
-        // 侧边栏
-        var sidebarAdminNameEl = document.getElementById('sidebarAdminName');
-        var sidebarAdminEmailEl = document.getElementById('sidebarAdminEmail');
-
         if (sidebarAdminNameEl) sidebarAdminNameEl.textContent = username;
         if (sidebarAdminEmailEl) sidebarAdminEmailEl.textContent = email;
 
-        // 侧边栏退出按钮
         var sidebarLogoutBtn = document.getElementById('sidebarLogoutBtn');
         if (sidebarLogoutBtn) {
             sidebarLogoutBtn.addEventListener('click', function(e) {
@@ -112,9 +128,16 @@
     async function checkSession() {
         var session = await sb.auth.getSession();
         var user = session.data.session ? session.data.session.user : null;
-        if (user && user.user_metadata && user.user_metadata.role === 'admin') {
-            showDashboard(user);
-            return true;
+        if (user) {
+            var role = await getUserRole(user.id);
+            if (role === 'admin') {
+                showDashboard(user);
+                return true;
+            } else {
+                // 非管理员，登出
+                await sb.auth.signOut();
+                return false;
+            }
         }
         return false;
     }

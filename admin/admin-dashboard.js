@@ -1,4 +1,4 @@
-// admin-dashboard.js – 仪表盘 + 侧边栏导航 + 数据加载（无 users 表查询）
+// admin-dashboard.js – 仪表盘 + 侧边栏导航 + 数据加载
 (function() {
     // 侧边栏折叠切换
     document.querySelectorAll('.nav-group-toggle').forEach(function(toggle) {
@@ -69,14 +69,12 @@
         if (overlay) overlay.classList.remove('show');
     }
 
-    // ===== 数据加载（只查业务表） =====
+    // ===== 数据加载 =====
     window.loadDashboardData = function(sb) {
         document.getElementById('pageTitle').textContent = '概览';
         document.querySelector('.page-content.active') || switchPage('overview');
 
-        // 加载统计数据（从业务表计数，不查 users）
         loadStats(sb);
-        // 加载各表格数据
         loadTableData(sb, 'exam_pending');
         loadTableData(sb, 'exam_progress');
         loadTableData(sb, 'exam_sessions');
@@ -84,30 +82,31 @@
         loadTableData(sb, 'qsl_cards');
     };
 
-    // 统计数量（只从允许的表查询，不涉及 auth.users）
+    // 统计数量（用户总数从 user_roles 查询）
     function loadStats(sb) {
-        // 统计 exam_sessions 数量作为“用户总数”示例
-        sb.from('exam_sessions').select('*', { count: 'exact', head: true }).then(function(result) {
+        // 真实用户数 = user_roles 表记录数（所有已分配角色的用户）
+        sb.from('user_roles').select('*', { count: 'exact', head: true }).then(function(result) {
             if (result.error) {
-                console.warn('加载统计失败:', result.error);
+                console.warn('加载用户统计失败:', result.error);
+                document.getElementById('totalUsers').textContent = '--';
                 return;
             }
             document.getElementById('totalUsers').textContent = result.count || '0';
         });
 
-        // 统计 qsl_cards 数量
         sb.from('qsl_cards').select('*', { count: 'exact', head: true }).then(function(result) {
             if (result.error) {
-                console.warn('加载统计失败:', result.error);
+                console.warn('加载 QSL 统计失败:', result.error);
+                document.getElementById('totalPosts').textContent = '--';
                 return;
             }
             document.getElementById('totalPosts').textContent = result.count || '0';
         });
 
-        // 统计 login_logs 数量
         sb.from('login_logs').select('*', { count: 'exact', head: true }).then(function(result) {
             if (result.error) {
-                console.warn('加载统计失败:', result.error);
+                console.warn('加载日志统计失败:', result.error);
+                document.getElementById('totalComments').textContent = '--';
                 return;
             }
             document.getElementById('totalComments').textContent = result.count || '0';
@@ -131,9 +130,7 @@
                 tbody.innerHTML = '<tr><td colspan="10" class="text-center text-muted">暂无数据</td></tr>';
                 return;
             }
-            // 动态渲染表头（取第一个对象的键）
             var headers = Object.keys(data[0]);
-            // 重新构建表头（如果希望自定义可在此处修改）
             var thead = document.querySelector('#page-' + tableName + ' thead');
             if (thead) {
                 thead.innerHTML = '<tr>' + headers.map(function(h) {
@@ -161,7 +158,6 @@
         if (firstToggle) {
             firstToggle.click();
         }
-        // 自动关闭侧边栏的遮罩点击
         document.addEventListener('click', function(e) {
             var overlay = document.querySelector('.sidebar-overlay');
             if (overlay && overlay.classList.contains('show')) {
