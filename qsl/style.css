@@ -265,7 +265,6 @@ footer a:hover {
     padding: 20px 22px;
     margin-bottom: 14px;
     box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
-    border-left: 3px solid var(--primary-blue);
     transition: all 0.3s;
     display: flex;
     align-items: center;
@@ -280,7 +279,6 @@ footer a:hover {
 .qsl-result-index {
     font-size: 1.3rem;
     font-weight: 700;
-    color: var(--primary-blue);
     min-width: 36px;
     text-align: center;
 }

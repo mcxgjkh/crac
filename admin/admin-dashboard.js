@@ -72,6 +72,158 @@
         });
     }
 
+    // ===== 下载管理 =====
+    function loadDownloadFiles(sb) {
+        var tbody = document.getElementById('downloadFilesBody');
+        if (!tbody) return;
+        tbody.innerHTML = '<tr><td colspan="2" class="text-center text-muted">加载中...</td></tr>';
+
+        sb.functions.invoke('github-files', {
+            method: 'GET',
+        }).then(function(result) {
+            if (result.error) {
+                tbody.innerHTML = '<tr><td colspan="2" class="text-center text-muted">加载失败: ' + result.error.message + '</td></tr>';
+                return;
+            }
+            var files = result.data.files || [];
+            if (files.length === 0) {
+                tbody.innerHTML = '<tr><td colspan="2" class="text-center text-muted">暂无文件</td></tr>';
+                return;
+            }
+            var rows = files.map(function(file) {
+                var sizeMB = (file.size / (1024 * 1024)).toFixed(2);
+                return '<tr><td>' + file.name + ' (' + sizeMB + ' MB)</td><td><button class="delete-file-btn" data-filename="' + file.name + '" data-sha="' + file.sha + '">删除</button></td></tr>';
+            }).join('');
+            tbody.innerHTML = rows;
+            // 绑定删除事件
+            tbody.querySelectorAll('.delete-file-btn').forEach(function(btn) {
+                btn.addEventListener('click', function() {
+                    var filename = this.dataset.filename;
+                    var sha = this.dataset.sha;
+                    if (confirm('确定删除文件 "' + filename + '" 吗？')) {
+                        deleteFile(sb, filename, sha);
+                    }
+                });
+            });
+        }).catch(function(err) {
+            tbody.innerHTML = '<tr><td colspan="2" class="text-center text-muted">网络错误，请重试</td></tr>';
+            console.error('加载下载文件失败:', err);
+        });
+    }
+
+    function deleteFile(sb, filename, sha) {
+        sb.functions.invoke('github-files', {
+            method: 'DELETE',
+            body: { filename: filename, sha: sha }
+        }).then(function(result) {
+            if (result.error) {
+                alert('删除失败: ' + result.error.message);
+                return;
+            }
+            alert('删除成功');
+            loadDownloadFiles(sb);
+        }).catch(function(err) {
+            alert('删除失败: ' + err.message);
+        });
+    }
+
+    // 上传文件事件绑定
+    document.addEventListener('DOMContentLoaded', function() {
+        var uploadForm = document.getElementById('uploadForm');
+        if (uploadForm) {
+            uploadForm.addEventListener('submit', function(e) {
+                e.preventDefault();
+                var fileInput = document.getElementById('fileInput');
+                var file = fileInput.files[0];
+                if (!file) return;
+                // 检查文件大小
+                if (file.size > 200 * 1024 * 1024) {
+                    alert('文件不能超过 200MB');
+                    return;
+                }
+                var formData = new FormData();
+                formData.append('file', file);
+                var sb = window.__supabaseClient;
+                if (!sb) {
+                    alert('未登录');
+                    return;
+                }
+                var uploadBtn = uploadForm.querySelector('button[type="submit"]');
+                uploadBtn.disabled = true;
+                uploadBtn.textContent = '上传中...';
+                sb.functions.invoke('github-files', {
+                    method: 'POST',
+                    body: formData,
+                }).then(function(result) {
+                    if (result.error) {
+                        alert('上传失败: ' + result.error.message);
+                        return;
+                    }
+                    var msg = '上传成功';
+                    if (result.data.method === 'lfs') {
+                        msg += ' (通过 LFS)';
+                    }
+                    alert(msg);
+                    fileInput.value = '';
+                    loadDownloadFiles(sb);
+                }).catch(function(err) {
+                    alert('上传失败: ' + err.message);
+                }).finally(function() {
+                    uploadBtn.disabled = false;
+                    uploadBtn.textContent = '上传文件';
+                });
+            });
+        }
+    });
+
+    function deleteFile(filename, sha) {
+        var sb = window.__supabaseClient;
+        sb.functions.invoke('github-files', {
+            method: 'DELETE',
+            body: { filename: filename, sha: sha }
+        }).then(function(result) {
+            if (result.error) {
+                alert('删除失败: ' + result.error.message);
+                return;
+            }
+            alert('删除成功');
+            loadDownloadFiles(); // 刷新列表
+        }).catch(function(err) {
+            alert('删除失败: ' + err.message);
+        });
+    }
+
+    // 上传文件
+    document.addEventListener('DOMContentLoaded', function() {
+        var uploadForm = document.getElementById('uploadForm');
+        if (uploadForm) {
+            uploadForm.addEventListener('submit', function(e) {
+                e.preventDefault();
+                var fileInput = document.getElementById('fileInput');
+                var file = fileInput.files[0];
+                if (!file) return;
+                var formData = new FormData();
+                formData.append('file', file);
+                var sb = window.__supabaseClient;
+                sb.functions.invoke('github-files', {
+                    method: 'POST',
+                    body: formData,
+                    headers: { 'Content-Type': 'multipart/form-data' }
+                }).then(function(result) {
+                    if (result.error) {
+                        alert('上传失败: ' + result.error.message);
+                        return;
+                    }
+                    alert('上传成功');
+                    fileInput.value = '';
+                    loadDownloadFiles(); // 刷新列表
+                }).catch(function(err) {
+                    alert('上传失败: ' + err.message);
+                });
+            });
+        }
+    });
+
     function closeSidebar() {
         sidebar.classList.remove('open');
         var overlay = document.querySelector('.sidebar-overlay');

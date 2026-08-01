@@ -157,6 +157,18 @@
                         <li><a href="#" data-page="qsl_cards"><i class="fas fa-images"></i> 所有卡片</a></li>
                     </ul>
                 </div>
+
+                <!-- 下载管理 -->
+                <div class="nav-group">
+                    <button class="nav-group-toggle" data-group="download">
+                        <i class="fas fa-download"></i>
+                        <span>下载管理</span>
+                        <i class="fas fa-chevron-down group-arrow"></i>
+                    </button>
+                    <ul class="nav-group-items" data-group="download">
+                        <li><a href="#" data-page="download_files"><i class="fas fa-file"></i> 文件列表</a></li>
+                    </ul>
+                </div>
             </nav>
 
             <div class="sidebar-footer">
@@ -228,6 +240,30 @@
                     <div class="page-header"><h3>QSL卡片列表</h3></div>
                     <div class="table-container"><table><thead><tr><th>ID</th><th>标题</th><th>上传者</th><th>上传时间</th><th>预览</th></tr></thead><tbody><tr><td colspan="5" class="text-center text-muted">加载中...</td></tr></tbody></table></div>
                 </div>
+                <div id="page-download_files" class="page-content" data-table="download_files">
+                <div class="page-header">
+                    <h3>下载文件管理</h3>
+                </div>
+                <div class="download-actions">
+                    <form id="uploadForm" class="upload-form">
+                        <input type="file" id="fileInput" required />
+                        <button type="submit" class="btn-primary">上传文件</button>
+                    </form>
+                </div>
+                <div class="table-container">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>文件名</th>
+                                <th>操作</th>
+                            </tr>
+                        </thead>
+                        <tbody id="downloadFilesBody">
+                            <tr><td colspan="2" class="text-center text-muted">加载中...</td></tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
             </div>
         </main>
     </div>

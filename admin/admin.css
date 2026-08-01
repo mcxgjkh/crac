@@ -1272,3 +1272,42 @@ body {
     transform: rotate(180deg);
     transition: transform 0.4s ease;
 }
+
+.download-actions {
+    margin-bottom: 20px;
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    flex-wrap: wrap;
+}
+.upload-form {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+.upload-form input[type="file"] {
+    color: var(--text-secondary);
+    background: var(--card-bg);
+    border: 1px solid var(--border-color);
+    padding: 6px 12px;
+    border-radius: 6px;
+}
+.upload-form .btn-primary {
+    background: var(--primary-color);
+    color: #fff;
+    border: none;
+    padding: 8px 20px;
+    border-radius: 6px;
+    cursor: pointer;
+}
+.delete-file-btn {
+    background: rgba(239, 68, 68, 0.15);
+    color: #ef4444;
+    border: none;
+    padding: 4px 12px;
+    border-radius: 4px;
+    cursor: pointer;
+}
+.delete-file-btn:hover {
+    background: rgba(239, 68, 68, 0.25);
+}
