@@ -1186,3 +1186,89 @@ body {
     font-size: 0.9rem;
     padding: 0 8px;
 }
+
+/* ===== 分页控件 ===== */
+.pagination-wrapper {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 12px;
+    padding: 16px 0 8px;
+    border-top: 1px solid var(--border-color);
+    margin-top: 12px;
+}
+
+.page-btn {
+    background: var(--card-bg);
+    border: 1px solid var(--border-color);
+    color: var(--text-primary);
+    padding: 6px 14px;
+    border-radius: 6px;
+    cursor: pointer;
+    transition: all 0.2s;
+    font-size: 0.9rem;
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+}
+
+.page-btn:hover:not(:disabled) {
+    background: rgba(var(--primary-rgb), 0.15);
+    border-color: var(--primary-color);
+}
+
+.page-btn:disabled {
+    opacity: 0.4;
+    cursor: not-allowed;
+}
+
+.page-info {
+    color: var(--text-secondary);
+    font-size: 0.9rem;
+    padding: 0 8px;
+}
+
+/* QSL 查看链接 */
+.qsl-link {
+    color: var(--primary-color);
+    text-decoration: none;
+    font-weight: 500;
+}
+.qsl-link:hover {
+    text-decoration: underline;
+}
+
+/* ===== 刷新按钮 ===== */
+.page-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+}
+
+.page-header h3 {
+    display: inline-flex !important;
+    align-items: center;
+    gap: 12px;
+    margin: 0;
+}
+
+.refresh-btn {
+    background: none;
+    border: none;
+    color: var(--text-secondary);
+    cursor: pointer;
+    font-size: 0.9rem;
+    padding: 4px 8px;
+    border-radius: 6px;
+    transition: all 0.2s;
+}
+
+.refresh-btn:hover {
+    color: var(--primary-color);
+    background: rgba(var(--primary-rgb), 0.1);
+}
+
+.refresh-btn:active {
+    transform: rotate(180deg);
+    transition: transform 0.4s ease;
+}

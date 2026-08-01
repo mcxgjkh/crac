@@ -1,6 +1,5 @@
 // admin-dashboard.js
 (function() {
-    // 分页状态存储
     var pageState = {};
 
     // 侧边栏折叠切换
@@ -44,10 +43,8 @@
                 'qsl_cards': 'QSL卡片列表'
             };
             document.getElementById('pageTitle').textContent = titleMap[pageId] || '概览';
-            // 切换到该页面时重新加载数据（如果已加载过则保持当前分页）
             var sb = window.__supabaseClient;
             if (sb) {
-                // 如果该表尚未加载，则初始化分页状态并加载
                 if (!pageState[pageId]) {
                     pageState[pageId] = { page: 1, pageSize: 50 };
                 }
@@ -88,7 +85,6 @@
 
         loadStats(sb);
 
-        // 初始化所有表格的分页状态，并加载第一页
         var tables = ['exam_pending', 'exam_progress', 'exam_sessions', 'login_logs', 'qsl_cards'];
         tables.forEach(function(table) {
             pageState[table] = { page: 1, pageSize: 50 };
@@ -96,7 +92,7 @@
         });
     };
 
-    // 统计数量（用户总数从 user_roles 查询）
+    // 统计数量
     function loadStats(sb) {
         sb.from('user_roles').select('*', { count: 'exact', head: true }).then(function(result) {
             if (result.error) {
@@ -126,13 +122,12 @@
         });
     }
 
-    // 加载表格数据（支持分页）
+    // 加载表格数据（支持分页、排序、QSL 查看链接、刷新按钮）
     function loadTableData(sb, tableName, page, pageSize) {
         var tbody = document.querySelector('#page-' + tableName + ' tbody');
         var paginationContainer = document.querySelector('#page-' + tableName + ' .pagination-container');
         if (!tbody) return;
 
-        // 如果分页容器不存在，创建一个
         if (!paginationContainer) {
             var container = document.getElementById('page-' + tableName);
             var div = document.createElement('div');
@@ -141,7 +136,35 @@
             paginationContainer = div;
         }
 
-        // 显示加载状态
+        // ---- 添加刷新按钮到标题右侧 ----
+        var pageHeader = document.querySelector('#page-' + tableName + ' .page-header');
+        if (pageHeader) {
+            var refreshBtn = pageHeader.querySelector('.refresh-btn');
+            if (!refreshBtn) {
+                refreshBtn = document.createElement('button');
+                refreshBtn.className = 'refresh-btn';
+                refreshBtn.innerHTML = '<i class="fas fa-sync-alt"></i>';
+                refreshBtn.title = '刷新数据';
+                refreshBtn.addEventListener('click', function() {
+                    // 重新加载当前页，保持分页
+                    var currentPage = pageState[tableName] ? pageState[tableName].page : 1;
+                    loadTableData(sb, tableName, currentPage, pageSize);
+                });
+                // 将刷新按钮添加到 h3 右侧
+                var h3 = pageHeader.querySelector('h3');
+                if (h3) {
+                    h3.style.display = 'inline-flex';
+                    h3.style.alignItems = 'center';
+                    h3.style.gap = '12px';
+                    h3.appendChild(refreshBtn);
+                } else {
+                    pageHeader.appendChild(refreshBtn);
+                }
+            } else {
+                // 已存在，更新引用（无需操作）
+            }
+        }
+
         tbody.innerHTML = '<tr><td colspan="10" class="text-center text-muted">加载中...</td></tr>';
         paginationContainer.innerHTML = '';
 
@@ -149,10 +172,15 @@
         var rangeStart = offset;
         var rangeEnd = offset + pageSize - 1;
 
-        // 查询数据并获取总计数
-        sb.from(tableName)
-            .select('*', { count: 'exact' })
-            .range(rangeStart, rangeEnd)
+        var query = sb.from(tableName).select('*', { count: 'exact' });
+
+        if (tableName === 'qsl_cards') {
+            query = query.order('id', { ascending: true });
+        } else {
+            query = query.order('id', { ascending: false });
+        }
+
+        query.range(rangeStart, rangeEnd)
             .then(function(result) {
                 if (result.error) {
                     tbody.innerHTML = '<tr><td colspan="10" class="text-center text-muted">加载失败: ' + result.error.message + '</td></tr>';
@@ -162,7 +190,6 @@
                 var totalCount = result.count || 0;
                 var totalPages = Math.ceil(totalCount / pageSize);
 
-                // 更新分页状态
                 pageState[tableName] = { page: page, pageSize: pageSize };
 
                 if (!data || data.length === 0) {
@@ -171,37 +198,67 @@
                     return;
                 }
 
-                // 动态渲染表头
+                var isQsl = (tableName === 'qsl_cards');
                 var headers = Object.keys(data[0]);
+                if (isQsl) {
+                    headers.push('操作');
+                }
+
+                var cardCounts = {};
+                if (isQsl) {
+                    data.forEach(function(row) {
+                        var cn = row.card_number;
+                        cardCounts[cn] = (cardCounts[cn] || 0) + 1;
+                    });
+                }
+
                 var thead = document.querySelector('#page-' + tableName + ' thead');
                 if (thead) {
                     thead.innerHTML = '<tr>' + headers.map(function(h) {
+                        if (h === '操作') return '<th>操作</th>';
                         return '<th>' + h.replace(/_/g, ' ').toUpperCase() + '</th>';
                     }).join('') + '</tr>';
                 }
 
-                // 渲染行
                 var rows = data.map(function(row) {
-                    return '<tr>' + headers.map(function(key) {
-                        var val = row[key];
-                        if (val === null || val === undefined) return '<td>-</td>';
-                        if (typeof val === 'object') val = JSON.stringify(val).substring(0, 50);
-                        return '<td>' + val + '</td>';
-                    }).join('') + '</tr>';
+                    var cols = headers.map(function(key) {
+                        if (key === '操作') {
+                            var cn = row.card_number || '';
+                            var callsign = row.callsign || '';
+                            var numLen = cn.length;
+                            var cardNumberPart;
+                            if (numLen === 12) cardNumberPart = cn.slice(-3);
+                            else if (numLen === 11) cardNumberPart = cn.slice(-2);
+                            else cardNumberPart = cn.slice(-3);
+
+                            var callsignPart = '';
+                            if (cardCounts[cn] > 1 && callsign) {
+                                var callLen = callsign.length;
+                                if (callLen >= 6) callsignPart = callsign.substring(3, 6);
+                                else if (callLen >= 5) callsignPart = callsign.substring(3, 5);
+                                else callsignPart = callsign;
+                            }
+                            var link = '../images/QSL/webp/' + cardNumberPart + (callsignPart ? callsignPart : '') + '.webp';
+                            return '<td><a href="' + link + '" target="_blank" class="qsl-link">查看</a></td>';
+                        } else {
+                            var val = row[key];
+                            if (val === null || val === undefined) return '<td>-</td>';
+                            if (typeof val === 'object') val = JSON.stringify(val).substring(0, 50);
+                            return '<td>' + val + '</td>';
+                        }
+                    });
+                    return '<tr>' + cols.join('') + '</tr>';
                 }).join('');
                 tbody.innerHTML = rows;
 
-                // 生成分页控件（如果总页数 > 1）
                 if (totalPages > 1) {
                     var paginationHTML = '<div class="pagination-wrapper">';
                     paginationHTML += '<button class="page-btn prev" data-page="' + (page - 1) + '" ' + (page <= 1 ? 'disabled' : '') + '><i class="fas fa-chevron-left"></i></button>';
-                    // 显示当前页码 / 总页数
                     paginationHTML += '<span class="page-info">' + page + ' / ' + totalPages + '</span>';
                     paginationHTML += '<button class="page-btn next" data-page="' + (page + 1) + '" ' + (page >= totalPages ? 'disabled' : '') + '><i class="fas fa-chevron-right"></i></button>';
                     paginationHTML += '</div>';
                     paginationContainer.innerHTML = paginationHTML;
 
-                    // 绑定事件
                     paginationContainer.querySelectorAll('.page-btn').forEach(function(btn) {
                         btn.addEventListener('click', function() {
                             var newPage = parseInt(this.dataset.page);
