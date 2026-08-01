@@ -6,9 +6,32 @@
     <title>QSL卡片查询 - BH6RKW</title>
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
-    <link rel="stylesheet" href="style.css?v=1.0.0">
+    <link rel="stylesheet" href="style.css?v=1.0.1">
 </head>
 <body>
+    <div class="time-sync-overlay" id="timeSyncOverlay" style="display: none;">
+        <div class="time-sync-card">
+            <div class="time-sync-icon"><i class="fas fa-sync-alt"></i></div>
+            <h2 class="time-sync-title">时间同步设置</h2>
+            <p class="time-sync-description">为了确保网站主题能根据准确的时间自动切换，我们需要获取准确的当前时间。</p>
+            <div class="time-sync-features">
+                <div class="time-sync-feature"><i class="fas fa-check-circle feature-icon"></i><span>每分钟自动同步时间</span></div>
+                <div class="time-sync-feature"><i class="fas fa-check-circle feature-icon"></i><span>根据时间自动切换白天/夜晚模式</span></div>
+                <div class="time-sync-feature"><i class="fas fa-exclamation-triangle feature-icon"></i><span>会消耗少量数据流量</span></div>
+            </div>
+            <div class="time-sync-buttons">
+                <button class="time-sync-btn time-sync-decline" id="declineTimeSync">使用本地时间</button>
+                <button class="time-sync-btn time-sync-agree" id="agreeTimeSync">同步在线时间</button>
+            </div>
+            <p class="time-sync-note">您可以在下次访问网站时重新选择此设置</p>
+        </div>
+    </div>
+    <div class="hidden-time-widget" aria-hidden="true">
+        <a href="https://time.is/Wuhan" id="time_is_link" rel="nofollow" style="font-size:36px">北京时间:</a>
+        <span id="Wuhan_z43d" style="font-size:36px"></span>
+    </div>
+    <script src="//widget.time.is/t.js"></script>
+    <script>time_is_widget.init({Wuhan_z43d:{}});</script>
     <!-- 顶部信息栏 -->
     <div class="top-bar">
         <div class="container">
@@ -59,7 +82,6 @@
                     <li class="nav-item"><a class="nav-link" href="https://bh6rkw.dpdns.org/laws/index.html">政策法规</a></li>
                     <li class="nav-item"><a class="nav-link" href="https://exam.bh6rkw.dpdns.org">模拟考试</a></li>
                     <li class="nav-item"><a class="nav-link" href="https://bh6rkw.dpdns.org/download/index.html">资料下载</a></li>
-                    <li class="nav-item"><a class="nav-link active" href="https://bh6rkw.dpdns.org/qsl/index.html">QSL查询</a></li>
                     <li class="nav-item" id="authNavItem"></li>
                 </ul>
             </div>
@@ -67,41 +89,37 @@
     </nav>
 
     <!-- 搜索区域 -->
-    <div class="search-section">
+    <div class="search-area">
         <div class="container">
             <div class="search-card">
-                <h2><i class="fas fa-search me-2"></i>QSL 卡片查询</h2>
+                <h2>QSL 卡片查询</h2>
                 <p class="subtitle">通过卡片编号、通联时间或呼号查找您的通联记录</p>
                 <div class="row g-3">
                     <div class="col-md-4">
                         <label class="form-label">卡片编号</label>
                         <div class="input-group">
                             <span class="input-group-text"><i class="fas fa-hashtag"></i></span>
-                            <input type="text" id="searchCardNumber" class="form-control" placeholder="如：286181123617" autocomplete="off">
+                            <input type="text" id="searchCardNumber" class="form-control" placeholder="如：286181123999" autocomplete="off">
                         </div>
                     </div>
                     <div class="col-md-4">
                         <label class="form-label">通联时间</label>
                         <div class="input-group">
                             <span class="input-group-text"><i class="fas fa-clock"></i></span>
-                            <input type="text" id="searchQsoTime" class="form-control" placeholder="如：20241006 或 202410062145" autocomplete="off">
+                            <input type="text" id="searchQsoTime" class="form-control" placeholder="如：20240101 或 202401010202" autocomplete="off">
                         </div>
                     </div>
                     <div class="col-md-4">
                         <label class="form-label">呼号</label>
                         <div class="input-group">
                             <span class="input-group-text"><i class="fas fa-broadcast-tower"></i></span>
-                            <input type="text" id="searchCallSign" class="form-control" placeholder="如：BH6RPY 或 BH6" autocomplete="off">
+                            <input type="text" id="searchCallSign" class="form-control" placeholder="如：BH6RKW 或 RKW 等" autocomplete="off">
                         </div>
                     </div>
                 </div>
                 <div class="d-flex justify-content-center gap-3 mt-4">
-                    <button class="btn btn-primary btn-search" id="btnSearch">
-                        <i class="fas fa-search me-1"></i> 搜索
-                    </button>
-                    <button class="btn btn-outline-secondary btn-reset" id="btnReset">
-                        <i class="fas fa-redo me-1"></i> 重置
-                    </button>
+                    <button class="btn btn-primary btn-search" id="btnSearch">搜索</button>
+                    <button class="btn btn-outline-secondary btn-reset" id="btnReset">重置</button>
                 </div>
                 <div class="search-tips">
                     <i class="fas fa-info-circle"></i> 支持不完整搜索，三个字段任一匹配即可。输入部分编号、日期或呼号均可模糊匹配。
@@ -118,11 +136,9 @@
         </div>
         <div id="resultsContainer"></div>
         <div class="no-result" id="noResult" style="display: none;">
-            <i class="fas fa-search"></i>
-            <p>暂无匹配结果，请尝试其他关键词</p>
+            <p>暂无匹配结果</p>
         </div>
         <div class="no-result" id="initialHint">
-            <i class="fas fa-hand-pointer"></i>
             <p>输入关键词开始查询 QSL 卡片</p>
         </div>
     </div>
@@ -138,7 +154,6 @@
                 </div>
                 <img id="modalImg" src="" alt="QSL卡片" style="display: none;">
                 <div class="image-modal-error" id="modalError" style="display: none;">
-                    <i class="fas fa-exclamation-triangle me-2"></i>
                     <span id="modalErrorText">暂时缺失该卡片数据</span>
                 </div>
             </div>
@@ -183,6 +198,6 @@
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
     <script src="/supabase-auth.js?v=1.5.0"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/js/all.min.js"></script>
-    <script src="script.js?v=1.0.0"></script>
+    <script src="script.js?v=1.0.1"></script>
 </body>
 </html>

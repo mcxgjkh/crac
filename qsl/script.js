@@ -25,10 +25,84 @@
         window.dispatchEvent(new CustomEvent('theme-changed'));
     }
 
+    var timeSyncOverlay = document.getElementById('timeSyncOverlay');
+    var agreeTimeSyncBtn = document.getElementById('agreeTimeSync');
+    var declineTimeSyncBtn = document.getElementById('declineTimeSync');
+    var userManuallySwitched = false;
+    var timeSyncIntervalId = null;
+    var beijingTimeSpan = document.getElementById('Wuhan_z43d');
+
+    function readBeijingTime() {
+        if (!beijingTimeSpan) return null;
+        var text = beijingTimeSpan.textContent.trim();
+        if (!text) return null;
+        var parts = text.split(':').map(function(p) { return Number(p); });
+        if (parts.length !== 3 || parts.some(isNaN)) return null;
+        return { hour: parts[0], minute: parts[1], second: parts[2] };
+    }
+
+    function applyHourToTheme(hour) {
+        if (hour >= 6 && hour < 18) {
+            themeSwitch.checked = false;
+            switchToLightTheme();
+        } else {
+            themeSwitch.checked = true;
+            switchToDarkTheme();
+        }
+        userManuallySwitched = false;
+    }
+
+    function setThemeByBeijingTime() {
+        var bt = readBeijingTime();
+        if (bt) { applyHourToTheme(bt.hour); return true; }
+        return false;
+    }
+
+    function useLocalTime() {
+        var h = new Date().getHours();
+        applyHourToTheme(h);
+    }
+
+    function startTimeSync() {
+        if (!setThemeByBeijingTime()) useLocalTime();
+        timeSyncIntervalId = setInterval(function() {
+            if (!userManuallySwitched) {
+                if (!setThemeByBeijingTime()) useLocalTime();
+            }
+        }, 60000);
+    }
+
+    function handleTimeSyncChoice(choice) {
+        sessionStorage.setItem('timeSyncChoice', choice);
+        timeSyncOverlay.style.display = 'none';
+        if (choice === 'agree') {
+            startTimeSync();
+        } else {
+            useLocalTime();
+        }
+    }
+
     themeSwitch.addEventListener('change', function() {
+        userManuallySwitched = true;
         if (this.checked) { switchToDarkTheme(); }
         else { switchToLightTheme(); }
     });
+
+    if (agreeTimeSyncBtn && declineTimeSyncBtn) {
+        agreeTimeSyncBtn.addEventListener('click', function() { handleTimeSyncChoice('agree'); });
+        declineTimeSyncBtn.addEventListener('click', function() { handleTimeSyncChoice('decline'); });
+    }
+
+    var storedChoice = sessionStorage.getItem('timeSyncChoice');
+    if (storedChoice === 'agree') {
+        timeSyncOverlay.style.display = 'none';
+        startTimeSync();
+    } else if (storedChoice === 'decline') {
+        timeSyncOverlay.style.display = 'none';
+        useLocalTime();
+    } else {
+        timeSyncOverlay.style.display = 'flex';
+    }
 
     [searchCardNumber, searchQsoTime, searchCallSign].forEach(function(el) {
         el.addEventListener('keydown', function(e) {
@@ -100,6 +174,12 @@
         return val;
     }
 
+    function formatCardClass(val) {
+        if (val === 'R') return '实体卡';
+        if (val === 'E') return '电子卡';
+        return formatField(val);
+    }
+
     btnSearch.addEventListener('click', async function() {
         var cn = searchCardNumber.value.trim();
         var qt = searchQsoTime.value.trim();
@@ -139,7 +219,7 @@
         ]);
 
         btnSearch.disabled = false;
-        btnSearch.innerHTML = '<i class="fas fa-search me-1"></i> 搜索';
+        btnSearch.innerHTML = '搜索';
 
         if (allRows.length === 0) {
             resultsContainer.innerHTML = '';
@@ -162,7 +242,7 @@
             var displayQsoTime = formatQsoTime(row.qso_time);
             var displayCallSign = formatField(row.call_sign);
             var displayCardType = formatField(row.card_type);
-            var displayCardClass = formatField(row.card_class);
+            var displayCardClass = formatCardClass(row.card_class);
             var displayGeneration = formatField(row.generation);
 
             html += '<div class="qsl-result-card">';
@@ -172,8 +252,8 @@
             html += '<div class="qsl-field"><span class="qsl-field-label">通联时间</span><span class="qsl-field-value time">' + displayQsoTime + '</span></div>';
             html += '<div class="qsl-field"><span class="qsl-field-label">呼号</span><span class="qsl-field-value callsign">' + displayCallSign + '</span></div>';
             html += '<div class="qsl-field"><span class="qsl-field-label">卡片类型</span><span class="qsl-field-value">' + displayCardType + '</span></div>';
-            html += '<div class="qsl-field"><span class="qsl-field-label">级别</span><span class="qsl-field-value">' + displayCardClass + '</span></div>';
-            html += '<div class="qsl-field"><span class="qsl-field-label">代数</span><span class="qsl-field-value">' + displayGeneration + '</span></div>';
+            html += '<div class="qsl-field"><span class="qsl-field-label">卡片类别</span><span class="qsl-field-value">' + displayCardClass + '</span></div>';
+            html += '<div class="qsl-field"><span class="qsl-field-label">卡片版本</span><span class="qsl-field-value">' + displayGeneration + '</span></div>';
             html += '</div>';
             html += '<a class="btn-view" data-img="' + imgUrl + '" data-cn="' + displayCardNumber + '" data-cs="' + displayCallSign + '"><i class="fas fa-image me-1"></i>查看</a>';
             html += '</div>';
@@ -299,10 +379,4 @@
         modalImgWrap.scrollLeft = scrollLeft + (startX - e.clientX);
         modalImgWrap.scrollTop = scrollTop + (startY - e.clientY);
     });
-
-    var savedTheme = localStorage.getItem('theme');
-    if (savedTheme === 'dark') {
-        themeSwitch.checked = true;
-        switchToDarkTheme();
-    }
 })();
