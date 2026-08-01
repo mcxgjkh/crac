@@ -4,7 +4,7 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>管理后台 · BH6RKW</title>
-    <link rel="stylesheet" href="admin.css?v=2.1.0" />
+    <link rel="stylesheet" href="admin.css?v=3.1.0" />
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" />
 </head>
 <body>
@@ -128,9 +128,9 @@
                         <i class="fas fa-chevron-down group-arrow"></i>
                     </button>
                     <ul class="nav-group-items" data-group="exam">
-                        <li><a href="#" data-page="exam_pending"><i class="fas fa-clock"></i> 待审批</a></li>
-                        <li><a href="#" data-page="exam_progress"><i class="fas fa-chart-line"></i> 考试进度</a></li>
-                        <li><a href="#" data-page="exam_sessions"><i class="fas fa-calendar-alt"></i> 考试场次</a></li>
+                        <li><a href="#" data-page="exam_pending"><i class="fas fa-clock"></i> 待做题目</a></li>
+                        <li><a href="#" data-page="exam_progress"><i class="fas fa-chart-line"></i> 考试错题</a></li>
+                        <li><a href="#" data-page="exam_sessions"><i class="fas fa-calendar-alt"></i> 考试成绩</a></li>
                     </ul>
                 </div>
 
@@ -194,11 +194,11 @@
                         </div>
                         <div class="stat-card">
                             <i class="fas fa-file-alt"></i>
-                            <div><h3>文章数</h3><p id="totalPosts">--</p></div>
+                            <div><h3>QSL卡片</h3><p id="totalPosts">--</p><p>张</p></div>
                         </div>
                         <div class="stat-card">
                             <i class="fas fa-comments"></i>
-                            <div><h3>留言</h3><p id="totalComments">--</p></div>
+                            <div><h3>登录记录</h3><p id="totalComments">--</p><p>条</p></div>
                         </div>
                     </div>
                     <section class="welcome-section">
@@ -209,15 +209,15 @@
 
                 <!-- 各表格页面 -->
                 <div id="page-exam_pending" class="page-content" data-table="exam_pending">
-                    <div class="page-header"><h3>待审批列表</h3></div>
+                    <div class="page-header"><h3>待做列表</h3></div>
                     <div class="table-container"><table><thead><tr><th>ID</th><th>用户</th><th>申请时间</th><th>状态</th><th>操作</th></tr></thead><tbody><tr><td colspan="5" class="text-center text-muted">加载中...</td></tr></tbody></table></div>
                 </div>
                 <div id="page-exam_progress" class="page-content" data-table="exam_progress">
-                    <div class="page-header"><h3>考试进度</h3></div>
+                    <div class="page-header"><h3>考试错题</h3></div>
                     <div class="table-container"><table><thead><tr><th>ID</th><th>用户</th><th>考试名称</th><th>进度</th><th>更新时间</th></tr></thead><tbody><tr><td colspan="5" class="text-center text-muted">加载中...</td></tr></tbody></table></div>
                 </div>
                 <div id="page-exam_sessions" class="page-content" data-table="exam_sessions">
-                    <div class="page-header"><h3>考试场次</h3></div>
+                    <div class="page-header"><h3>考试成绩</h3></div>
                     <div class="table-container"><table><thead><tr><th>ID</th><th>场次名称</th><th>日期</th><th>地点</th><th>状态</th></tr></thead><tbody><tr><td colspan="5" class="text-center text-muted">加载中...</td></tr></tbody></table></div>
                 </div>
                 <div id="page-login_logs" class="page-content" data-table="login_logs">
@@ -234,8 +234,8 @@
 
     <!-- ========== 脚本 ========== -->
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
-    <script src="admin-auth.js?v=2.1.0"></script>
-    <script src="admin-theme.js?v=2.1.0"></script>
-    <script src="admin-dashboard.js?v=2.1.0"></script>
+    <script src="admin-auth.js?v=3.1.0"></script>
+    <script src="admin-theme.js?v=3.1.0"></script>
+    <script src="admin-dashboard.js?v=3.1.0"></script>
 </body>
 </html>

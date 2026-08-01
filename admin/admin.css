@@ -1145,3 +1145,44 @@ body {
     padding: 60px 50px;
     justify-content: center;
 }
+
+/* ===== 分页控件 ===== */
+.pagination-wrapper {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 12px;
+    padding: 16px 0 8px;
+    border-top: 1px solid var(--border-color);
+    margin-top: 12px;
+}
+
+.page-btn {
+    background: var(--card-bg);
+    border: 1px solid var(--border-color);
+    color: var(--text-primary);
+    padding: 6px 14px;
+    border-radius: 6px;
+    cursor: pointer;
+    transition: all 0.2s;
+    font-size: 0.9rem;
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+}
+
+.page-btn:hover:not(:disabled) {
+    background: rgba(var(--primary-rgb), 0.15);
+    border-color: var(--primary-color);
+}
+
+.page-btn:disabled {
+    opacity: 0.4;
+    cursor: not-allowed;
+}
+
+.page-info {
+    color: var(--text-secondary);
+    font-size: 0.9rem;
+    padding: 0 8px;
+}

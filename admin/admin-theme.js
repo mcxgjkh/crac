@@ -1,4 +1,4 @@
-// admin-theme.js – 主题色、布局切换、暗色模式
+// admin-theme.js
 (function() {
     // ---- 预设颜色 ----
     var presetColors = [

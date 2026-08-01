@@ -1,4 +1,4 @@
-// admin-auth.js – 认证模块（使用 user_roles 表判断管理员）
+// admin-auth.js
 (function() {
     var SUPABASE_URL = 'https://pxhiobmdzntnxwpwtgpx.supabase.co';
     var SUPABASE_KEY = 'sb_publishable_06fy5uemh4fJnAQXIsIXdQ_79UMtlC_';
