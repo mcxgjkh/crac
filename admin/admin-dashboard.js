@@ -1,4 +1,4 @@
-// admin-dashboard.js
+// admin-dashboard.js – 仪表盘、分页、排序、QSL 查看、刷新、下载管理
 (function() {
     var pageState = {};
 
@@ -28,6 +28,7 @@
         });
     });
 
+    // ----- 核心切换函数（修复：增加 download_files 分支） -----
     function switchPage(pageId) {
         document.querySelectorAll('.page-content').forEach(function(el) {
             el.classList.remove('active');
@@ -40,16 +41,24 @@
                 'exam_progress': '考试错题',
                 'exam_sessions': '考试成绩',
                 'login_logs': '登录日志',
-                'qsl_cards': 'QSL卡片列表'
+                'qsl_cards': 'QSL卡片列表',
+                'download_files': '下载文件管理'
             };
             document.getElementById('pageTitle').textContent = titleMap[pageId] || '概览';
             var sb = window.__supabaseClient;
-            if (sb) {
-                if (!pageState[pageId]) {
-                    pageState[pageId] = { page: 1, pageSize: 50 };
-                }
-                loadTableData(sb, pageId, pageState[pageId].page, pageState[pageId].pageSize);
+            if (!sb) return;
+
+            // 下载管理单独处理（不是数据库表）
+            if (pageId === 'download_files') {
+                loadDownloadFiles(sb);
+                return;
             }
+
+            // 其他表：初始化分页并加载
+            if (!pageState[pageId]) {
+                pageState[pageId] = { page: 1, pageSize: 50 };
+            }
+            loadTableData(sb, pageId, pageState[pageId].page, pageState[pageId].pageSize);
         }
     }
 
@@ -70,6 +79,12 @@
             }
             overlay.classList.toggle('show', sidebar.classList.contains('open'));
         });
+    }
+
+    function closeSidebar() {
+        sidebar.classList.remove('open');
+        var overlay = document.querySelector('.sidebar-overlay');
+        if (overlay) overlay.classList.remove('show');
     }
 
     // ===== 下载管理 =====
@@ -125,109 +140,6 @@
         }).catch(function(err) {
             alert('删除失败: ' + err.message);
         });
-    }
-
-    // 上传文件事件绑定
-    document.addEventListener('DOMContentLoaded', function() {
-        var uploadForm = document.getElementById('uploadForm');
-        if (uploadForm) {
-            uploadForm.addEventListener('submit', function(e) {
-                e.preventDefault();
-                var fileInput = document.getElementById('fileInput');
-                var file = fileInput.files[0];
-                if (!file) return;
-                // 检查文件大小
-                if (file.size > 200 * 1024 * 1024) {
-                    alert('文件不能超过 200MB');
-                    return;
-                }
-                var formData = new FormData();
-                formData.append('file', file);
-                var sb = window.__supabaseClient;
-                if (!sb) {
-                    alert('未登录');
-                    return;
-                }
-                var uploadBtn = uploadForm.querySelector('button[type="submit"]');
-                uploadBtn.disabled = true;
-                uploadBtn.textContent = '上传中...';
-                sb.functions.invoke('github-files', {
-                    method: 'POST',
-                    body: formData,
-                }).then(function(result) {
-                    if (result.error) {
-                        alert('上传失败: ' + result.error.message);
-                        return;
-                    }
-                    var msg = '上传成功';
-                    if (result.data.method === 'lfs') {
-                        msg += ' (通过 LFS)';
-                    }
-                    alert(msg);
-                    fileInput.value = '';
-                    loadDownloadFiles(sb);
-                }).catch(function(err) {
-                    alert('上传失败: ' + err.message);
-                }).finally(function() {
-                    uploadBtn.disabled = false;
-                    uploadBtn.textContent = '上传文件';
-                });
-            });
-        }
-    });
-
-    function deleteFile(filename, sha) {
-        var sb = window.__supabaseClient;
-        sb.functions.invoke('github-files', {
-            method: 'DELETE',
-            body: { filename: filename, sha: sha }
-        }).then(function(result) {
-            if (result.error) {
-                alert('删除失败: ' + result.error.message);
-                return;
-            }
-            alert('删除成功');
-            loadDownloadFiles(); // 刷新列表
-        }).catch(function(err) {
-            alert('删除失败: ' + err.message);
-        });
-    }
-
-    // 上传文件
-    document.addEventListener('DOMContentLoaded', function() {
-        var uploadForm = document.getElementById('uploadForm');
-        if (uploadForm) {
-            uploadForm.addEventListener('submit', function(e) {
-                e.preventDefault();
-                var fileInput = document.getElementById('fileInput');
-                var file = fileInput.files[0];
-                if (!file) return;
-                var formData = new FormData();
-                formData.append('file', file);
-                var sb = window.__supabaseClient;
-                sb.functions.invoke('github-files', {
-                    method: 'POST',
-                    body: formData,
-                    headers: { 'Content-Type': 'multipart/form-data' }
-                }).then(function(result) {
-                    if (result.error) {
-                        alert('上传失败: ' + result.error.message);
-                        return;
-                    }
-                    alert('上传成功');
-                    fileInput.value = '';
-                    loadDownloadFiles(); // 刷新列表
-                }).catch(function(err) {
-                    alert('上传失败: ' + err.message);
-                });
-            });
-        }
-    });
-
-    function closeSidebar() {
-        sidebar.classList.remove('open');
-        var overlay = document.querySelector('.sidebar-overlay');
-        if (overlay) overlay.classList.remove('show');
     }
 
     // ===== 数据加载 =====
@@ -298,11 +210,9 @@
                 refreshBtn.innerHTML = '<i class="fas fa-sync-alt"></i>';
                 refreshBtn.title = '刷新数据';
                 refreshBtn.addEventListener('click', function() {
-                    // 重新加载当前页，保持分页
                     var currentPage = pageState[tableName] ? pageState[tableName].page : 1;
                     loadTableData(sb, tableName, currentPage, pageSize);
                 });
-                // 将刷新按钮添加到 h3 右侧
                 var h3 = pageHeader.querySelector('h3');
                 if (h3) {
                     h3.style.display = 'inline-flex';
@@ -312,8 +222,6 @@
                 } else {
                     pageHeader.appendChild(refreshBtn);
                 }
-            } else {
-                // 已存在，更新引用（无需操作）
             }
         }
 
@@ -442,4 +350,53 @@
             }
         });
     });
+
+    // ---- 绑定上传表单事件（挂载在全局，避免重复绑定） ----
+    (function bindUploadForm() {
+        var uploadForm = document.getElementById('uploadForm');
+        if (uploadForm && !uploadForm.dataset.bound) {
+            uploadForm.dataset.bound = 'true';
+            uploadForm.addEventListener('submit', function(e) {
+                e.preventDefault();
+                var fileInput = document.getElementById('fileInput');
+                var file = fileInput.files[0];
+                if (!file) return;
+                if (file.size > 200 * 1024 * 1024) {
+                    alert('文件不能超过 200MB');
+                    return;
+                }
+                var formData = new FormData();
+                formData.append('file', file);
+                var sb = window.__supabaseClient;
+                if (!sb) {
+                    alert('未登录');
+                    return;
+                }
+                var uploadBtn = uploadForm.querySelector('button[type="submit"]');
+                uploadBtn.disabled = true;
+                uploadBtn.textContent = '上传中...';
+                sb.functions.invoke('github-files', {
+                    method: 'POST',
+                    body: formData,
+                }).then(function(result) {
+                    if (result.error) {
+                        alert('上传失败: ' + result.error.message);
+                        return;
+                    }
+                    var msg = '上传成功';
+                    if (result.data.method === 'lfs') {
+                        msg += ' (通过 LFS)';
+                    }
+                    alert(msg);
+                    fileInput.value = '';
+                    loadDownloadFiles(sb);
+                }).catch(function(err) {
+                    alert('上传失败: ' + err.message);
+                }).finally(function() {
+                    uploadBtn.disabled = false;
+                    uploadBtn.textContent = '上传文件';
+                });
+            });
+        }
+    })();
 })();
