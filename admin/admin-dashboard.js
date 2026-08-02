@@ -1,13 +1,56 @@
-// admin-dashboard.js – v3.7.0 (修复 XSS 漏洞)
+// admin-dashboard.js – v3.9.0
 (function() {
     var pageState = {};
 
-    // ===== HTML 转义（防止 XSS） =====
+    // ===== HTML 转义 =====
     function escapeHtml(str) {
         if (!str) return '';
         var div = document.createElement('div');
         div.textContent = str;
         return div.innerHTML;
+    }
+
+    // ===== 确认对话框 =====
+    function showConfirmDialog(message) {
+        return new Promise(function(resolve) {
+            var overlay = document.createElement('div');
+            overlay.className = 'confirm-overlay';
+
+            var dialog = document.createElement('div');
+            dialog.className = 'confirm-dialog';
+            dialog.innerHTML = `
+                <div class="confirm-header">
+                    <span>确认操作</span>
+                    <button class="confirm-close" title="关闭">×</button>
+                </div>
+                <div class="confirm-body">${escapeHtml(message)}</div>
+                <div class="confirm-footer">
+                    <button class="confirm-btn confirm-cancel">取消</button>
+                    <button class="confirm-btn confirm-ok">确定</button>
+                </div>
+            `;
+
+            overlay.appendChild(dialog);
+            document.body.appendChild(overlay);
+
+            function close(result) {
+                overlay.remove();
+                resolve(result);
+            }
+
+            dialog.querySelector('.confirm-close').addEventListener('click', function() { close(false); });
+            dialog.querySelector('.confirm-cancel').addEventListener('click', function() { close(false); });
+            dialog.querySelector('.confirm-ok').addEventListener('click', function() { close(true); });
+            overlay.addEventListener('click', function(e) {
+                if (e.target === overlay) close(false);
+            });
+            document.addEventListener('keydown', function handler(e) {
+                if (e.key === 'Escape') {
+                    close(false);
+                    document.removeEventListener('keydown', handler);
+                }
+            });
+        });
     }
 
     // 侧边栏折叠切换
@@ -130,16 +173,19 @@
                 var sizeMB = (file.size / (1024 * 1024)).toFixed(2);
                 var safeName = escapeHtml(file.name);
                 var safeSha = escapeHtml(file.sha);
-                return '<tr><td>' + safeName + ' (' + sizeMB + ' MB)</td><td><button class="delete-file-btn" data-filename="' + safeSha + '" data-sha="' + safeSha + '">删除</button></td></tr>';
+                return '<tr><td>' + safeName + ' (' + sizeMB + ' MB)</td><td><button class="delete-file-btn" data-filename="' + safeName + '" data-sha="' + safeSha + '">删除</button></td></tr>';
             }).join('');
             tbody.innerHTML = rows;
             tbody.querySelectorAll('.delete-file-btn').forEach(function(btn) {
                 btn.addEventListener('click', function() {
                     var filename = this.dataset.filename;
                     var sha = this.dataset.sha;
-                    if (confirm('确定删除文件 "' + filename + '" 吗？')) {
-                        deleteFile(sb, filename, sha);
-                    }
+                    var msg = '确定删除文件 "' + filename + '" 吗？\nSHA: ' + sha;
+                    showConfirmDialog(msg).then(function(confirmed) {
+                        if (confirmed) {
+                            deleteFile(sb, filename, sha);
+                        }
+                    });
                 });
             });
         }).catch(function(err) {
@@ -167,27 +213,58 @@
         });
     }
 
-    // ===== 上传文件 =====
+    // ===== 上传文件（支持加密选项） =====
     document.addEventListener('DOMContentLoaded', function() {
         var uploadForm = document.getElementById('uploadForm');
         if (uploadForm && !uploadForm.dataset.bound) {
             uploadForm.dataset.bound = 'true';
+
+            // 复选框控制密码框显示
+            var protectedCheckbox = document.getElementById('uploadProtected');
+            var passwordGroup = document.getElementById('passwordGroup');
+            if (protectedCheckbox && passwordGroup) {
+                protectedCheckbox.addEventListener('change', function() {
+                    passwordGroup.style.display = this.checked ? 'flex' : 'none';
+                    if (!this.checked) {
+                        document.getElementById('uploadPassword').value = '';
+                    }
+                });
+            }
+
             uploadForm.addEventListener('submit', function(e) {
                 e.preventDefault();
                 var fileInput = document.getElementById('fileInput');
                 var file = fileInput.files[0];
-                if (!file) return;
+                if (!file) {
+                    alert('请先选择文件');
+                    return;
+                }
                 if (file.size > 200 * 1024 * 1024) {
                     alert('文件不能超过 200MB');
                     return;
                 }
+
                 var sb = window.__supabaseClient;
                 if (!sb) {
                     alert('未登录');
                     return;
                 }
+
                 var formData = new FormData();
                 formData.append('file', file);
+
+                // 加密选项
+                var isProtected = document.getElementById('uploadProtected').checked;
+                formData.append('protected', isProtected ? 'true' : 'false');
+                if (isProtected) {
+                    var password = document.getElementById('uploadPassword').value.trim();
+                    if (!password) {
+                        alert('请设置下载密码');
+                        return;
+                    }
+                    formData.append('password', password);
+                }
+
                 var uploadBtn = uploadForm.querySelector('button[type="submit"]');
                 uploadBtn.disabled = true;
                 uploadBtn.textContent = '上传中...';
@@ -207,8 +284,21 @@
                     if (result.data.method === 'lfs') {
                         msg += ' (通过 LFS)';
                     }
+                    if (result.data.md5) {
+                        msg += '\nMD5: ' + result.data.md5;
+                    }
+                    if (result.data.sha256) {
+                        msg += '\nSHA-256: ' + result.data.sha256;
+                    }
                     alert(msg);
                     fileInput.value = '';
+                    // 重置文件名显示
+                    var fileNameSpan = document.querySelector('.file-name-display');
+                    if (fileNameSpan) fileNameSpan.textContent = '未选择任何文件';
+                    // 重置加密选项
+                    protectedCheckbox.checked = false;
+                    passwordGroup.style.display = 'none';
+                    document.getElementById('uploadPassword').value = '';
                     loadDownloadFiles(sb);
                 }).catch(function(err) {
                     alert('上传失败: ' + err.message);
@@ -219,6 +309,8 @@
             });
         }
     });
+
+    // ===== 美化文件选择（已在上面处理） =====
 
     // ===== 数据加载 =====
     window.loadDashboardData = function(sb) {
@@ -362,7 +454,6 @@
                                 else if (callLen >= 5) callsignPart = callsign.substring(3, 5);
                                 else callsignPart = callsign;
                             }
-                            // 对 cardNumberPart 和 callsignPart 进行转义，确保 URL 安全
                             var safeCardPart = encodeURIComponent(cardNumberPart);
                             var safeCallPart = encodeURIComponent(callsignPart);
                             var link = '../images/QSL/webp/' + safeCardPart + (safeCallPart ? safeCallPart : '') + '.webp';
@@ -371,7 +462,6 @@
                         var val = row[key];
                         if (val === null || val === undefined) return '<td>-</td>';
                         if (typeof val === 'object') val = JSON.stringify(val).substring(0, 50);
-                        // 关键：对数据库字段进行 HTML 转义
                         return '<td>' + escapeHtml(String(val)) + '</td>';
                     });
                     return '<tr>' + cols.join('') + '</tr>';

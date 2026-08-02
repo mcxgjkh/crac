@@ -4,7 +4,7 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>管理后台 · BH6RKW</title>
-    <link rel="stylesheet" href="admin.css?v=3.5.0" />
+    <link rel="stylesheet" href="admin.css?v=4.0.0" />
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" />
 </head>
 <body>
@@ -246,7 +246,23 @@
                 </div>
                 <div class="download-actions">
                     <form id="uploadForm" class="upload-form">
-                        <input type="file" id="fileInput" required />
+                        <div class="file-input-wrapper">
+                            <input type="file" id="fileInput" required />
+                            <label class="file-custom-label" for="fileInput">
+                                <i class="fas fa-folder-open"></i> 选择文件
+                            </label>
+                            <span class="file-name-display">未选择任何文件</span>
+                        </div>
+                        <div class="upload-options">
+                            <label class="upload-checkbox">
+                                <input type="checkbox" id="uploadProtected" />
+                                <span>加密此文件</span>
+                            </label>
+                            <div class="upload-password-group" id="passwordGroup" style="display:none;">
+                                <label for="uploadPassword">下载密码</label>
+                                <input type="text" id="uploadPassword" placeholder="请输入密码" />
+                            </div>
+                        </div>
                         <button type="submit" class="btn-primary">上传文件</button>
                     </form>
                 </div>
@@ -270,8 +286,8 @@
 
     <!-- ========== 脚本 ========== -->
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
-    <script src="admin-auth.js?v=3.5.0"></script>
-    <script src="admin-theme.js?v=3.5.0"></script>
-    <script src="admin-dashboard.js?v=3.5.0"></script>
+    <script src="admin-auth.js?v=4.0.0"></script>
+    <script src="admin-theme.js?v=4.0.0"></script>
+    <script src="admin-dashboard.js?v=4.0.0"></script>
 </body>
 </html>

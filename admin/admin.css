@@ -1311,3 +1311,195 @@ body {
 .delete-file-btn:hover {
     background: rgba(239, 68, 68, 0.25);
 }
+
+/* ===== 自定义确认对话框 ===== */
+.confirm-overlay {
+    position: fixed;
+    inset: 0;
+    background: rgba(0, 0, 0, 0.6);
+    backdrop-filter: blur(4px);
+    z-index: 9999;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.confirm-dialog {
+    background: var(--card-bg);
+    border-radius: 16px;
+    max-width: 440px;
+    width: 90%;
+    border: 1px solid var(--border-color);
+    box-shadow: 0 30px 60px rgba(0,0,0,0.5);
+    overflow: hidden;
+    animation: confirmIn 0.25s ease;
+}
+
+@keyframes confirmIn {
+    from { opacity: 0; transform: scale(0.95); }
+    to { opacity: 1; transform: scale(1); }
+}
+
+.confirm-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 16px 20px 12px;
+    border-bottom: 1px solid var(--border-color);
+}
+
+.confirm-header span {
+    font-weight: 600;
+    font-size: 1.1rem;
+    color: var(--text-primary);
+}
+
+.confirm-close {
+    background: none;
+    border: none;
+    color: var(--text-secondary);
+    font-size: 1.5rem;
+    cursor: pointer;
+    padding: 0 4px;
+    transition: color 0.2s;
+}
+.confirm-close:hover {
+    color: var(--text-primary);
+}
+
+.confirm-body {
+    padding: 20px;
+    color: var(--text-primary);
+    font-size: 1rem;
+    line-height: 1.5;
+}
+
+.confirm-footer {
+    display: flex;
+    justify-content: flex-end;
+    gap: 10px;
+    padding: 12px 20px 20px;
+}
+
+.confirm-btn {
+    padding: 8px 24px;
+    border: none;
+    border-radius: 8px;
+    font-size: 0.9rem;
+    font-weight: 500;
+    cursor: pointer;
+    transition: background 0.2s;
+}
+.confirm-cancel {
+    background: var(--card-bg);
+    color: var(--text-secondary);
+    border: 1px solid var(--border-color);
+}
+.confirm-cancel:hover {
+    background: rgba(255,255,255,0.05);
+}
+.confirm-ok {
+    background: #ef4444;
+    color: #fff;
+}
+.confirm-ok:hover {
+    background: #dc2626;
+}
+
+/* ===== 自定义文件选择 ===== */
+.file-input-wrapper {
+    display: inline-flex;
+    align-items: center;
+    gap: 12px;
+    background: var(--card-bg);
+    border: 1px solid var(--border-color);
+    border-radius: 8px;
+    padding: 4px 6px 4px 12px;
+}
+
+.file-input-wrapper input[type="file"] {
+    position: absolute;
+    width: 0.1px;
+    height: 0.1px;
+    opacity: 0;
+    overflow: hidden;
+    z-index: -1;
+}
+
+.file-custom-label {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    background: var(--primary-color);
+    color: #fff;
+    padding: 6px 16px;
+    border-radius: 6px;
+    cursor: pointer;
+    font-size: 0.85rem;
+    font-weight: 500;
+    white-space: nowrap;
+    transition: background 0.2s;
+}
+.file-custom-label:hover {
+    background: rgba(var(--primary-rgb), 0.8);
+}
+.file-custom-label i {
+    font-size: 0.9rem;
+}
+
+.file-name-display {
+    color: var(--text-secondary);
+    font-size: 0.85rem;
+    max-width: 200px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+/* ===== 加密选项 ===== */
+.upload-options {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    flex-wrap: wrap;
+}
+
+.upload-checkbox {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    color: var(--text-secondary);
+    cursor: pointer;
+    font-size: 0.9rem;
+}
+
+.upload-checkbox input[type="checkbox"] {
+    width: 16px;
+    height: 16px;
+    accent-color: var(--primary-color);
+    cursor: pointer;
+}
+
+.upload-password-group {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.upload-password-group label {
+    color: var(--text-secondary);
+    font-size: 0.85rem;
+}
+
+.upload-password-group input[type="text"] {
+    background: var(--card-bg);
+    border: 1px solid var(--border-color);
+    color: var(--text-primary);
+    padding: 4px 10px;
+    border-radius: 4px;
+    font-size: 0.85rem;
+    outline: none;
+}
+.upload-password-group input[type="text"]:focus {
+    border-color: var(--primary-color);
+}
