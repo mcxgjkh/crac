@@ -1,4 +1,4 @@
-// admin-dashboard.js – v4.5.0 (修复提示换行、文件选择显示)
+// admin-dashboard.js – v4.5.0 (修复选择文件显示、消息框滚动、操作列右对齐)
 (function() {
     var pageState = {};
 
@@ -33,7 +33,7 @@
                     <span>确认操作</span>
                     <button class="confirm-close" title="关闭">×</button>
                 </div>
-                <div class="confirm-body">${message}</div>
+                <div class="confirm-body">${escapeHtml(message)}</div>
                 <div class="confirm-footer">
                     <button class="confirm-btn confirm-cancel">取消</button>
                     <button class="confirm-btn confirm-ok">确定</button>
@@ -63,7 +63,7 @@
         });
     }
 
-    // ===== 自定义消息对话框（信息提示，无取消） =====
+    // ===== 自定义消息对话框 =====
     function showMessageDialog(message, title) {
         title = title || '提示';
         return new Promise(function(resolve) {
@@ -72,13 +72,13 @@
 
             var dialog = document.createElement('div');
             dialog.className = 'confirm-dialog';
-            // 消息内容使用 pre-wrap 样式保留换行
+            var escapedMsg = escapeHtml(message).replace(/\n/g, '<br>');
             dialog.innerHTML = `
                 <div class="confirm-header">
                     <span>${escapeHtml(title)}</span>
                     <button class="confirm-close" title="关闭">×</button>
                 </div>
-                <div class="confirm-body" style="white-space:pre-wrap;word-break:break-all;">${escapeHtml(message)}</div>
+                <div class="confirm-body" style="max-height:60vh;overflow-y:auto;word-break:break-all;white-space:pre-wrap;">${escapedMsg}</div>
                 <div class="confirm-footer">
                     <button class="confirm-btn confirm-ok" style="background:var(--primary-color);">确定</button>
                 </div>
@@ -259,7 +259,7 @@
                 btn.addEventListener('click', function() {
                     var hash = this.dataset.hash;
                     var type = this.dataset.type;
-                    showMessageDialog(type + ':\n' + hash, '哈希值');
+                    showMessageDialog(type + ': ' + hash, '哈希值');
                 });
             });
 
@@ -304,19 +304,6 @@
 
     // ===== 上传文件（支持加密选项） =====
     document.addEventListener('DOMContentLoaded', function() {
-        // 文件选择显示
-        var fileInput = document.getElementById('fileInput');
-        var fileNameSpan = document.querySelector('.file-name-display');
-        if (fileInput && fileNameSpan) {
-            fileInput.addEventListener('change', function() {
-                if (this.files && this.files[0]) {
-                    fileNameSpan.textContent = this.files[0].name;
-                } else {
-                    fileNameSpan.textContent = '未选择任何文件';
-                }
-            });
-        }
-
         var uploadForm = document.getElementById('uploadForm');
         if (uploadForm && !uploadForm.dataset.bound) {
             uploadForm.dataset.bound = 'true';
@@ -334,6 +321,7 @@
 
             uploadForm.addEventListener('submit', function(e) {
                 e.preventDefault();
+                var fileInput = document.getElementById('fileInput');
                 var file = fileInput.files[0];
                 if (!file) {
                     showMessageDialog('请先选择文件', '提示');
@@ -381,7 +369,7 @@
                     }
                     var msg = '上传成功';
                     if (result.data.method === 'lfs') {
-                        msg += '\n(通过 LFS)';
+                        msg += ' (通过 LFS)';
                     }
                     if (result.data.md5) {
                         msg += '\nMD5: ' + result.data.md5;
@@ -391,6 +379,7 @@
                     }
                     showMessageDialog(msg, '成功').then(function() {
                         fileInput.value = '';
+                        var fileNameSpan = document.querySelector('.file-name-display');
                         if (fileNameSpan) fileNameSpan.textContent = '未选择任何文件';
                         protectedCheckbox.checked = false;
                         passwordGroup.style.display = 'none';
@@ -404,6 +393,19 @@
                     uploadBtn.disabled = false;
                     uploadBtn.textContent = '上传文件';
                 });
+            });
+        }
+
+        // 修复文件选择显示
+        var fileInput = document.getElementById('fileInput');
+        var fileNameSpan = document.querySelector('.file-name-display');
+        if (fileInput && fileNameSpan) {
+            fileInput.addEventListener('change', function() {
+                if (this.files && this.files[0]) {
+                    fileNameSpan.textContent = this.files[0].name;
+                } else {
+                    fileNameSpan.textContent = '未选择任何文件';
+                }
             });
         }
     });
@@ -528,7 +530,9 @@
                 var thead = document.querySelector('#page-' + tableName + ' thead');
                 if (thead) {
                     thead.innerHTML = '<tr>' + headers.map(function(h) {
-                        if (h === '操作') return '<th>操作</th>';
+                        if (h === '操作') {
+                            return '<th style="text-align: right;">操作</th>';
+                        }
                         return '<th>' + escapeHtml(h.replace(/_/g, ' ').toUpperCase()) + '</th>';
                     }).join('') + '</tr>';
                 }
