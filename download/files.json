@@ -219,15 +219,5 @@
     "url": "./MemoryCleaner.apk",
     "ext": "apk",
     "protected": false
-  },
-  {
-    "name": "admin.css",
-    "size": 32259,
-    "modified": "2026-08-02 04:55:02",
-    "url": "./download/admin.css",
-    "ext": "css",
-    "md5": "586713caf232621bb63b44be48c53d55",
-    "sha256": "58bc34e7928cb83aca2a19fc7868f62cd8b8ed6cb508e1558c38a76d07830f95",
-    "protected": false
   }
 ]
