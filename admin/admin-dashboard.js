@@ -1,4 +1,4 @@
-// admin-dashboard.js – v4.4.0 (修复提示、上传、删除刷新)
+// admin-dashboard.js – v4.4.1 (修复“选择文件后仍提示未选择”)
 (function() {
     var pageState = {};
 
@@ -63,7 +63,7 @@
         });
     }
 
-    // ===== 自定义消息对话框（信息提示，无取消） =====
+    // ===== 自定义消息对话框 =====
     function showMessageDialog(message, title) {
         title = title || '提示';
         return new Promise(function(resolve) {
@@ -303,6 +303,19 @@
 
     // ===== 上传文件（支持加密选项） =====
     document.addEventListener('DOMContentLoaded', function() {
+        // ---- 文件选择更新显示 ----
+        var fileInput = document.getElementById('fileInput');
+        var fileNameSpan = document.querySelector('.file-name-display');
+        if (fileInput && fileNameSpan) {
+            fileInput.addEventListener('change', function() {
+                if (this.files && this.files[0]) {
+                    fileNameSpan.textContent = this.files[0].name;
+                } else {
+                    fileNameSpan.textContent = '未选择任何文件';
+                }
+            });
+        }
+
         var uploadForm = document.getElementById('uploadForm');
         if (uploadForm && !uploadForm.dataset.bound) {
             uploadForm.dataset.bound = 'true';
@@ -320,7 +333,6 @@
 
             uploadForm.addEventListener('submit', function(e) {
                 e.preventDefault();
-                var fileInput = document.getElementById('fileInput');
                 var file = fileInput.files[0];
                 if (!file) {
                     showMessageDialog('请先选择文件', '提示');
@@ -340,7 +352,7 @@
                 var formData = new FormData();
                 formData.append('file', file);
 
-                var isProtected = document.getElementById('uploadProtected').checked;
+                var isProtected = protectedCheckbox.checked;
                 formData.append('protected', isProtected ? 'true' : 'false');
                 if (isProtected) {
                     var password = document.getElementById('uploadPassword').value.trim();
@@ -378,7 +390,6 @@
                     }
                     showMessageDialog(msg, '成功').then(function() {
                         fileInput.value = '';
-                        var fileNameSpan = document.querySelector('.file-name-display');
                         if (fileNameSpan) fileNameSpan.textContent = '未选择任何文件';
                         protectedCheckbox.checked = false;
                         passwordGroup.style.display = 'none';
