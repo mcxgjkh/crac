@@ -5,7 +5,9 @@
     "modified": "2025-08-03 15:17:53",
     "url": "./总题库附图标记.pdf",
     "ext": "pdf",
-    "protected": false
+    "protected": false,
+    "md5": "9a51583952de510c25e7c80be10713a7",
+    "sha256": "a6cfb5c255076d7cab46b72887112e9e0d6675ac976f0a59ba0d2509bda219e2"
   },
   {
     "name": "总题库.pdf",
@@ -13,7 +15,9 @@
     "modified": "2025-08-09 12:36:15",
     "url": "./总题库.pdf",
     "ext": "pdf",
-    "protected": false
+    "protected": false,
+    "md5": "1cd1746be4668973b1d010008656fa0e",
+    "sha256": "16eaaa0bf8fa734f0995588f841fb1774cb2c31890f7dbecb23c64b066f2f9eb"
   },
   {
     "name": "A类题库.pdf",
@@ -21,7 +25,9 @@
     "modified": "2025-08-09 12:36:36",
     "url": "./A类题库.pdf",
     "ext": "pdf",
-    "protected": false
+    "protected": false,
+    "md5": "3a6bc545bb344c1a63f2cd6b6beab552",
+    "sha256": "871cf0290e5d89da926216f95eeecbc2ef46a5d8a10eaa2a29dab018736d14a3"
   },
   {
     "name": "B类题库.pdf",
@@ -29,7 +35,9 @@
     "modified": "2025-08-09 12:36:47",
     "url": "./B类题库.pdf",
     "ext": "pdf",
-    "protected": false
+    "protected": false,
+    "md5": "1558bd7d434dac588bd9c28495021591",
+    "sha256": "492eaaa1e2d56b90923cd2ba13c901c0fc18e9c037db50462dafeb81b707a34b"
   },
   {
     "name": "C类题库.pdf",
@@ -37,7 +45,9 @@
     "modified": "2025-08-09 12:36:57",
     "url": "./C类题库.pdf",
     "ext": "pdf",
-    "protected": false
+    "protected": false,
+    "md5": "23673b1e24d98d65c2ac19735796b232",
+    "sha256": "94c525cdadf210ac3d183d17c80d9bef829eebcf1fe93e550917e5e39b5d0098"
   },
   {
     "name": "CRAC LOGO.zip",
@@ -45,7 +55,9 @@
     "modified": "2025-08-10 13:25:21",
     "url": "./CRAC LOGO.zip",
     "ext": "zip",
-    "protected": false
+    "protected": false,
+    "md5": "a30c9204f5bed5cc37065bd73568802b",
+    "sha256": "09b715ea65ed5f8450c805c8a85edf602483413e354cade5284ee50e41301e6c"
   },
   {
     "name": "17表.xls",
@@ -53,7 +65,9 @@
     "modified": "2025-09-07 17:24:54",
     "url": "./17表.xls",
     "ext": "xls",
-    "protected": false
+    "protected": false,
+    "md5": "b05ce78c1d0e380df4181972f357b625",
+    "sha256": "4e42186735ebdb70381a3cca06417503247760de1faa1893f179d93d845d201b"
   },
   {
     "name": "19表.xls",
@@ -61,7 +75,9 @@
     "modified": "2025-09-07 17:25:00",
     "url": "./19表.xls",
     "ext": "xls",
-    "protected": false
+    "protected": false,
+    "md5": "43db4f82fb553518ed4dd848924238e1",
+    "sha256": "2bb20b1cec6e32d78719888a7c19f9b5d096e4163cba0153973620c3844e6fda"
   },
   {
     "name": "跨省说明材料.doc",
@@ -69,7 +85,9 @@
     "modified": "2025-09-07 17:26:56",
     "url": "./跨省说明材料.doc",
     "ext": "doc",
-    "protected": false
+    "protected": false,
+    "md5": "33171b1ca4216801b57ab31a83aa6bf1",
+    "sha256": "4d309b438c8b72c3dfc1e0a1089598c5fa8111a6a3e5cd6dd62bc718ebfd9cdd"
   },
   {
     "name": "QSL卡片1.0反面.webp",
@@ -77,7 +95,9 @@
     "modified": "2025-11-14 10:32:38",
     "url": "./../images/QSL卡片1.0反面.webp",
     "ext": "webp",
-    "protected": false
+    "protected": false,
+    "md5": "e9b2c0eb0adef63c659085b65f325236",
+    "sha256": "c444aa74a2a0f36e1274531491d55f2fcd223a75329a950534b10205b7e2b2b0"
   },
   {
     "name": "QSL卡片2.0反面.webp",
@@ -85,7 +105,9 @@
     "modified": "2025-11-14 10:32:38",
     "url": "./../images/QSL卡片2.0反面.webp",
     "ext": "webp",
-    "protected": false
+    "protected": false,
+    "md5": "769682835d4b2898fc6d1e8570ba752e",
+    "sha256": "c7f86c57a1e1ce0b11802b4011d0332120ad475d7927a0b03fa7458118ef836b"
   },
   {
     "name": "QSL卡片3.0反面.webp",
@@ -93,7 +115,9 @@
     "modified": "2025-11-14 10:32:38",
     "url": "./../images/QSL卡片3.0反面.webp",
     "ext": "webp",
-    "protected": false
+    "protected": false,
+    "md5": "c8adef7e523ecb497374bb19a9f5c11d",
+    "sha256": "4bd022c446a77a126ea86ce1309e41c04fa6d397275667969816851b6fe3109e"
   },
   {
     "name": "CRAC-圆形-无底-带边线.webp",
@@ -101,7 +125,9 @@
     "modified": "2025-11-14 10:32:40",
     "url": "./../images/CRAC-圆形-无底-带边线.webp",
     "ext": "webp",
-    "protected": false
+    "protected": false,
+    "md5": "9109e5269054969f25927b2f32263e11",
+    "sha256": "cdadc660863910fd839832060e76836c09cbebf95d7d40484e47f28f3e63f0eb"
   },
   {
     "name": "QSL卡片1.0正面.webp",
@@ -109,7 +135,9 @@
     "modified": "2025-11-14 10:32:42",
     "url": "./../images/QSL卡片1.0正面.webp",
     "ext": "webp",
-    "protected": false
+    "protected": false,
+    "md5": "4cd7ee8c1112db2a5d6aaa939af7bff1",
+    "sha256": "64574ccc9644190a89a470fa5976a711aca964bbff6b34db26a9e7be95ef2ddb"
   },
   {
     "name": "QSL卡片2.0正面.webp",
@@ -117,7 +145,9 @@
     "modified": "2025-11-14 10:32:42",
     "url": "./../images/QSL卡片2.0正面.webp",
     "ext": "webp",
-    "protected": false
+    "protected": false,
+    "md5": "ae62c1b0f98d5f62915aa9459da9ac26",
+    "sha256": "740380f45b843ac88f01dbe5ced965b3432d6d5823ad69eebef62a47b5bd82f6"
   },
   {
     "name": "QSL卡片3.0正面.webp",
@@ -125,7 +155,9 @@
     "modified": "2025-11-14 10:32:42",
     "url": "./../images/QSL卡片3.0正面.webp",
     "ext": "webp",
-    "protected": false
+    "protected": false,
+    "md5": "c297f504dd7eb5aa62b67202370fa7ea",
+    "sha256": "77af0220d738957c872490cbf23d0b169db2c7d9f032ab78557ed5b525fa9565"
   },
   {
     "name": "HMCL-3.13.2.exe",
@@ -134,7 +166,9 @@
     "url": "./HMCL-3.13.2.exe",
     "ext": "exe",
     "protected": true,
-    "password": "114514"
+    "password": "114514",
+    "md5": "23d6cd0087fe686ac69d839b34245385",
+    "sha256": "972a101ff01ef7521c59547afeab64bfaaf95ab5cc4284c01895b5daa10f8d43"
   },
   {
     "name": "jdk-20.0.2_windows-x64_bin.exe",
@@ -143,7 +177,9 @@
     "url": "./jdk-20.0.2_windows-x64_bin.exe",
     "ext": "exe",
     "protected": true,
-    "password": "114514"
+    "password": "114514",
+    "md5": "95f20fdf9e5091671fe763b16b172b6b",
+    "sha256": "ef40941f1b54b52747d98330ca845374bccb8e3635fc7f647f60405cf51eb17f"
   },
   {
     "name": "1.20.1server.jar",
@@ -152,7 +188,9 @@
     "url": "./1.20.1server.jar",
     "ext": "jar",
     "protected": true,
-    "password": "114514"
+    "password": "114514",
+    "md5": "308f4d8ff0c2019bccba141616e10c32",
+    "sha256": "3af73a9dc5a102e38147946360dd27d4d70bae7055bf91cf2151cd5d121b79e0"
   },
   {
     "name": "26.1.2server.jar",
@@ -161,7 +199,9 @@
     "url": "./26.1.2server.jar",
     "ext": "jar",
     "protected": true,
-    "password": "114514"
+    "password": "114514",
+    "md5": "b7759ea140e0999660a0896249c1cd35",
+    "sha256": "cd47e7c38328f64768fd17af8fcd8b22496b40b63d4ffee81e71ae059fedcb42"
   },
   {
     "name": "业余无线电台呼号编制和核发要求.webp",
@@ -169,7 +209,9 @@
     "modified": "2026-05-30 23:15:54",
     "url": "./../images/业余无线电台呼号编制和核发要求.webp",
     "ext": "webp",
-    "protected": false
+    "protected": false,
+    "md5": "2b5f2ff3519bfddcb6c5ed56e77db7fc",
+    "sha256": "577c0eb369e7147d67dcda7120e6b970d20e1c8eb1f7c05647610a5884d5c34a"
   },
   {
     "name": "global-security.instructions.md",
@@ -177,7 +219,9 @@
     "modified": "2026-06-28 19:24:43",
     "url": "./global-security.instructions.md",
     "ext": "md",
-    "protected": false
+    "protected": false,
+    "md5": "5b5367981c88ac93a7539c75a07efac0",
+    "sha256": "7cdb65f75d9c7ec1d192d2f0f7605f0d874d474ab7015f932b4b15c9107912f5"
   },
   {
     "name": "三体.mobi",
@@ -185,7 +229,9 @@
     "modified": "2026-07-13 12:36:41",
     "url": "./三体.mobi",
     "ext": "mobi",
-    "protected": false
+    "protected": false,
+    "md5": "b0e134d36447474bcb3a28793be13cd9",
+    "sha256": "143ddff3ba44b6dc59acd617ba558ffbd7652a26cb01207ea71cc242887e57a8"
   },
   {
     "name": "tominecon.zip",
@@ -194,7 +240,9 @@
     "url": "./tominecon.zip",
     "ext": "zip",
     "protected": true,
-    "password": "114514"
+    "password": "114514",
+    "md5": "78f4bccd6227ce72fd646d81024f7d55",
+    "sha256": "3f9826896807d6f3b833e06c1447d3864258662054fd3413ba9dcbb691c93834"
   },
   {
     "name": "盗墓笔记.mobi",
@@ -202,7 +250,9 @@
     "modified": "2026-07-13 23:25:37",
     "url": "./盗墓笔记.mobi",
     "ext": "mobi",
-    "protected": false
+    "protected": false,
+    "md5": "4b89c481e358cf8f2e65437c0a5e27d4",
+    "sha256": "36c4562fdbabb0b24a7672a7184a664199e1de236d34687e15ea2f041ca6cc6a"
   },
   {
     "name": "龙族.mobi",
@@ -210,7 +260,9 @@
     "modified": "2026-07-13 23:25:42",
     "url": "./龙族.mobi",
     "ext": "mobi",
-    "protected": false
+    "protected": false,
+    "md5": "2378fc66734afde24f251d2d3ab7e40a",
+    "sha256": "6b5c051051d7c01704332866b65d1b8d512d08ae7b2674719522c88746c305fc"
   },
   {
     "name": "MemoryCleaner.apk",
@@ -218,7 +270,9 @@
     "modified": "2026-07-26 20:08:04",
     "url": "./MemoryCleaner.apk",
     "ext": "apk",
-    "protected": false
+    "protected": false,
+    "md5": "5cd3ba37332dded79b4901663f4822f6",
+    "sha256": "0af3a2f76f435e2afce5787dddb6d38f8ffb3a0782a40f82852513d59841a44f"
   },
   {
     "name": "admin.css",
