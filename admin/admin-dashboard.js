@@ -1,4 +1,4 @@
-// admin-dashboard.js – v4.4.1 (修复“选择文件后仍提示未选择”)
+// admin-dashboard.js – v4.5.0 (修复提示换行、文件选择显示)
 (function() {
     var pageState = {};
 
@@ -33,7 +33,7 @@
                     <span>确认操作</span>
                     <button class="confirm-close" title="关闭">×</button>
                 </div>
-                <div class="confirm-body">${escapeHtml(message)}</div>
+                <div class="confirm-body">${message}</div>
                 <div class="confirm-footer">
                     <button class="confirm-btn confirm-cancel">取消</button>
                     <button class="confirm-btn confirm-ok">确定</button>
@@ -63,7 +63,7 @@
         });
     }
 
-    // ===== 自定义消息对话框 =====
+    // ===== 自定义消息对话框（信息提示，无取消） =====
     function showMessageDialog(message, title) {
         title = title || '提示';
         return new Promise(function(resolve) {
@@ -72,12 +72,13 @@
 
             var dialog = document.createElement('div');
             dialog.className = 'confirm-dialog';
+            // 消息内容使用 pre-wrap 样式保留换行
             dialog.innerHTML = `
                 <div class="confirm-header">
                     <span>${escapeHtml(title)}</span>
                     <button class="confirm-close" title="关闭">×</button>
                 </div>
-                <div class="confirm-body">${escapeHtml(message)}</div>
+                <div class="confirm-body" style="white-space:pre-wrap;word-break:break-all;">${escapeHtml(message)}</div>
                 <div class="confirm-footer">
                     <button class="confirm-btn confirm-ok" style="background:var(--primary-color);">确定</button>
                 </div>
@@ -258,7 +259,7 @@
                 btn.addEventListener('click', function() {
                     var hash = this.dataset.hash;
                     var type = this.dataset.type;
-                    showMessageDialog(type + ': ' + hash, '哈希值');
+                    showMessageDialog(type + ':\n' + hash, '哈希值');
                 });
             });
 
@@ -303,7 +304,7 @@
 
     // ===== 上传文件（支持加密选项） =====
     document.addEventListener('DOMContentLoaded', function() {
-        // ---- 文件选择更新显示 ----
+        // 文件选择显示
         var fileInput = document.getElementById('fileInput');
         var fileNameSpan = document.querySelector('.file-name-display');
         if (fileInput && fileNameSpan) {
@@ -352,7 +353,7 @@
                 var formData = new FormData();
                 formData.append('file', file);
 
-                var isProtected = protectedCheckbox.checked;
+                var isProtected = document.getElementById('uploadProtected').checked;
                 formData.append('protected', isProtected ? 'true' : 'false');
                 if (isProtected) {
                     var password = document.getElementById('uploadPassword').value.trim();
@@ -380,7 +381,7 @@
                     }
                     var msg = '上传成功';
                     if (result.data.method === 'lfs') {
-                        msg += ' (通过 LFS)';
+                        msg += '\n(通过 LFS)';
                     }
                     if (result.data.md5) {
                         msg += '\nMD5: ' + result.data.md5;
