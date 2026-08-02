@@ -1,8 +1,8 @@
-// admin-dashboard.js – v3.9.0
+// admin-dashboard.js – v3.9.1 (修复 LFS 文件大小显示，自适应单位)
 (function() {
     var pageState = {};
 
-    // ===== HTML 转义 =====
+    // ===== HTML 转义（防止 XSS） =====
     function escapeHtml(str) {
         if (!str) return '';
         var div = document.createElement('div');
@@ -10,7 +10,17 @@
         return div.innerHTML;
     }
 
-    // ===== 确认对话框 =====
+    // ===== 文件大小格式化（自适应单位） =====
+    function formatFileSize(bytes) {
+        if (bytes === 0) return '0 B';
+        var units = ['B', 'KB', 'MB', 'GB', 'TB'];
+        var k = 1024;
+        var i = Math.floor(Math.log(bytes) / Math.log(k));
+        var size = (bytes / Math.pow(k, i)).toFixed(2);
+        return size + ' ' + units[i];
+    }
+
+    // ===== 自定义确认对话框 =====
     function showConfirmDialog(message) {
         return new Promise(function(resolve) {
             var overlay = document.createElement('div');
@@ -170,10 +180,10 @@
                 return;
             }
             var rows = files.map(function(file) {
-                var sizeMB = (file.size / (1024 * 1024)).toFixed(2);
+                var sizeDisplay = formatFileSize(file.size);
                 var safeName = escapeHtml(file.name);
                 var safeSha = escapeHtml(file.sha);
-                return '<tr><td>' + safeName + ' (' + sizeMB + ' MB)</td><td><button class="delete-file-btn" data-filename="' + safeName + '" data-sha="' + safeSha + '">删除</button></td></tr>';
+                return '<tr><td>' + safeName + ' (' + sizeDisplay + ')</td><td><button class="delete-file-btn" data-filename="' + safeName + '" data-sha="' + safeSha + '">删除</button></td></tr>';
             }).join('');
             tbody.innerHTML = rows;
             tbody.querySelectorAll('.delete-file-btn').forEach(function(btn) {
@@ -219,7 +229,6 @@
         if (uploadForm && !uploadForm.dataset.bound) {
             uploadForm.dataset.bound = 'true';
 
-            // 复选框控制密码框显示
             var protectedCheckbox = document.getElementById('uploadProtected');
             var passwordGroup = document.getElementById('passwordGroup');
             if (protectedCheckbox && passwordGroup) {
@@ -253,7 +262,6 @@
                 var formData = new FormData();
                 formData.append('file', file);
 
-                // 加密选项
                 var isProtected = document.getElementById('uploadProtected').checked;
                 formData.append('protected', isProtected ? 'true' : 'false');
                 if (isProtected) {
@@ -292,10 +300,8 @@
                     }
                     alert(msg);
                     fileInput.value = '';
-                    // 重置文件名显示
                     var fileNameSpan = document.querySelector('.file-name-display');
                     if (fileNameSpan) fileNameSpan.textContent = '未选择任何文件';
-                    // 重置加密选项
                     protectedCheckbox.checked = false;
                     passwordGroup.style.display = 'none';
                     document.getElementById('uploadPassword').value = '';
@@ -309,8 +315,6 @@
             });
         }
     });
-
-    // ===== 美化文件选择（已在上面处理） =====
 
     // ===== 数据加载 =====
     window.loadDashboardData = function(sb) {
@@ -352,7 +356,7 @@
         });
     }
 
-    // 加载表格数据（支持分页、排序、QSL 查看链接、刷新按钮）
+    // 加载表格数据
     function loadTableData(sb, tableName, page, pageSize) {
         var tbody = document.querySelector('#page-' + tableName + ' tbody');
         var paginationContainer = document.querySelector('#page-' + tableName + ' .pagination-container');
