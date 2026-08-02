@@ -8,7 +8,6 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <style>
         #css-detect { --css-loaded: 1; display: none; }
-        /* ========== 以下所有样式均与初代源代码完全一致，一字未改 ========== */
         :root {
             --primary-blue: #1a5faf;
             --secondary-blue: #0d4a8d;
@@ -1014,6 +1013,48 @@
                 right: 5px;
             }
         }
+
+        .hash-overlay {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(0,0,0,0.7); display: flex; justify-content: center;
+            align-items: center; z-index: 10001;
+        }
+        .hash-card {
+            background: white; border-radius: 10px; padding: 28px 30px;
+            max-width: 520px; width: 90%; box-shadow: 0 8px 30px rgba(0,0,0,0.25);
+        }
+        .hash-card h5 { font-weight: 700; margin-bottom: 18px; color: var(--primary-blue); }
+        .hash-row { margin-bottom: 14px; }
+        .hash-row .hash-label { font-weight: 600; font-size: 0.85rem; color: #666; margin-bottom: 4px; }
+        .hash-row .hash-value {
+            font-family: "JetBrains Mono","Consolas",monospace; font-size: 0.8rem;
+            word-break: break-all; background: #f5f6f8; padding: 8px 12px;
+            border-radius: 5px; color: #333; user-select: all;
+        }
+        .hash-row .hash-value.empty { color: #bbb; font-style: italic; }
+        .hash-btn-row { display: flex; gap: 10px; justify-content: flex-end; margin-top: 18px; }
+        .hash-btn-row button { border: none; padding: 8px 22px; border-radius: 5px; font-weight: 600; cursor: pointer; transition: all 0.2s; }
+        .hash-btn-dl { background: var(--primary-blue); color: white; }
+        .hash-btn-dl:hover { background: var(--secondary-blue); }
+        .hash-btn-close { background: #eee; color: #555; }
+        .hash-btn-close:hover { background: #ddd; }
+        .btn-hash {
+            background: none; border: 1px solid #c5d5ea; color: var(--primary-blue);
+            padding: 7px 10px; border-radius: 4px; cursor: pointer; font-size: 0.85rem;
+            transition: all 0.2s; margin-left: 6px; white-space: nowrap;
+        }
+        .btn-hash:hover { background: var(--light-blue); border-color: var(--primary-blue); }
+        .dark-theme .hash-card { background: #1e1e1e; box-shadow: 0 8px 30px rgba(0,0,0,0.5); }
+        .dark-theme .hash-card h5 { color: #64b5f6; }
+        .dark-theme .hash-row .hash-label { color: #aaa; }
+        .dark-theme .hash-row .hash-value { background: #2a2a2a; color: #e0e0e0; }
+        .dark-theme .hash-row .hash-value.empty { color: #666; }
+        .dark-theme .hash-btn-close { background: #333; color: #ccc; }
+        .dark-theme .hash-btn-close:hover { background: #444; }
+        .dark-theme .hash-btn-dl { background: #2a5a8a; }
+        .dark-theme .hash-btn-dl:hover { background: #3a6a9a; }
+        .dark-theme .btn-hash { border-color: #444; color: #64b5f6; }
+        .dark-theme .btn-hash:hover { background: #2a3a4a; border-color: #64b5f6; }
     </style>
 </head>
 <body>
@@ -1034,6 +1075,18 @@
                 <button class="time-sync-btn time-sync-agree" id="agreeTimeSync">同步在线时间</button>
             </div>
             <p class="time-sync-note">您可以在下次访问网站时重新选择此设置</p>
+        </div>
+    </div>
+
+    <div class="hash-overlay" id="hashOverlay" style="display:none;">
+        <div class="hash-card">
+            <h5 id="hashFileName"></h5>
+            <div class="hash-row"><div class="hash-label">SHA-256</div><div class="hash-value" id="hashSha256"></div></div>
+            <div class="hash-row"><div class="hash-label">MD5</div><div class="hash-value" id="hashMd5"></div></div>
+            <div class="hash-btn-row">
+                <button class="hash-btn-close" id="hashBtnClose">关闭</button>
+                <button class="hash-btn-dl" id="hashBtnDl">确认下载</button>
+            </div>
         </div>
     </div>
 
@@ -1189,28 +1242,69 @@
         });
     }
 
-    // 下载点击处理（事件委托）
+    // 下载/哈希点击处理（事件委托）
     function handleDownloadClick(e) {
+        const hashBtn = e.target.closest('.btn-hash');
+        if (hashBtn) {
+            e.preventDefault();
+            showHashModal({
+                name: hashBtn.getAttribute('data-name'),
+                sha256: hashBtn.getAttribute('data-sha256'),
+                md5: hashBtn.getAttribute('data-md5'),
+                url: hashBtn.getAttribute('data-url'),
+                protected: hashBtn.getAttribute('data-protected') === 'true',
+                password: hashBtn.getAttribute('data-password') || ''
+            });
+            return;
+        }
         const btn = e.target.closest('.download-btn');
         if (!btn) return;
         e.preventDefault();
-        const url = btn.getAttribute('data-url');
-        const isProtected = btn.getAttribute('data-protected') === 'true';
-        const requiredPassword = btn.getAttribute('data-password') || '';
+        showHashModal({
+            name: btn.getAttribute('data-name') || '',
+            sha256: btn.getAttribute('data-sha256') || '',
+            md5: btn.getAttribute('data-md5') || '',
+            url: btn.getAttribute('data-url'),
+            protected: btn.getAttribute('data-protected') === 'true',
+            password: btn.getAttribute('data-password') || ''
+        });
+    }
 
-        if (!isProtected) {
-            // 直接下载
-            window.location.href = url;
-            return;
-        }
+    function showHashModal(info) {
+        var overlay = document.getElementById('hashOverlay');
+        document.getElementById('hashFileName').textContent = info.name;
+        var shaEl = document.getElementById('hashSha256');
+        var md5El = document.getElementById('hashMd5');
+        shaEl.textContent = info.sha256 || '(无)';
+        shaEl.className = 'hash-value' + (info.sha256 ? '' : ' empty');
+        md5El.textContent = info.md5 || '(无)';
+        md5El.className = 'hash-value' + (info.md5 ? '' : ' empty');
+        overlay.style.display = 'flex';
 
-        // 受保护，弹出密码输入框
-        const userPwd = prompt('该文件需要密码才能下载，请输入密码：');
-        if (userPwd === requiredPassword) {
-            window.location.href = url;
-        } else if (userPwd !== null) {
-            alert('密码错误，无权下载！');
+        function cleanup() {
+            document.getElementById('hashBtnDl').removeEventListener('click', onDl);
+            document.getElementById('hashBtnClose').removeEventListener('click', onClose);
+            document.removeEventListener('keydown', onKey);
+            overlay.removeEventListener('click', onOverlay);
         }
+        function onDl() {
+            overlay.style.display = 'none';
+            cleanup();
+            if (info.protected) {
+                var pwd = prompt('该文件需要密码才能下载，请输入密码：');
+                if (pwd === info.password) { window.location.href = info.url; }
+                else if (pwd !== null) { alert('密码错误，无权下载！'); }
+            } else {
+                window.location.href = info.url;
+            }
+        }
+        function onClose() { overlay.style.display = 'none'; cleanup(); }
+        function onKey(e) { if (e.key === 'Escape') onClose(); }
+        function onOverlay(e) { if (e.target === overlay) onClose(); }
+        document.getElementById('hashBtnDl').addEventListener('click', onDl);
+        document.getElementById('hashBtnClose').addEventListener('click', onClose);
+        document.addEventListener('keydown', onKey);
+        overlay.addEventListener('click', onOverlay);
     }
 
     // 渲染文件列表
@@ -1234,6 +1328,9 @@
                 const sizeDisplay = (file.size && file.size !== '-') ? formatFileSize(file.size) : '未知大小';
                 const isProtected = file.protected === true;
                 const passwordAttr = isProtected ? ` data-protected="true" data-password="${escapeHtml(file.password)}"` : ` data-protected="false"`;
+                const sha256 = file.sha256 || '';
+                const md5 = file.md5 || '';
+                const hashBtns = (sha256 || md5) ? `<button class="btn-hash" data-name="${escapeHtml(file.name)}" data-sha256="${escapeHtml(sha256)}" data-md5="${escapeHtml(md5)}" data-url="${escapeHtml(file.url)}"${passwordAttr} title="查看哈希"><i class="fas fa-fingerprint"></i></button>` : '';
                 html += `
                     <div class="download-item d-flex">
                         <div class="file-icon">${iconHtml}</div>
@@ -1246,7 +1343,8 @@
                             </div>
                         </div>
                         <div class="file-action">
-                            <a href="#" class="download-btn" data-url="${escapeHtml(file.url)}"${passwordAttr}><i class="fas fa-download me-1"></i> 下载</a>
+                            ${hashBtns}
+                            <a href="#" class="download-btn" data-url="${escapeHtml(file.url)}" data-name="${escapeHtml(file.name)}" data-sha256="${escapeHtml(sha256)}" data-md5="${escapeHtml(md5)}"${passwordAttr}><i class="fas fa-download me-1"></i> 下载</a>
                         </div>
                     </div>
                 `;
@@ -1328,7 +1426,8 @@
 
     async function loadFileList() {
         try {
-            const response = await fetch('/download/files.json?t=' + Date.now());
+            const cacheBuster = Array.from({length:16},function(){return Math.floor(Math.random()*16).toString(16)}).join('');
+            const response = await fetch('/download/files.json?v=' + cacheBuster);
             if (!response.ok) throw new Error('JSON 加载失败');
             const files = await response.json();
             if (!Array.isArray(files)) throw new Error('数据格式错误');
