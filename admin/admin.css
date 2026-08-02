@@ -1503,3 +1503,32 @@ body {
 .upload-password-group input[type="text"]:focus {
     border-color: var(--primary-color);
 }
+
+/* ===== 文件操作按钮 ===== */
+.file-action-btn {
+    background: var(--card-bg);
+    border: 1px solid var(--border-color);
+    color: var(--text-primary);
+    padding: 2px 10px;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 0.8rem;
+    margin-right: 4px;
+    transition: background 0.2s;
+}
+.file-action-btn:hover {
+    background: rgba(var(--primary-rgb), 0.15);
+}
+.download-btn {
+    color: var(--primary-color);
+    border-color: var(--primary-color);
+}
+.download-btn:hover {
+    background: rgba(var(--primary-rgb), 0.1);
+}
+.hash-btn {
+    color: var(--text-secondary);
+}
+.hash-btn:hover {
+    background: rgba(255,255,255,0.05);
+}

@@ -1,8 +1,8 @@
-// admin-dashboard.js – v3.9.1 (修复 LFS 文件大小显示，自适应单位)
+// admin-dashboard.js – v4.2.0
 (function() {
     var pageState = {};
 
-    // ===== HTML 转义（防止 XSS） =====
+    // ===== HTML 转义 =====
     function escapeHtml(str) {
         if (!str) return '';
         var div = document.createElement('div');
@@ -10,7 +10,7 @@
         return div.innerHTML;
     }
 
-    // ===== 文件大小格式化（自适应单位） =====
+    // ===== 文件大小格式化 =====
     function formatFileSize(bytes) {
         if (bytes === 0) return '0 B';
         var units = ['B', 'KB', 'MB', 'GB', 'TB'];
@@ -179,13 +179,47 @@
                 tbody.innerHTML = '<tr><td colspan="2" class="text-center text-muted">暂无文件</td></tr>';
                 return;
             }
+
             var rows = files.map(function(file) {
                 var sizeDisplay = formatFileSize(file.size);
                 var safeName = escapeHtml(file.name);
                 var safeSha = escapeHtml(file.sha);
-                return '<tr><td>' + safeName + ' (' + sizeDisplay + ')</td><td><button class="delete-file-btn" data-filename="' + safeName + '" data-sha="' + safeSha + '">删除</button></td></tr>';
+                var md5 = file.md5 || null;
+                var sha256 = file.sha256 || null;
+                var md5Display = md5 ? escapeHtml(md5) : '无';
+                var sha256Display = sha256 ? escapeHtml(sha256) : '无';
+                var downloadUrl = file.download_url ? escapeHtml(file.download_url) : '#';
+                return '<tr><td>' + safeName + ' (' + sizeDisplay + ')</td><td>' +
+                    '<button class="file-action-btn download-btn" data-url="' + downloadUrl + '">下载</button>' +
+                    '<button class="file-action-btn hash-btn" data-hash="' + sha256Display + '" data-type="SHA-256">SHA-256</button>' +
+                    '<button class="file-action-btn hash-btn" data-hash="' + md5Display + '" data-type="MD5">MD5</button>' +
+                    '<button class="delete-file-btn" data-filename="' + safeName + '" data-sha="' + safeSha + '">删除</button>' +
+                    '</td></tr>';
             }).join('');
             tbody.innerHTML = rows;
+
+            // 绑定下载按钮
+            tbody.querySelectorAll('.download-btn').forEach(function(btn) {
+                btn.addEventListener('click', function() {
+                    var url = this.dataset.url;
+                    if (url && url !== '#') {
+                        window.open(url, '_blank');
+                    } else {
+                        alert('下载链接不可用');
+                    }
+                });
+            });
+
+            // 绑定哈希按钮
+            tbody.querySelectorAll('.hash-btn').forEach(function(btn) {
+                btn.addEventListener('click', function() {
+                    var hash = this.dataset.hash;
+                    var type = this.dataset.type;
+                    alert(type + ': ' + hash);
+                });
+            });
+
+            // 绑定删除按钮（原有逻辑）
             tbody.querySelectorAll('.delete-file-btn').forEach(function(btn) {
                 btn.addEventListener('click', function() {
                     var filename = this.dataset.filename;
