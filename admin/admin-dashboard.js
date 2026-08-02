@@ -1,6 +1,14 @@
-// admin-dashboard.js – 仪表盘、分页、排序、QSL 查看、刷新、下载管理
+// admin-dashboard.js – v3.7.0 (修复 XSS 漏洞)
 (function() {
     var pageState = {};
+
+    // ===== HTML 转义（防止 XSS） =====
+    function escapeHtml(str) {
+        if (!str) return '';
+        var div = document.createElement('div');
+        div.textContent = str;
+        return div.innerHTML;
+    }
 
     // 侧边栏折叠切换
     document.querySelectorAll('.nav-group-toggle').forEach(function(toggle) {
@@ -28,7 +36,6 @@
         });
     });
 
-    // ----- 核心切换函数（修复：增加 download_files 分支） -----
     function switchPage(pageId) {
         document.querySelectorAll('.page-content').forEach(function(el) {
             el.classList.remove('active');
@@ -48,13 +55,11 @@
             var sb = window.__supabaseClient;
             if (!sb) return;
 
-            // 下载管理单独处理（不是数据库表）
             if (pageId === 'download_files') {
                 loadDownloadFiles(sb);
                 return;
             }
 
-            // 其他表：初始化分页并加载
             if (!pageState[pageId]) {
                 pageState[pageId] = { page: 1, pageSize: 50 };
             }
@@ -87,17 +92,33 @@
         if (overlay) overlay.classList.remove('show');
     }
 
+    // ===== 获取带 token 的请求头 =====
+    function getAuthHeaders(sb) {
+        return sb.auth.getSession().then(function(session) {
+            var token = session.data.session?.access_token;
+            if (!token) {
+                throw new Error('未登录或 session 已过期');
+            }
+            return {
+                Authorization: 'Bearer ' + token
+            };
+        });
+    }
+
     // ===== 下载管理 =====
     function loadDownloadFiles(sb) {
         var tbody = document.getElementById('downloadFilesBody');
         if (!tbody) return;
         tbody.innerHTML = '<tr><td colspan="2" class="text-center text-muted">加载中...</td></tr>';
 
-        sb.functions.invoke('github-files', {
-            method: 'GET',
+        getAuthHeaders(sb).then(function(headers) {
+            return sb.functions.invoke('github-files', {
+                method: 'GET',
+                headers: headers
+            });
         }).then(function(result) {
             if (result.error) {
-                tbody.innerHTML = '<tr><td colspan="2" class="text-center text-muted">加载失败: ' + result.error.message + '</td></tr>';
+                tbody.innerHTML = '<tr><td colspan="2" class="text-center text-muted">加载失败: ' + escapeHtml(result.error.message) + '</td></tr>';
                 return;
             }
             var files = result.data.files || [];
@@ -107,10 +128,11 @@
             }
             var rows = files.map(function(file) {
                 var sizeMB = (file.size / (1024 * 1024)).toFixed(2);
-                return '<tr><td>' + file.name + ' (' + sizeMB + ' MB)</td><td><button class="delete-file-btn" data-filename="' + file.name + '" data-sha="' + file.sha + '">删除</button></td></tr>';
+                var safeName = escapeHtml(file.name);
+                var safeSha = escapeHtml(file.sha);
+                return '<tr><td>' + safeName + ' (' + sizeMB + ' MB)</td><td><button class="delete-file-btn" data-filename="' + safeSha + '" data-sha="' + safeSha + '">删除</button></td></tr>';
             }).join('');
             tbody.innerHTML = rows;
-            // 绑定删除事件
             tbody.querySelectorAll('.delete-file-btn').forEach(function(btn) {
                 btn.addEventListener('click', function() {
                     var filename = this.dataset.filename;
@@ -121,15 +143,18 @@
                 });
             });
         }).catch(function(err) {
-            tbody.innerHTML = '<tr><td colspan="2" class="text-center text-muted">网络错误，请重试</td></tr>';
+            tbody.innerHTML = '<tr><td colspan="2" class="text-center text-muted">加载失败: ' + escapeHtml(err.message) + '</td></tr>';
             console.error('加载下载文件失败:', err);
         });
     }
 
     function deleteFile(sb, filename, sha) {
-        sb.functions.invoke('github-files', {
-            method: 'DELETE',
-            body: { filename: filename, sha: sha }
+        getAuthHeaders(sb).then(function(headers) {
+            return sb.functions.invoke('github-files', {
+                method: 'DELETE',
+                headers: headers,
+                body: { filename: filename, sha: sha }
+            });
         }).then(function(result) {
             if (result.error) {
                 alert('删除失败: ' + result.error.message);
@@ -142,13 +167,64 @@
         });
     }
 
+    // ===== 上传文件 =====
+    document.addEventListener('DOMContentLoaded', function() {
+        var uploadForm = document.getElementById('uploadForm');
+        if (uploadForm && !uploadForm.dataset.bound) {
+            uploadForm.dataset.bound = 'true';
+            uploadForm.addEventListener('submit', function(e) {
+                e.preventDefault();
+                var fileInput = document.getElementById('fileInput');
+                var file = fileInput.files[0];
+                if (!file) return;
+                if (file.size > 200 * 1024 * 1024) {
+                    alert('文件不能超过 200MB');
+                    return;
+                }
+                var sb = window.__supabaseClient;
+                if (!sb) {
+                    alert('未登录');
+                    return;
+                }
+                var formData = new FormData();
+                formData.append('file', file);
+                var uploadBtn = uploadForm.querySelector('button[type="submit"]');
+                uploadBtn.disabled = true;
+                uploadBtn.textContent = '上传中...';
+
+                getAuthHeaders(sb).then(function(headers) {
+                    return sb.functions.invoke('github-files', {
+                        method: 'POST',
+                        headers: headers,
+                        body: formData,
+                    });
+                }).then(function(result) {
+                    if (result.error) {
+                        alert('上传失败: ' + result.error.message);
+                        return;
+                    }
+                    var msg = '上传成功';
+                    if (result.data.method === 'lfs') {
+                        msg += ' (通过 LFS)';
+                    }
+                    alert(msg);
+                    fileInput.value = '';
+                    loadDownloadFiles(sb);
+                }).catch(function(err) {
+                    alert('上传失败: ' + err.message);
+                }).finally(function() {
+                    uploadBtn.disabled = false;
+                    uploadBtn.textContent = '上传文件';
+                });
+            });
+        }
+    });
+
     // ===== 数据加载 =====
     window.loadDashboardData = function(sb) {
         document.getElementById('pageTitle').textContent = '概览';
         document.querySelector('.page-content.active') || switchPage('overview');
-
         loadStats(sb);
-
         var tables = ['exam_pending', 'exam_progress', 'exam_sessions', 'login_logs', 'qsl_cards'];
         tables.forEach(function(table) {
             pageState[table] = { page: 1, pageSize: 50 };
@@ -166,7 +242,6 @@
             }
             document.getElementById('totalUsers').textContent = result.count || '0';
         });
-
         sb.from('qsl_cards').select('*', { count: 'exact', head: true }).then(function(result) {
             if (result.error) {
                 console.warn('加载 QSL 统计失败:', result.error);
@@ -175,7 +250,6 @@
             }
             document.getElementById('totalPosts').textContent = result.count || '0';
         });
-
         sb.from('login_logs').select('*', { count: 'exact', head: true }).then(function(result) {
             if (result.error) {
                 console.warn('加载日志统计失败:', result.error);
@@ -200,7 +274,6 @@
             paginationContainer = div;
         }
 
-        // ---- 添加刷新按钮到标题右侧 ----
         var pageHeader = document.querySelector('#page-' + tableName + ' .page-header');
         if (pageHeader) {
             var refreshBtn = pageHeader.querySelector('.refresh-btn');
@@ -229,27 +302,21 @@
         paginationContainer.innerHTML = '';
 
         var offset = (page - 1) * pageSize;
-        var rangeStart = offset;
-        var rangeEnd = offset + pageSize - 1;
-
         var query = sb.from(tableName).select('*', { count: 'exact' });
-
         if (tableName === 'qsl_cards') {
             query = query.order('id', { ascending: true });
         } else {
             query = query.order('id', { ascending: false });
         }
-
-        query.range(rangeStart, rangeEnd)
+        query.range(offset, offset + pageSize - 1)
             .then(function(result) {
                 if (result.error) {
-                    tbody.innerHTML = '<tr><td colspan="10" class="text-center text-muted">加载失败: ' + result.error.message + '</td></tr>';
+                    tbody.innerHTML = '<tr><td colspan="10" class="text-center text-muted">加载失败: ' + escapeHtml(result.error.message) + '</td></tr>';
                     return;
                 }
                 var data = result.data;
                 var totalCount = result.count || 0;
                 var totalPages = Math.ceil(totalCount / pageSize);
-
                 pageState[tableName] = { page: page, pageSize: pageSize };
 
                 if (!data || data.length === 0) {
@@ -260,9 +327,7 @@
 
                 var isQsl = (tableName === 'qsl_cards');
                 var headers = Object.keys(data[0]);
-                if (isQsl) {
-                    headers.push('操作');
-                }
+                if (isQsl) headers.push('操作');
 
                 var cardCounts = {};
                 if (isQsl) {
@@ -276,7 +341,7 @@
                 if (thead) {
                     thead.innerHTML = '<tr>' + headers.map(function(h) {
                         if (h === '操作') return '<th>操作</th>';
-                        return '<th>' + h.replace(/_/g, ' ').toUpperCase() + '</th>';
+                        return '<th>' + escapeHtml(h.replace(/_/g, ' ').toUpperCase()) + '</th>';
                     }).join('') + '</tr>';
                 }
 
@@ -290,7 +355,6 @@
                             if (numLen === 12) cardNumberPart = cn.slice(-3);
                             else if (numLen === 11) cardNumberPart = cn.slice(-2);
                             else cardNumberPart = cn.slice(-3);
-
                             var callsignPart = '';
                             if (cardCounts[cn] > 1 && callsign) {
                                 var callLen = callsign.length;
@@ -298,14 +362,17 @@
                                 else if (callLen >= 5) callsignPart = callsign.substring(3, 5);
                                 else callsignPart = callsign;
                             }
-                            var link = '../images/QSL/webp/' + cardNumberPart + (callsignPart ? callsignPart : '') + '.webp';
+                            // 对 cardNumberPart 和 callsignPart 进行转义，确保 URL 安全
+                            var safeCardPart = encodeURIComponent(cardNumberPart);
+                            var safeCallPart = encodeURIComponent(callsignPart);
+                            var link = '../images/QSL/webp/' + safeCardPart + (safeCallPart ? safeCallPart : '') + '.webp';
                             return '<td><a href="' + link + '" target="_blank" class="qsl-link">查看</a></td>';
-                        } else {
-                            var val = row[key];
-                            if (val === null || val === undefined) return '<td>-</td>';
-                            if (typeof val === 'object') val = JSON.stringify(val).substring(0, 50);
-                            return '<td>' + val + '</td>';
                         }
+                        var val = row[key];
+                        if (val === null || val === undefined) return '<td>-</td>';
+                        if (typeof val === 'object') val = JSON.stringify(val).substring(0, 50);
+                        // 关键：对数据库字段进行 HTML 转义
+                        return '<td>' + escapeHtml(String(val)) + '</td>';
                     });
                     return '<tr>' + cols.join('') + '</tr>';
                 }).join('');
@@ -318,7 +385,6 @@
                     paginationHTML += '<button class="page-btn next" data-page="' + (page + 1) + '" ' + (page >= totalPages ? 'disabled' : '') + '><i class="fas fa-chevron-right"></i></button>';
                     paginationHTML += '</div>';
                     paginationContainer.innerHTML = paginationHTML;
-
                     paginationContainer.querySelectorAll('.page-btn').forEach(function(btn) {
                         btn.addEventListener('click', function() {
                             var newPage = parseInt(this.dataset.page);
@@ -340,63 +406,10 @@
     // 默认展开第一个分组
     document.addEventListener('DOMContentLoaded', function() {
         var firstToggle = document.querySelector('.nav-group-toggle');
-        if (firstToggle) {
-            firstToggle.click();
-        }
+        if (firstToggle) firstToggle.click();
         document.addEventListener('click', function(e) {
             var overlay = document.querySelector('.sidebar-overlay');
-            if (overlay && overlay.classList.contains('show')) {
-                closeSidebar();
-            }
+            if (overlay && overlay.classList.contains('show')) closeSidebar();
         });
     });
-
-    // ---- 绑定上传表单事件（挂载在全局，避免重复绑定） ----
-    (function bindUploadForm() {
-        var uploadForm = document.getElementById('uploadForm');
-        if (uploadForm && !uploadForm.dataset.bound) {
-            uploadForm.dataset.bound = 'true';
-            uploadForm.addEventListener('submit', function(e) {
-                e.preventDefault();
-                var fileInput = document.getElementById('fileInput');
-                var file = fileInput.files[0];
-                if (!file) return;
-                if (file.size > 200 * 1024 * 1024) {
-                    alert('文件不能超过 200MB');
-                    return;
-                }
-                var formData = new FormData();
-                formData.append('file', file);
-                var sb = window.__supabaseClient;
-                if (!sb) {
-                    alert('未登录');
-                    return;
-                }
-                var uploadBtn = uploadForm.querySelector('button[type="submit"]');
-                uploadBtn.disabled = true;
-                uploadBtn.textContent = '上传中...';
-                sb.functions.invoke('github-files', {
-                    method: 'POST',
-                    body: formData,
-                }).then(function(result) {
-                    if (result.error) {
-                        alert('上传失败: ' + result.error.message);
-                        return;
-                    }
-                    var msg = '上传成功';
-                    if (result.data.method === 'lfs') {
-                        msg += ' (通过 LFS)';
-                    }
-                    alert(msg);
-                    fileInput.value = '';
-                    loadDownloadFiles(sb);
-                }).catch(function(err) {
-                    alert('上传失败: ' + err.message);
-                }).finally(function() {
-                    uploadBtn.disabled = false;
-                    uploadBtn.textContent = '上传文件';
-                });
-            });
-        }
-    })();
 })();
