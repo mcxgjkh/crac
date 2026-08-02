@@ -1,7 +1,8 @@
-// admin-dashboard.js – v4.3.1 (自定义提示框，修复删除/上传反馈)
+// admin-dashboard.js – v4.4.0 (修复提示、上传、删除刷新)
 (function() {
     var pageState = {};
 
+    // ===== HTML 转义 =====
     function escapeHtml(str) {
         if (!str) return '';
         var div = document.createElement('div');
@@ -9,6 +10,7 @@
         return div.innerHTML;
     }
 
+    // ===== 文件大小格式化 =====
     function formatFileSize(bytes) {
         if (bytes === 0) return '0 B';
         var units = ['B', 'KB', 'MB', 'GB', 'TB'];
@@ -18,11 +20,12 @@
         return size + ' ' + units[i];
     }
 
-    // ===== 自定义确认对话框（有取消/确定） =====
+    // ===== 自定义确认对话框 =====
     function showConfirmDialog(message) {
         return new Promise(function(resolve) {
             var overlay = document.createElement('div');
             overlay.className = 'confirm-overlay';
+
             var dialog = document.createElement('div');
             dialog.className = 'confirm-dialog';
             dialog.innerHTML = `
@@ -36,9 +39,15 @@
                     <button class="confirm-btn confirm-ok">确定</button>
                 </div>
             `;
+
             overlay.appendChild(dialog);
             document.body.appendChild(overlay);
-            function close(result) { overlay.remove(); resolve(result); }
+
+            function close(result) {
+                overlay.remove();
+                resolve(result);
+            }
+
             dialog.querySelector('.confirm-close').addEventListener('click', function() { close(false); });
             dialog.querySelector('.confirm-cancel').addEventListener('click', function() { close(false); });
             dialog.querySelector('.confirm-ok').addEventListener('click', function() { close(true); });
@@ -46,16 +55,21 @@
                 if (e.target === overlay) close(false);
             });
             document.addEventListener('keydown', function handler(e) {
-                if (e.key === 'Escape') { close(false); document.removeEventListener('keydown', handler); }
+                if (e.key === 'Escape') {
+                    close(false);
+                    document.removeEventListener('keydown', handler);
+                }
             });
         });
     }
 
-    // ===== 自定义信息对话框（只有一个确定按钮） =====
-    function showInfoDialog(title, message) {
+    // ===== 自定义消息对话框（信息提示，无取消） =====
+    function showMessageDialog(message, title) {
+        title = title || '提示';
         return new Promise(function(resolve) {
             var overlay = document.createElement('div');
             overlay.className = 'confirm-overlay';
+
             var dialog = document.createElement('div');
             dialog.className = 'confirm-dialog';
             dialog.innerHTML = `
@@ -64,20 +78,29 @@
                     <button class="confirm-close" title="关闭">×</button>
                 </div>
                 <div class="confirm-body">${escapeHtml(message)}</div>
-                <div class="confirm-footer" style="justify-content:center;">
-                    <button class="confirm-btn confirm-ok" style="min-width:100px;">确定</button>
+                <div class="confirm-footer">
+                    <button class="confirm-btn confirm-ok" style="background:var(--primary-color);">确定</button>
                 </div>
             `;
+
             overlay.appendChild(dialog);
             document.body.appendChild(overlay);
-            function close() { overlay.remove(); resolve(); }
+
+            function close() {
+                overlay.remove();
+                resolve();
+            }
+
             dialog.querySelector('.confirm-close').addEventListener('click', close);
             dialog.querySelector('.confirm-ok').addEventListener('click', close);
             overlay.addEventListener('click', function(e) {
                 if (e.target === overlay) close();
             });
             document.addEventListener('keydown', function handler(e) {
-                if (e.key === 'Escape') { close(); document.removeEventListener('keydown', handler); }
+                if (e.key === 'Escape' || e.key === 'Enter') {
+                    close();
+                    document.removeEventListener('keydown', handler);
+                }
             });
         });
     }
@@ -126,10 +149,12 @@
             document.getElementById('pageTitle').textContent = titleMap[pageId] || '概览';
             var sb = window.__supabaseClient;
             if (!sb) return;
+
             if (pageId === 'download_files') {
                 loadDownloadFiles(sb);
                 return;
             }
+
             if (!pageState[pageId]) {
                 pageState[pageId] = { page: 1, pageSize: 50 };
             }
@@ -140,6 +165,7 @@
     // 侧边栏移动端开关
     var sidebar = document.querySelector('.dashboard-sidebar');
     var toggleBtn = document.getElementById('sidebarToggle');
+
     if (toggleBtn) {
         toggleBtn.addEventListener('click', function(e) {
             e.stopPropagation();
@@ -161,13 +187,16 @@
         if (overlay) overlay.classList.remove('show');
     }
 
+    // ===== 获取带 token 的请求头 =====
     function getAuthHeaders(sb) {
         return sb.auth.getSession().then(function(session) {
             var token = session.data.session?.access_token;
             if (!token) {
                 throw new Error('未登录或 session 已过期');
             }
-            return { Authorization: 'Bearer ' + token };
+            return {
+                Authorization: 'Bearer ' + token
+            };
         });
     }
 
@@ -212,25 +241,28 @@
             }).join('');
             tbody.innerHTML = rows;
 
+            // 绑定下载按钮
             tbody.querySelectorAll('.download-btn').forEach(function(btn) {
                 btn.addEventListener('click', function() {
                     var url = this.dataset.url;
                     if (url) {
                         window.open(url, '_blank');
                     } else {
-                        showInfoDialog('提示', '下载链接不可用');
+                        showMessageDialog('下载链接不可用', '错误');
                     }
                 });
             });
 
+            // 绑定哈希按钮
             tbody.querySelectorAll('.hash-btn').forEach(function(btn) {
                 btn.addEventListener('click', function() {
                     var hash = this.dataset.hash;
                     var type = this.dataset.type;
-                    showInfoDialog(type, hash);
+                    showMessageDialog(type + ': ' + hash, '哈希值');
                 });
             });
 
+            // 绑定删除按钮
             tbody.querySelectorAll('.delete-file-btn').forEach(function(btn) {
                 btn.addEventListener('click', function() {
                     var filename = this.dataset.filename;
@@ -258,17 +290,18 @@
             });
         }).then(function(result) {
             if (result.error) {
-                showInfoDialog('删除失败', result.error.message);
+                showMessageDialog('删除失败: ' + result.error.message, '错误');
                 return;
             }
-            showInfoDialog('成功', '文件 "' + filename + '" 已删除');
-            loadDownloadFiles(sb);
+            showMessageDialog('删除成功', '成功').then(function() {
+                loadDownloadFiles(sb);
+            });
         }).catch(function(err) {
-            showInfoDialog('错误', '删除失败: ' + err.message);
+            showMessageDialog('删除失败: ' + err.message, '错误');
         });
     }
 
-    // ===== 上传文件 =====
+    // ===== 上传文件（支持加密选项） =====
     document.addEventListener('DOMContentLoaded', function() {
         var uploadForm = document.getElementById('uploadForm');
         if (uploadForm && !uploadForm.dataset.bound) {
@@ -290,17 +323,17 @@
                 var fileInput = document.getElementById('fileInput');
                 var file = fileInput.files[0];
                 if (!file) {
-                    showInfoDialog('提示', '请先选择文件');
+                    showMessageDialog('请先选择文件', '提示');
                     return;
                 }
                 if (file.size > 200 * 1024 * 1024) {
-                    showInfoDialog('提示', '文件不能超过 200MB');
+                    showMessageDialog('文件不能超过 200MB', '错误');
                     return;
                 }
 
                 var sb = window.__supabaseClient;
                 if (!sb) {
-                    showInfoDialog('错误', '未登录');
+                    showMessageDialog('未登录', '错误');
                     return;
                 }
 
@@ -312,7 +345,7 @@
                 if (isProtected) {
                     var password = document.getElementById('uploadPassword').value.trim();
                     if (!password) {
-                        showInfoDialog('提示', '请设置下载密码');
+                        showMessageDialog('请设置下载密码', '提示');
                         return;
                     }
                     formData.append('password', password);
@@ -330,7 +363,7 @@
                     });
                 }).then(function(result) {
                     if (result.error) {
-                        showInfoDialog('上传失败', result.error.message);
+                        showMessageDialog('上传失败: ' + result.error.message, '错误');
                         return;
                     }
                     var msg = '上传成功';
@@ -343,16 +376,18 @@
                     if (result.data.sha256) {
                         msg += '\nSHA-256: ' + result.data.sha256;
                     }
-                    showInfoDialog('成功', msg);
-                    fileInput.value = '';
-                    var fileNameSpan = document.querySelector('.file-name-display');
-                    if (fileNameSpan) fileNameSpan.textContent = '未选择任何文件';
-                    protectedCheckbox.checked = false;
-                    passwordGroup.style.display = 'none';
-                    document.getElementById('uploadPassword').value = '';
-                    loadDownloadFiles(sb);
+                    showMessageDialog(msg, '成功').then(function() {
+                        fileInput.value = '';
+                        var fileNameSpan = document.querySelector('.file-name-display');
+                        if (fileNameSpan) fileNameSpan.textContent = '未选择任何文件';
+                        protectedCheckbox.checked = false;
+                        passwordGroup.style.display = 'none';
+                        document.getElementById('uploadPassword').value = '';
+                        loadDownloadFiles(sb);
+                    });
                 }).catch(function(err) {
-                    showInfoDialog('错误', '上传失败: ' + err.message);
+                    console.error('上传异常:', err);
+                    showMessageDialog('上传失败: ' + err.message, '错误');
                 }).finally(function() {
                     uploadBtn.disabled = false;
                     uploadBtn.textContent = '上传文件';
@@ -373,6 +408,7 @@
         });
     };
 
+    // 统计数量
     function loadStats(sb) {
         sb.from('user_roles').select('*', { count: 'exact', head: true }).then(function(result) {
             if (result.error) {
@@ -400,6 +436,7 @@
         });
     }
 
+    // 加载表格数据
     function loadTableData(sb, tableName, page, pageSize) {
         var tbody = document.querySelector('#page-' + tableName + ' tbody');
         var paginationContainer = document.querySelector('#page-' + tableName + ' .pagination-container');
@@ -540,6 +577,7 @@
             });
     }
 
+    // 默认展开第一个分组
     document.addEventListener('DOMContentLoaded', function() {
         var firstToggle = document.querySelector('.nav-group-toggle');
         if (firstToggle) firstToggle.click();
