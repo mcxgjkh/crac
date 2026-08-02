@@ -1532,3 +1532,19 @@ body {
 .hash-btn:hover {
     background: rgba(255,255,255,0.05);
 }
+
+/* ===== 操作按钮右对齐 & 垂直居中 ===== */
+.action-buttons {
+    display: flex;
+    justify-content: flex-end;
+    align-items: center;
+    gap: 6px;
+    flex-wrap: nowrap;
+}
+.file-action-btn,
+.delete-file-btn {
+    vertical-align: middle;
+    line-height: 1.4;
+    height: auto;
+    padding: 4px 10px;
+}
