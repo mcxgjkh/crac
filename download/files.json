@@ -219,15 +219,5 @@
     "url": "./MemoryCleaner.apk",
     "ext": "apk",
     "protected": false
-  },
-  {
-    "name": "qsl_cards_rows.csv",
-    "size": 3132,
-    "modified": "2026-08-02 04:34:32",
-    "url": "./download/qsl_cards_rows.csv",
-    "ext": "csv",
-    "md5": "c6a1d0aab4c8198e066da6896740bd1d",
-    "sha256": "f14dc1e9e5cf5252c87c2d74247bb85b9f85e951dfd7c75d271fe3287c1a267c",
-    "protected": false
   }
 ]
