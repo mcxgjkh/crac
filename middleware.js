@@ -1,11 +1,15 @@
 // middleware.js
+export const runtime = 'edge';  // 显式声明为 Edge Runtime
+
 export function middleware(request) {
-  // 直接拦截所有请求，返回一个显眼的测试页面
+  // 直接返回测试页面
   return new Response(
-    `<h1>Middleware is working!</h1><p>If you see this, middleware is active.</p>`,
-    {
-      status: 200,
-      headers: { 'Content-Type': 'text/html' },
-    }
+    `<h1>✅ Edge Middleware is ACTIVE</h1>
+     <p>If you see this, middleware is working!</p>`,
+    { status: 200, headers: { 'Content-Type': 'text/html' } }
   );
 }
+
+export const config = {
+  matcher: ['/(.*)'],
+};
