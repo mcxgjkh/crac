@@ -1711,29 +1711,49 @@ body {
     }
 }
 
-/* QSL 卡片表格列宽 */
+/* QSL 卡片表格列宽 - 桌面端固定 */
 #page-qsl_cards .table-container table {
     table-layout: fixed;
     min-width: 800px;
 }
 #page-qsl_cards .table-container th:nth-child(1),
-#page-qsl_cards .table-container td:nth-child(1) { width: 5%; } /* ID */
+#page-qsl_cards .table-container td:nth-child(1) { width: 5%; }
 #page-qsl_cards .table-container th:nth-child(2),
-#page-qsl_cards .table-container td:nth-child(2) { width: 12%; } /* 卡片编号 */
+#page-qsl_cards .table-container td:nth-child(2) { width: 12%; }
 #page-qsl_cards .table-container th:nth-child(3),
-#page-qsl_cards .table-container td:nth-child(3) { width: 15%; } /* 通联时间 */
+#page-qsl_cards .table-container td:nth-child(3) { width: 15%; }
 #page-qsl_cards .table-container th:nth-child(4),
-#page-qsl_cards .table-container td:nth-child(4) { width: 15%; } /* 呼号 */
+#page-qsl_cards .table-container td:nth-child(4) { width: 15%; }
 #page-qsl_cards .table-container th:nth-child(5),
-#page-qsl_cards .table-container td:nth-child(5) { width: 12%; } /* 类型 */
+#page-qsl_cards .table-container td:nth-child(5) { width: 12%; }
 #page-qsl_cards .table-container th:nth-child(6),
-#page-qsl_cards .table-container td:nth-child(6) { width: 12%; } /* 等级 */
+#page-qsl_cards .table-container td:nth-child(6) { width: 12%; }
 #page-qsl_cards .table-container th:nth-child(7),
-#page-qsl_cards .table-container td:nth-child(7) { width: 12%; } /* 代数 */
+#page-qsl_cards .table-container td:nth-child(7) { width: 12%; }
 #page-qsl_cards .table-container th:nth-child(8),
-#page-qsl_cards .table-container td:nth-child(8) { width: 15%; } /* 图片 */
+#page-qsl_cards .table-container td:nth-child(8) { width: 15%; }
 #page-qsl_cards .table-container th:nth-child(9),
-#page-qsl_cards .table-container td:nth-child(9) { width: 8%; } /* 操作 */
+#page-qsl_cards .table-container td:nth-child(9) { width: 8%; }
+
+/* 移动端适配：取消固定宽度，自动换行 */
+@media (max-width: 640px) {
+    #page-qsl_cards .table-container table {
+        table-layout: auto;
+        min-width: auto;
+        width: 100%;
+    }
+    #page-qsl_cards .table-container td,
+    #page-qsl_cards .table-container th {
+        word-break: break-word;
+        padding: 6px 8px;
+        font-size: 0.75rem;
+    }
+    /* 使卡片编号和通联时间分开显示 */
+    #page-qsl_cards .table-container td:nth-child(2),
+    #page-qsl_cards .table-container td:nth-child(3) {
+        word-break: break-all;
+    }
+}
 
 /* 美化下拉框 */
 #addQslForm select {

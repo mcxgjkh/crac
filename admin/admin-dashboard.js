@@ -1,4 +1,4 @@
-// admin-dashboard.js – v4.9.1
+// admin-dashboard.js – v4.9.2
 (function() {
     var pageState = {};
 
@@ -759,11 +759,13 @@
                         formData.append('file', webpBlob);
                         formData.append('cardNumber', cardNumber);
 
-                        const { data: { session }, error: sessionError } = await sb.auth.getSession();
-                        if (sessionError || !session) {
-                            throw new Error('获取会话失败，请重新登录');
+                        // 获取当前用户和 token
+                        const { data: { user }, error: userError } = await sb.auth.getUser();
+                        if (userError || !user) {
+                            throw new Error('获取用户信息失败，请重新登录');
                         }
-                        const token = session.access_token;
+                        const { data: { session } } = await sb.auth.getSession();
+                        const token = session?.access_token;
                         if (!token) throw new Error('未登录或会话已过期');
 
                         const uploadResp = await fetch('https://pxhiobmdzntnxwpwtgpx.supabase.co/functions/v1/github-upload', {
