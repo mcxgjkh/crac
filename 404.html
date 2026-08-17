@@ -1,16 +1,10 @@
-// middleware.js
-export const runtime = 'edge';   // 关键：强制边缘运行时
-
-import isbot from 'isbot';
-
-// 把你 403.html 的全部内容（包括样式和 HTML 结构）复制到下面的模板字符串中
-const FORBIDDEN_HTML = `<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="zh-CN">
 
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>403 - Forbidden</title>
+    <title>404 - Not Found</title>
     <style>
         @font-face {
             font-family: "font";
@@ -58,7 +52,7 @@ const FORBIDDEN_HTML = `<!DOCTYPE html>
             /* 轻微投影增加立体感 */
         }
 
-        .text403 {
+        .text404 {
             font-family: "font";
             display: block;
             /* 保持较大的字号 */
@@ -125,7 +119,7 @@ const FORBIDDEN_HTML = `<!DOCTYPE html>
     <div class="message-container">
         <div class="text403">
             <span class="error">Error </span>
-            <span class="error">403</span>
+            <span class="error">404</span>
         </div>
         <div class="main-text">此计算机因违规外联已被阻断</div>
         <div class="sub-text">请等待安全部门与你联系</div>
@@ -138,32 +132,4 @@ const FORBIDDEN_HTML = `<!DOCTYPE html>
 
 </body>
 
-</html>`;
-
-export function middleware(request) {
-  const userAgent = request.headers.get('user-agent') || '';
-  
-  // 使用 isbot 检测爬虫
-  if (isbot(userAgent)) {
-    // 返回 403 状态码和自定义 HTML
-    return new Response(FORBIDDEN_HTML, {
-      status: 403,
-      headers: {
-        'Content-Type': 'text/html; charset=utf-8',
-        // 可选：阻止搜索引擎索引这个错误页
-        'X-Robots-Tag': 'noindex, nofollow',
-      },
-    });
-  }
-
-  // 正常用户继续访问（什么也不返回，或者返回 undefined）
-  // 对于静态站点，直接 return; 即可
-}
-
-// 可选配置：匹配哪些路径（默认所有路径）
-export const config = {
-  matcher: [
-    // 匹配所有路径，排除静态资源（图片、CSS、JS 等）
-    '/((?!_next/static|_next/image|favicon.ico|.*\\..*).*)',
-  ],
-};
+</html>
