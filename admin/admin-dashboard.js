@@ -1,4 +1,4 @@
-// admin-dashboard.js – v4.9.5
+// admin-dashboard.js – v4.9.6
 (function() {
     var pageState = {};
 
