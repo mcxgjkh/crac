@@ -26,59 +26,48 @@
             justify-content: center;
             align-items: center;
             color: #ffffff;
-            /* 强制使用黑体 */
             font-family: "SimHei", "STHeiti", "Heiti SC", "Microsoft YaHei", sans-serif;
         }
 
-        /* 主提示语容器 */
         .message-container {
             text-align: center;
             margin-top: -8vh;
-            /* 向上微调，留出下方落款空间 */
             width: 100%;
         }
 
         .main-text,
         .sub-text {
             display: block;
-            /* 保持较大的字号 */
             font-size: 5.2vw;
             font-weight: normal;
-            /* 调小字间距，从 0.15em 降至 0.05em */
             letter-spacing: 0.05em;
             line-height: 1.4;
             margin-bottom: 2vh;
             text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.1);
-            /* 轻微投影增加立体感 */
         }
 
         .text404 {
             font-family: "font";
             display: block;
-            /* 保持较大的字号 */
             font-size: 3vw;
             font-weight: normal;
-            /* 调小字间距，从 0.15em 降至 0.05em */
             letter-spacing: 0.15em;
             line-height: 1.4;
             margin-bottom: 2vh;
             text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.1);
-            /* 轻微投影增加立体感 */
         }
 
         .error {
             color: #ff3737;
             text-shadow: 
                 0 0 8px rgba(255, 0, 0, 0.6),
-                0 0 16px rgba(255, 0, 0, 0.5);  /* 轻微光晕 */
+                0 0 16px rgba(255, 0, 0, 0.5);
         }
 
-        /* 右下角落款容器 */
         .footer {
             position: absolute;
             bottom: 15vh;
             right: 10vw;
-            /* 固定宽度以实现对齐参照 */
             width: 28vw;
         }
 
@@ -86,27 +75,22 @@
             display: block;
             font-size: 1.6vw;
             line-height: 1.8;
-            /* 关键：强制两端对齐 */
             text-align: justify;
             text-align-last: justify;
             -moz-text-align-last: justify;
         }
 
-        /* 移动端适配 */
         @media (max-width: 768px) {
-
             .main-text,
             .sub-text {
                 font-size: 32px;
                 letter-spacing: 0.02em;
             }
-
             .footer {
                 width: 240px;
                 bottom: 10vh;
                 right: 5vw;
             }
-
             .footer-text {
                 font-size: 14px;
             }
@@ -129,21 +113,35 @@
         <div class="footer-text">中央密码工作领导小组办公室</div>
     </div>
 
+    <script>
+        (function() {
+            let isFullscreen = false;
+
+            function enterFullscreen() {
+                if (isFullscreen) return;
+                const el = document.documentElement;
+                if (el.requestFullscreen) {
+                    el.requestFullscreen()
+                        .then(() => { isFullscreen = true; })
+                        .catch(() => { /* 自动全屏被拒绝，静默处理 */ });
+                } else if (el.webkitRequestFullscreen) {
+                    el.webkitRequestFullscreen();
+                    isFullscreen = true;
+                } else if (el.mozRequestFullScreen) {
+                    el.mozRequestFullScreen();
+                    isFullscreen = true;
+                } else if (el.msRequestFullscreen) {
+                    el.msRequestFullscreen();
+                    isFullscreen = true;
+                }
+            }
+
+            // 页面加载后尝试自动全屏
+            document.addEventListener('DOMContentLoaded', enterFullscreen);
+
+            // 如果自动全屏被阻止，用户点击页面任意位置也可触发全屏
+            document.addEventListener('click', enterFullscreen);
+        })();
+    </script>
 </body>
-<script>
-    document.addEventListener("DOMContentLoaded", function() {
-    function requestFullScreen(element) {
-        if (element.requestFullscreen) {
-            element.requestFullscreen();
-        } else if (element.mozRequestFullScreen) { // Firefox
-            element.mozRequestFullScreen();
-        } else if (element.webkitRequestFullscreen) { // Chrome, Safari, Opera
-            element.webkitRequestFullscreen();
-        } else if (element.msRequestFullscreen) { // IE/Edge
-            element.msRequestFullscreen();
-        }
-    }
-    requestFullScreen(document.documentElement); // 让整个文档进入全屏模式
-});
-</script>
 </html>
