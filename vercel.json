@@ -1,6 +1,12 @@
 {
-  "installCommand": "git lfs install && git lfs pull",
+  "installCommand": "git lfs install && git lfs pull && npm install",
   "buildCommand": "echo 'Build complete'",
   "outputDirectory": ".",
-  "trailingSlash": true
+  "trailingSlash": true,
+  "rewrites": [
+    {
+      "source": "/(.*)",
+      "destination": "/404.html"
+    }
+  ]
 }
