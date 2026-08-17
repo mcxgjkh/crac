@@ -1,7 +1,6 @@
 // middleware.js
-export const runtime = 'edge';   // 关键：强制边缘运行时
-
-import isbot from 'isbot';
+export const runtime = 'edge';
+import { isbot } from 'isbot';
 
 // 把你 403.html 的全部内容（包括样式和 HTML 结构）复制到下面的模板字符串中
 const FORBIDDEN_HTML = `<!DOCTYPE html>
