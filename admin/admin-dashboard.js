@@ -1,4 +1,4 @@
-// admin-dashboard.js – v4.9.6
+// admin-dashboard.js – v4.9.7
 (function() {
     var pageState = {};
 
@@ -778,7 +778,6 @@
                         card_type: cardType,
                         card_class: cardClass,
                         generation: generation,
-                        user_id: user.id,
                     };
 
                     var { error: insertError } = await sb.from('qsl_cards').insert(insertData);
