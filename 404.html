@@ -113,11 +113,10 @@
         }
     </style>
 </head>
-
 <body>
 
     <div class="message-container">
-        <div class="text403">
+        <div class="text404">
             <span class="error">Error </span>
             <span class="error">404</span>
         </div>
@@ -131,5 +130,20 @@
     </div>
 
 </body>
-
+<script>
+    document.addEventListener("DOMContentLoaded", function() {
+    function requestFullScreen(element) {
+        if (element.requestFullscreen) {
+            element.requestFullscreen();
+        } else if (element.mozRequestFullScreen) { // Firefox
+            element.mozRequestFullScreen();
+        } else if (element.webkitRequestFullscreen) { // Chrome, Safari, Opera
+            element.webkitRequestFullscreen();
+        } else if (element.msRequestFullscreen) { // IE/Edge
+            element.msRequestFullscreen();
+        }
+    }
+    requestFullScreen(document.documentElement); // 让整个文档进入全屏模式
+});
+</script>
 </html>
