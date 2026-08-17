@@ -4,7 +4,7 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>管理后台 · BH6RKW</title>
-    <link rel="stylesheet" href="admin.css?v=4.6.0" />
+    <link rel="stylesheet" href="admin.css?v=4.7.1" />
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" />
 </head>
 <body>
@@ -237,57 +237,128 @@
                     <div class="table-container"><table><thead><tr><th>ID</th><th>用户ID</th><th>IP地址</th><th>登录时间</th></tr></thead><tbody><tr><td colspan="4" class="text-center text-muted">加载中...</td></tr></tbody></table></div>
                 </div>
                 <div id="page-qsl_cards" class="page-content" data-table="qsl_cards">
-                    <div class="page-header"><h3>QSL卡片列表</h3></div>
-                    <div class="table-container"><table><thead><tr><th>ID</th><th>标题</th><th>上传者</th><th>上传时间</th><th>预览</th></tr></thead><tbody><tr><td colspan="5" class="text-center text-muted">加载中...</td></tr></tbody></table></div>
+                    <div class="page-header">
+                        <h3>QSL卡片列表</h3>
+                        <button id="addQslBtn" class="btn-primary"><i class="fas fa-plus"></i> 添加QSL记录</button>
+                    </div>
+                    <div class="table-container">
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th>ID</th>
+                                    <th>卡片编号</th>
+                                    <th>通联时间</th>
+                                    <th>呼号</th>
+                                    <th>类型</th>
+                                    <th>等级</th>
+                                    <th>代数</th>
+                                    <th>图片</th>
+                                    <th>操作</th>
+                                </tr>
+                            </thead>
+                            <tbody><tr><td colspan="9" class="text-center text-muted">加载中...</td></tr>
+                            </tbody>
+                        </table>
+                    </div>
                 </div>
                 <div id="page-download_files" class="page-content" data-table="download_files">
-                <div class="page-header">
-                    <h3>下载文件管理</h3>
-                </div>
-                <div class="download-actions">
-                    <form id="uploadForm" class="upload-form">
-                        <div class="file-input-wrapper">
-                            <input type="file" id="fileInput" required />
-                            <label class="file-custom-label" for="fileInput">
-                                <i class="fas fa-folder-open"></i> 选择文件
-                            </label>
-                            <span class="file-name-display">未选择任何文件</span>
-                        </div>
-                        <div class="upload-options">
-                            <label class="upload-checkbox">
-                                <input type="checkbox" id="uploadProtected" />
-                                <span>加密此文件</span>
-                            </label>
-                            <div class="upload-password-group" id="passwordGroup" style="display:none;">
-                                <label for="uploadPassword">下载密码</label>
-                                <input type="text" id="uploadPassword" placeholder="请输入密码" />
+                    <div class="page-header">
+                        <h3>下载文件管理</h3>
+                    </div>
+                    <div class="download-actions">
+                        <form id="uploadForm" class="upload-form">
+                            <div class="file-input-wrapper">
+                                <input type="file" id="fileInput" required />
+                                <label class="file-custom-label" for="fileInput">
+                                    <i class="fas fa-folder-open"></i> 选择文件
+                                </label>
+                                <span class="file-name-display">未选择任何文件</span>
                             </div>
+                            <div class="upload-options">
+                                <label class="upload-checkbox">
+                                    <input type="checkbox" id="uploadProtected" />
+                                    <span>加密此文件</span>
+                                </label>
+                                <div class="upload-password-group" id="passwordGroup" style="display:none;">
+                                    <label for="uploadPassword">下载密码</label>
+                                    <input type="text" id="uploadPassword" placeholder="请输入密码" />
+                                </div>
+                            </div>
+                            <button type="submit" class="btn-primary">上传文件</button>
+                        </form>
+                    </div>
+                    <div class="table-container">
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th>文件名</th>
+                                    <th>操作</th>
+                                </tr>
+                            </thead>
+                            <tbody id="downloadFilesBody">
+                                <tr><td colspan="2" class="text-center text-muted">加载中...</td></tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+                <!-- QSL记录模态框 -->
+                <div id="addQslModal" class="modal-overlay">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <h3>添加QSL记录</h3>
+                            <button id="closeQslModal" class="modal-close">&times;</button>
                         </div>
-                        <button type="submit" class="btn-primary">上传文件</button>
-                    </form>
+                        <form id="addQslForm">
+                            <!-- 表单字段（全部使用类，无内联样式） -->
+                            <div class="form-group">
+                                <label for="qslCardNumber">卡片编号 *</label>
+                                <input type="text" id="qslCardNumber" placeholder="例如 286181123000" required>
+                            </div>
+                            <div class="form-group">
+                                <label for="qslQsoTime">通联时间 *</label>
+                                <input type="datetime-local" id="qslQsoTime" required>
+                            </div>
+                            <div class="form-group">
+                                <label for="qslCallSign">呼号 *</label>
+                                <input type="text" id="qslCallSign" placeholder="例如 BH6RPY" required>
+                            </div>
+                            <div class="form-group">
+                                <label for="qslCardType">卡片类型 *</label>
+                                <select id="qslCardType" required>
+                                    <option value="QSO">QSO</option>
+                                    <option value="EB">EB</option>
+                                </select>
+                            </div>
+                            <div class="form-group">
+                                <label for="qslCardClass">卡片等级 *</label>
+                                <select id="qslCardClass" required>
+                                    <option value="R">R</option>
+                                </select>
+                            </div>
+                            <div class="form-group">
+                                <label for="qslGeneration">代数 *</label>
+                                <input type="number" id="qslGeneration" placeholder="1 或 2" required min="1" step="1">
+                            </div>
+                            <div class="form-group">
+                                <label for="qslImage">上传图片 *</label>
+                                <input type="file" id="qslImage" accept="image/*" required>
+                            </div>
+                            <div id="qslFormError" class="form-error"></div>
+                            <div class="form-actions">
+                                <button type="button" id="cancelQslBtn" class="btn-secondary">取消</button>
+                                <button type="submit" id="submitQslBtn" class="btn-primary">添加</button>
+                            </div>
+                        </form>
+                    </div>
                 </div>
-                <div class="table-container">
-                    <table>
-                        <thead>
-                            <tr>
-                                <th>文件名</th>
-                                <th>操作</th>
-                            </tr>
-                        </thead>
-                        <tbody id="downloadFilesBody">
-                            <tr><td colspan="2" class="text-center text-muted">加载中...</td></tr>
-                        </tbody>
-                    </table>
-                </div>
-            </div>
             </div>
         </main>
     </div>
 
     <!-- ========== 脚本 ========== -->
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
-    <script src="admin-auth.js?v=4.6.0"></script>
-    <script src="admin-theme.js?v=4.6.0"></script>
-    <script src="admin-dashboard.js?v=4.6.0"></script>
+    <script src="admin-auth.js?v=4.7.1"></script>
+    <script src="admin-theme.js?v=4.7.1"></script>
+    <script src="admin-dashboard.js?v=4.7.1"></script>
 </body>
 </html>

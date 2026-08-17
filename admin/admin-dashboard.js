@@ -1,4 +1,4 @@
-// admin-dashboard.js – v4.5.0 (修复选择文件显示、消息框滚动、操作列右对齐)
+// admin-dashboard.js – v4.7.1 (修复选择文件显示、消息框滚动、操作列右对齐)
 (function() {
     var pageState = {};
 
@@ -537,9 +537,11 @@
                     }).join('') + '</tr>';
                 }
 
+                // 关键修改：处理 image_url 列
                 var rows = data.map(function(row) {
                     var cols = headers.map(function(key) {
                         if (key === '操作') {
+                            // 原有查看链接逻辑（适用于 qsl_cards）
                             var cn = row.card_number || '';
                             var callsign = row.callsign || '';
                             var numLen = cn.length;
@@ -558,14 +560,23 @@
                             var safeCallPart = encodeURIComponent(callsignPart);
                             var link = '../images/QSL/webp/' + safeCardPart + (safeCallPart ? safeCallPart : '') + '.webp';
                             return '<td><a href="' + link + '" target="_blank" class="qsl-link">查看</a></td>';
+                        } else if (key === 'image_url') {
+                            // 处理图片列：显示查看链接或“无”
+                            var val = row[key];
+                            if (val) {
+                                return '<td><a href="' + escapeHtml(val) + '" target="_blank" class="qsl-link">查看</a></td>';
+                            } else {
+                                return '<td>无</td>';
+                            }
+                        } else {
+                            var val = row[key];
+                            if (val === null || val === undefined) return '<td>-</td>';
+                            if (typeof val === 'object') val = JSON.stringify(val).substring(0, 50);
+                            return '<td>' + escapeHtml(String(val)) + '</td>';
                         }
-                        var val = row[key];
-                        if (val === null || val === undefined) return '<td>-</td>';
-                        if (typeof val === 'object') val = JSON.stringify(val).substring(0, 50);
-                        return '<td>' + escapeHtml(String(val)) + '</td>';
                     });
                     return '<tr>' + cols.join('') + '</tr>';
-                }).join('');
+                });
                 tbody.innerHTML = rows;
 
                 if (totalPages > 1) {
@@ -593,13 +604,178 @@
             });
     }
 
-    // 默认展开第一个分组
+    // 默认展开分组，添加QSL按钮
     document.addEventListener('DOMContentLoaded', function() {
-        var firstToggle = document.querySelector('.nav-group-toggle');
-        if (firstToggle) firstToggle.click();
+        // 展开所有侧边栏分组
+        document.querySelectorAll('.nav-group-toggle').forEach(function(toggle) {
+            toggle.classList.add('active');
+            var group = toggle.dataset.group;
+            var items = document.querySelector('.nav-group-items[data-group="' + group + '"]');
+            if (items) items.classList.add('open');
+        });
         document.addEventListener('click', function(e) {
             var overlay = document.querySelector('.sidebar-overlay');
             if (overlay && overlay.classList.contains('show')) closeSidebar();
         });
+        // ===== 添加QSL记录功能 =====
+        (function initAddQsl() {
+            var addBtn = document.getElementById('addQslBtn');
+            var modal = document.getElementById('addQslModal');
+            if (!addBtn || !modal) return;
+
+            var closeBtn = document.getElementById('closeQslModal');
+            var cancelBtn = document.getElementById('cancelQslBtn');
+            var form = document.getElementById('addQslForm');
+            var errorEl = document.getElementById('qslFormError');
+
+            function showModal() {
+                modal.classList.add('active');
+                document.body.style.overflow = 'hidden';
+            }
+            function hideModal() {
+                modal.classList.remove('active');
+                document.body.style.overflow = '';
+                form.reset();
+                errorEl.style.display = 'none';
+                var fileInput = document.getElementById('qslImage');
+                if (fileInput) fileInput.value = '';
+            }
+
+            addBtn.addEventListener('click', showModal);
+            if (closeBtn) closeBtn.addEventListener('click', hideModal);
+            if (cancelBtn) cancelBtn.addEventListener('click', hideModal);
+            modal.addEventListener('click', function(e) {
+                if (e.target === modal) hideModal();
+            });
+
+            form.addEventListener('submit', async function(e) {
+                e.preventDefault();
+                errorEl.style.display = 'none';
+
+                var cardNumber = document.getElementById('qslCardNumber').value.trim();
+                var qsoTime = document.getElementById('qslQsoTime').value;
+                var callSign = document.getElementById('qslCallSign').value.trim();
+                var cardType = document.getElementById('qslCardType').value;
+                var cardClass = document.getElementById('qslCardClass').value;
+                var generation = parseInt(document.getElementById('qslGeneration').value);
+                var imageFile = document.getElementById('qslImage').files[0];
+
+                if (!cardNumber || !qsoTime || !callSign || !cardType || !cardClass || isNaN(generation)) {
+                    errorEl.textContent = '请填写所有必填字段';
+                    errorEl.style.display = 'block';
+                    return;
+                }
+
+                var sb = window.__supabaseClient;
+                if (!sb) {
+                    errorEl.textContent = '未登录或客户端未初始化';
+                    errorEl.style.display = 'block';
+                    return;
+                }
+
+                var session = await sb.auth.getSession();
+                var user = session.data.session?.user;
+                if (!user) {
+                    errorEl.textContent = '请先登录';
+                    errorEl.style.display = 'block';
+                    return;
+                }
+
+                // 检查管理员权限
+                var { data: roleData, error: roleError } = await sb
+                    .from('user_roles')
+                    .select('role')
+                    .eq('user_id', user.id)
+                    .maybeSingle();
+                if (roleError || !roleData || roleData.role !== 'admin') {
+                    errorEl.textContent = '权限不足，仅管理员可添加';
+                    errorEl.style.display = 'block';
+                    return;
+                }
+
+                var submitBtn = document.getElementById('submitQslBtn');
+                submitBtn.disabled = true;
+                submitBtn.textContent = '提交中...';
+
+                try {
+                    var imageUrl = null;
+                    // 上传图片
+                    if (imageFile) {
+                        // 转换并压缩为 WebP (50% quality)
+                        const webpBlob = await new Promise((resolve, reject) => {
+                            const reader = new FileReader();
+                            reader.onload = (e) => {
+                                const img = new Image();
+                                img.onload = () => {
+                                    const canvas = document.createElement('canvas');
+                                    canvas.width = img.width;
+                                    canvas.height = img.height;
+                                    const ctx = canvas.getContext('2d');
+                                    ctx.drawImage(img, 0, 0);
+                                    canvas.toBlob((blob) => {
+                                        if (blob) resolve(blob);
+                                        else reject(new Error('WebP 转换失败'));
+                                    }, 'image/webp', 0.5);
+                                };
+                                img.onerror = reject;
+                                img.src = e.target.result;
+                            };
+                            reader.onerror = reject;
+                            reader.readAsDataURL(imageFile);
+                        });
+
+                        const formData = new FormData();
+                        formData.append('file', webpBlob);
+                        formData.append('cardNumber', cardNumber);
+
+                        const { data: { session } } = await sb.auth.getSession();
+                        const token = session?.access_token;
+                        if (!token) throw new Error('未登录');
+
+                        const uploadResp = await fetch('https://pxhiobmdzntnxwpwtgpx.supabase.co/functions/v1/github-upload', {
+                            method: 'POST',
+                            headers: { Authorization: 'Bearer ' + token },
+                            body: formData,
+                        });
+
+                        if (!uploadResp.ok) {
+                            const err = await uploadResp.json();
+                            throw new Error('图片上传失败: ' + (err.error || '未知错误'));
+                        }
+                        const uploadResult = await uploadResp.json();
+                        if (!uploadResult.success) throw new Error('上传失败: ' + (uploadResult.error || ''));
+                        imageUrl = uploadResult.url;
+                    }
+
+                    var insertData = {
+                        card_number: cardNumber,
+                        qso_time: qsoTime,
+                        call_sign: callSign,
+                        card_type: cardType,
+                        card_class: cardClass,
+                        generation: generation,
+                        image_url: imageUrl,
+                        user_id: user.id,
+                    };
+
+                    var { error: insertError } = await sb.from('qsl_cards').insert(insertData);
+                    if (insertError) throw new Error('插入失败: ' + insertError.message);
+
+                    hideModal();
+                    // 刷新表格
+                    var tableName = 'qsl_cards';
+                    var state = pageState[tableName];
+                    var currentPage = state ? state.page : 1;
+                    var pageSize = state ? state.pageSize : 50;
+                    loadTableData(sb, tableName, currentPage, pageSize);
+                } catch (err) {
+                    errorEl.textContent = err.message || '添加失败，请重试';
+                    errorEl.style.display = 'block';
+                } finally {
+                    submitBtn.disabled = false;
+                    submitBtn.textContent = '添加';
+                }
+            });
+        })();
     });
 })();
