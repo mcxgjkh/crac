@@ -1,4 +1,4 @@
-// admin-dashboard.js – v4.9.4
+// admin-dashboard.js – v4.9.5
 (function() {
     var pageState = {};
 
@@ -778,7 +778,6 @@
                         card_type: cardType,
                         card_class: cardClass,
                         generation: generation,
-                        image_url: imageUrl,
                         user_id: user.id,
                     };
 
