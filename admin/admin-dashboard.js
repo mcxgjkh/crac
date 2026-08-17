@@ -1,4 +1,4 @@
-// admin-dashboard.js – v4.9.2
+// admin-dashboard.js – v4.9.3
 (function() {
     var pageState = {};
 
@@ -520,12 +520,7 @@
                 // ----- 针对 QSL 表固定列顺序 -----
                 var headers;
                 if (isQsl) {
-                    // 固定列顺序（不含 image_url，因为 image_url 可能不存在于所有行）
                     var baseCols = ['id', 'card_number', 'qso_time', 'call_sign', 'card_type', 'card_class', 'generation'];
-                    var hasImage = data.some(function(row) { return row.image_url; });
-                    if (hasImage) {
-                        baseCols.push('image_url');
-                    }
                     baseCols.push('操作');
                     headers = baseCols;
                 } else {
@@ -570,13 +565,6 @@
                                 }
                                 var link = '../images/QSL/webp/' + cardNumberPart + (callsignPart ? callsignPart : '') + '.webp';
                                 return '<td><a href="' + link + '" target="_blank" class="qsl-link">查看</a></td>';
-                            } else if (key === 'image_url') {
-                                var val = row[key];
-                                if (val) {
-                                    return '<td><a href="' + escapeHtml(val) + '" target="_blank" class="qsl-link">查看</a></td>';
-                                } else {
-                                    return '<td>无</td>';
-                                }
                             } else {
                                 var val = row[key];
                                 if (val === null || val === undefined) return '<td>-</td>';
