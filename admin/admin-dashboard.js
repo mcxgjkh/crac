@@ -1,4 +1,4 @@
-// admin-dashboard.js – v4.8.1 (修复选择文件显示、消息框滚动、操作列右对齐)
+// admin-dashboard.js – v4.9.1
 (function() {
     var pageState = {};
 
@@ -537,7 +537,7 @@
                 if (thead) {
                     thead.innerHTML = '<tr>' + headers.map(function(h) {
                         if (h === '操作') {
-                            return '<th style="text-align: right;">操作</th>';
+                            return '<th>操作</th>';
                         }
                         if (h === 'image_url') {
                             return '<th>图片</th>';

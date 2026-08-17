@@ -1723,17 +1723,17 @@ body {
 #page-qsl_cards .table-container th:nth-child(3),
 #page-qsl_cards .table-container td:nth-child(3) { width: 15%; } /* 通联时间 */
 #page-qsl_cards .table-container th:nth-child(4),
-#page-qsl_cards .table-container td:nth-child(4) { width: 10%; } /* 呼号 */
+#page-qsl_cards .table-container td:nth-child(4) { width: 15%; } /* 呼号 */
 #page-qsl_cards .table-container th:nth-child(5),
-#page-qsl_cards .table-container td:nth-child(5) { width: 8%; } /* 类型 */
+#page-qsl_cards .table-container td:nth-child(5) { width: 12%; } /* 类型 */
 #page-qsl_cards .table-container th:nth-child(6),
-#page-qsl_cards .table-container td:nth-child(6) { width: 8%; } /* 等级 */
+#page-qsl_cards .table-container td:nth-child(6) { width: 12%; } /* 等级 */
 #page-qsl_cards .table-container th:nth-child(7),
-#page-qsl_cards .table-container td:nth-child(7) { width: 8%; } /* 代数 */
+#page-qsl_cards .table-container td:nth-child(7) { width: 12%; } /* 代数 */
 #page-qsl_cards .table-container th:nth-child(8),
 #page-qsl_cards .table-container td:nth-child(8) { width: 15%; } /* 图片 */
 #page-qsl_cards .table-container th:nth-child(9),
-#page-qsl_cards .table-container td:nth-child(9) { width: 19%; } /* 操作 */
+#page-qsl_cards .table-container td:nth-child(9) { width: 8%; } /* 操作 */
 
 /* 美化下拉框 */
 #addQslForm select {
