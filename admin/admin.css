@@ -1710,3 +1710,75 @@ body {
         justify-content: center;
     }
 }
+
+/* QSL 卡片表格列宽 */
+#page-qsl_cards .table-container table {
+    table-layout: fixed;
+    min-width: 800px;
+}
+#page-qsl_cards .table-container th:nth-child(1),
+#page-qsl_cards .table-container td:nth-child(1) { width: 5%; } /* ID */
+#page-qsl_cards .table-container th:nth-child(2),
+#page-qsl_cards .table-container td:nth-child(2) { width: 12%; } /* 卡片编号 */
+#page-qsl_cards .table-container th:nth-child(3),
+#page-qsl_cards .table-container td:nth-child(3) { width: 15%; } /* 通联时间 */
+#page-qsl_cards .table-container th:nth-child(4),
+#page-qsl_cards .table-container td:nth-child(4) { width: 10%; } /* 呼号 */
+#page-qsl_cards .table-container th:nth-child(5),
+#page-qsl_cards .table-container td:nth-child(5) { width: 8%; } /* 类型 */
+#page-qsl_cards .table-container th:nth-child(6),
+#page-qsl_cards .table-container td:nth-child(6) { width: 8%; } /* 等级 */
+#page-qsl_cards .table-container th:nth-child(7),
+#page-qsl_cards .table-container td:nth-child(7) { width: 8%; } /* 代数 */
+#page-qsl_cards .table-container th:nth-child(8),
+#page-qsl_cards .table-container td:nth-child(8) { width: 15%; } /* 图片 */
+#page-qsl_cards .table-container th:nth-child(9),
+#page-qsl_cards .table-container td:nth-child(9) { width: 19%; } /* 操作 */
+
+/* 美化下拉框 */
+#addQslForm select {
+    appearance: auto;
+    -webkit-appearance: auto;
+    background: rgba(255, 255, 255, 0.06);
+    border: 1px solid var(--border-color);
+    color: var(--text-primary);
+    padding: 8px 12px;
+    border-radius: 6px;
+    outline: none;
+    cursor: pointer;
+}
+#addQslForm select:focus {
+    border-color: var(--primary-color);
+}
+
+/* 美化文件上传按钮（与 admin.css 中已有的 file-input-wrapper 一致） */
+#qslImage {
+    padding: 6px;
+    background: rgba(255, 255, 255, 0.06);
+    border: 1px solid var(--border-color);
+    border-radius: 6px;
+    color: var(--text-secondary);
+    cursor: pointer;
+}
+#qslImage::file-selector-button {
+    background: var(--primary-color);
+    color: #fff;
+    border: none;
+    padding: 6px 16px;
+    border-radius: 4px;
+    cursor: pointer;
+    font-weight: 500;
+}
+#qslImage::file-selector-button:hover {
+    background: rgba(var(--primary-rgb), 0.8);
+}
+
+/* 数字输入框（代数）微调按钮样式（兼容性） */
+#qslGeneration {
+    -moz-appearance: textfield;
+}
+#qslGeneration::-webkit-outer-spin-button,
+#qslGeneration::-webkit-inner-spin-button {
+    -webkit-appearance: none;
+    margin: 0;
+}

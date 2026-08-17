@@ -1,4 +1,4 @@
-// admin-dashboard.js – v4.7.1 (修复选择文件显示、消息框滚动、操作列右对齐)
+// admin-dashboard.js – v4.8.1 (修复选择文件显示、消息框滚动、操作列右对齐)
 (function() {
     var pageState = {};
 
@@ -516,69 +516,100 @@
                 }
 
                 var isQsl = (tableName === 'qsl_cards');
-                var headers = Object.keys(data[0]);
-                if (isQsl) headers.push('操作');
 
-                var cardCounts = {};
+                // ----- 针对 QSL 表固定列顺序 -----
+                var headers;
                 if (isQsl) {
-                    data.forEach(function(row) {
-                        var cn = row.card_number;
-                        cardCounts[cn] = (cardCounts[cn] || 0) + 1;
-                    });
+                    // 固定列顺序（不含 image_url，因为 image_url 可能不存在于所有行）
+                    var baseCols = ['id', 'card_number', 'qso_time', 'call_sign', 'card_type', 'card_class', 'generation'];
+                    var hasImage = data.some(function(row) { return row.image_url; });
+                    if (hasImage) {
+                        baseCols.push('image_url');
+                    }
+                    baseCols.push('操作');
+                    headers = baseCols;
+                } else {
+                    headers = Object.keys(data[0]);
                 }
 
+                // ----- 生成表头 -----
                 var thead = document.querySelector('#page-' + tableName + ' thead');
                 if (thead) {
                     thead.innerHTML = '<tr>' + headers.map(function(h) {
                         if (h === '操作') {
                             return '<th style="text-align: right;">操作</th>';
                         }
+                        if (h === 'image_url') {
+                            return '<th>图片</th>';
+                        }
                         return '<th>' + escapeHtml(h.replace(/_/g, ' ').toUpperCase()) + '</th>';
                     }).join('') + '</tr>';
                 }
 
-                // 关键修改：处理 image_url 列
-                var rows = data.map(function(row) {
-                    var cols = headers.map(function(key) {
-                        if (key === '操作') {
-                            // 原有查看链接逻辑（适用于 qsl_cards）
-                            var cn = row.card_number || '';
-                            var callsign = row.callsign || '';
-                            var numLen = cn.length;
-                            var cardNumberPart;
-                            if (numLen === 12) cardNumberPart = cn.slice(-3);
-                            else if (numLen === 11) cardNumberPart = cn.slice(-2);
-                            else cardNumberPart = cn.slice(-3);
-                            var callsignPart = '';
-                            if (cardCounts[cn] > 1 && callsign) {
-                                var callLen = callsign.length;
-                                if (callLen >= 6) callsignPart = callsign.substring(3, 6);
-                                else if (callLen >= 5) callsignPart = callsign.substring(3, 5);
-                                else callsignPart = callsign;
-                            }
-                            var safeCardPart = encodeURIComponent(cardNumberPart);
-                            var safeCallPart = encodeURIComponent(callsignPart);
-                            var link = '../images/QSL/webp/' + safeCardPart + (safeCallPart ? safeCallPart : '') + '.webp';
-                            return '<td><a href="' + link + '" target="_blank" class="qsl-link">查看</a></td>';
-                        } else if (key === 'image_url') {
-                            // 处理图片列：显示查看链接或“无”
-                            var val = row[key];
-                            if (val) {
-                                return '<td><a href="' + escapeHtml(val) + '" target="_blank" class="qsl-link">查看</a></td>';
+                // ----- 生成数据行 -----
+                var rows;
+                if (isQsl) {
+                    // QSL 表特殊处理：使用固定列顺序，并生成操作链接
+                    rows = data.map(function(row) {
+                        var cols = headers.map(function(key) {
+                            if (key === '操作') {
+                                // 操作列：基于 card_number 和 callsign 生成查看链接
+                                var cn = row.card_number || '';
+                                var callsign = row.callsign || '';
+                                var numLen = cn.length;
+                                var cardNumberPart;
+                                if (numLen === 12) cardNumberPart = cn.slice(-3);
+                                else if (numLen === 11) cardNumberPart = cn.slice(-2);
+                                else cardNumberPart = cn.slice(-3);
+                                var callsignPart = '';
+                                if (callsign) {
+                                    var callLen = callsign.length;
+                                    if (callLen >= 6) callsignPart = callsign.substring(3, 6);
+                                    else if (callLen >= 5) callsignPart = callsign.substring(3, 5);
+                                    else callsignPart = callsign;
+                                }
+                                var link = '../images/QSL/webp/' + cardNumberPart + (callsignPart ? callsignPart : '') + '.webp';
+                                return '<td><a href="' + link + '" target="_blank" class="qsl-link">查看</a></td>';
+                            } else if (key === 'image_url') {
+                                var val = row[key];
+                                if (val) {
+                                    return '<td><a href="' + escapeHtml(val) + '" target="_blank" class="qsl-link">查看</a></td>';
+                                } else {
+                                    return '<td>无</td>';
+                                }
                             } else {
-                                return '<td>无</td>';
+                                var val = row[key];
+                                if (val === null || val === undefined) return '<td>-</td>';
+                                if (typeof val === 'object') val = JSON.stringify(val).substring(0, 50);
+                                return '<td>' + escapeHtml(String(val)) + '</td>';
                             }
-                        } else {
+                        });
+                        return '<tr>' + cols.join('') + '</tr>';
+                    });
+                } else {
+                    // 其他表使用通用逻辑
+                    var cardCounts = {};
+                    // 通用表头（原有逻辑）
+                    var genericHeaders = Object.keys(data[0]);
+                    // 添加操作列（如果需要）
+                    var hasOperation = false;
+                    // 对于 exam_pending 等，我们可能不需要操作列，但保持原有逻辑
+                    // 原代码中非QSL表没有操作列，所以我们保持原样
+                    rows = data.map(function(row) {
+                        var cols = genericHeaders.map(function(key) {
                             var val = row[key];
                             if (val === null || val === undefined) return '<td>-</td>';
                             if (typeof val === 'object') val = JSON.stringify(val).substring(0, 50);
                             return '<td>' + escapeHtml(String(val)) + '</td>';
-                        }
+                        });
+                        return '<tr>' + cols.join('') + '</tr>';
                     });
-                    return '<tr>' + cols.join('') + '</tr>';
-                });
-                tbody.innerHTML = rows;
+                }
 
+                // ----- 渲染表格，修复多余逗号（使用 join） -----
+                tbody.innerHTML = rows.join('');
+
+                // ----- 分页控件 -----
                 if (totalPages > 1) {
                     var paginationHTML = '<div class="pagination-wrapper">';
                     paginationHTML += '<button class="page-btn prev" data-page="' + (page - 1) + '" ' + (page <= 1 ? 'disabled' : '') + '><i class="fas fa-chevron-left"></i></button>';
@@ -728,9 +759,12 @@
                         formData.append('file', webpBlob);
                         formData.append('cardNumber', cardNumber);
 
-                        const { data: { session } } = await sb.auth.getSession();
-                        const token = session?.access_token;
-                        if (!token) throw new Error('未登录');
+                        const { data: { session }, error: sessionError } = await sb.auth.getSession();
+                        if (sessionError || !session) {
+                            throw new Error('获取会话失败，请重新登录');
+                        }
+                        const token = session.access_token;
+                        if (!token) throw new Error('未登录或会话已过期');
 
                         const uploadResp = await fetch('https://pxhiobmdzntnxwpwtgpx.supabase.co/functions/v1/github-upload', {
                             method: 'POST',
