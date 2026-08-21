@@ -42,6 +42,7 @@
     }
 
     function injectAuthModal() {
+        // --- 修改：密码框增加小眼睛，注册增加确认密码 ---
         var html = [
             '<div class="modal fade" id="authModal" tabindex="-1">',
             '<div class="modal-dialog modal-dialog-centered"><div class="modal-content"><div class="modal-header">',
@@ -53,8 +54,17 @@
             '<input type="text" id="authUsername" class="form-control" placeholder="10位以内，选填" maxlength="10"></div>',
             '<div class="mb-3"><label class="form-label">邮箱</label>',
             '<input type="email" id="authEmail" class="form-control" placeholder="your@email.com"></div>',
+            // 密码组（含小眼睛）
             '<div class="mb-3"><label class="form-label">密码</label>',
-            '<input type="password" id="authPassword" class="form-control" placeholder="至少8位，需包含字母和数字"></div>',
+            '<div class="input-group">',
+            '<input type="password" id="authPassword" class="form-control" placeholder="至少8位，需包含字母和数字">',
+            '<button class="btn btn-outline-secondary" type="button" id="togglePassword" style="border-color: var(--border-color); background: rgba(255,255,255,0.06); color: var(--text-secondary);">',
+            '<i class="fas fa-eye"></i>',
+            '</button>',
+            '</div></div>',
+            // 确认密码（注册时显示）
+            '<div class="mb-3 d-none" id="confirmGroup"><label class="form-label">确认密码</label>',
+            '<input type="password" id="authConfirmPassword" class="form-control" placeholder="再次输入密码"></div>',
             '<div id="turnstileWidget" class="d-flex justify-content-center mb-2"></div>',
             '<button id="authSubmitBtn" class="btn btn-primary w-100 mb-2">登录</button>',
             '<div id="authExtraLinks" class="d-flex justify-content-between mb-2">',
@@ -77,11 +87,22 @@
         var errorEl = document.getElementById('authError');
         var emailEl = document.getElementById('authEmail');
         var passwordEl = document.getElementById('authPassword');
+        var confirmEl = document.getElementById('authConfirmPassword');
         var usernameEl = document.getElementById('authUsername');
         var usernameGroup = document.getElementById('usernameGroup');
+        var confirmGroup = document.getElementById('confirmGroup');
         var tsWidget = document.getElementById('turnstileWidget');
+        var togglePwdBtn = document.getElementById('togglePassword');
         var bsModal = new bootstrap.Modal(modal);
         var tsId = null;
+
+        // --- 小眼睛切换密码可见性 ---
+        togglePwdBtn.addEventListener('click', function() {
+            var type = passwordEl.getAttribute('type') === 'password' ? 'text' : 'password';
+            passwordEl.setAttribute('type', type);
+            this.querySelector('i').classList.toggle('fa-eye');
+            this.querySelector('i').classList.toggle('fa-eye-slash');
+        });
 
         function renderTurnstile() {
             if (typeof turnstile === 'undefined') {
@@ -104,7 +125,6 @@
             renderTurnstile();
         });
 
-        // 主题切换时重新渲染 Turnstile
         window.addEventListener('theme-changed', function() {
             if (modal.classList.contains('show') && tsId !== null) renderTurnstile();
         });
@@ -117,8 +137,12 @@
             errorEl.classList.add('d-none');
             if (m === 'register') {
                 usernameGroup.classList.remove('d-none');
+                confirmGroup.classList.remove('d-none');
+                confirmEl.required = true;
             } else {
                 usernameGroup.classList.add('d-none');
+                confirmGroup.classList.add('d-none');
+                confirmEl.required = false;
             }
         }
 
@@ -165,19 +189,32 @@
             var email = emailEl.value.trim();
             var password = passwordEl.value;
             var username = usernameEl.value.trim();
+            var confirm = confirmEl.value;
+
             if (!email || !password) {
                 errorEl.textContent = '请填写邮箱和密码';
                 errorEl.classList.remove('d-none');
                 return;
             }
+            // 注册时验证确认密码
+            if (mode === 'register') {
+                if (password !== confirm) {
+                    errorEl.textContent = '两次输入的密码不一致';
+                    errorEl.classList.remove('d-none');
+                    return;
+                }
+            }
+
             var pwdErr = validatePassword(password);
             if (pwdErr) {
                 errorEl.textContent = pwdErr;
                 errorEl.classList.remove('d-none');
                 return;
             }
+
             submitBtn.disabled = true;
             submitBtn.innerHTML = '<span class="spinner-border spinner-border-sm me-1"></span>处理中…';
+
             var captchaToken = getCaptchaToken();
             if (!captchaToken) {
                 errorEl.textContent = '请完成人机验证';
@@ -186,17 +223,30 @@
                 submitBtn.innerHTML = mode === 'login' ? '登录' : '注册';
                 return;
             }
+
             var options = { email: email, password: password, options: { captchaToken: captchaToken } };
             if (mode === 'register' && username) {
                 options.options.data = { username: username };
             }
+
             var result;
-            if (mode === 'login') {
-                result = await sb.auth.signInWithPassword(options);
-            } else {
-                result = await sb.auth.signUp(options);
+            try {
+                if (mode === 'login') {
+                    result = await sb.auth.signInWithPassword(options);
+                } else {
+                    result = await sb.auth.signUp(options);
+                }
+            } catch (e) {
+                errorEl.textContent = '网络错误，请稍后重试';
+                errorEl.classList.remove('d-none');
+                submitBtn.disabled = false;
+                submitBtn.innerHTML = mode === 'login' ? '登录' : '注册';
+                return;
             }
+
             submitBtn.disabled = false;
+            submitBtn.innerHTML = mode === 'login' ? '登录' : '注册';
+
             if (result.error) {
                 turnstile.reset(tsId);
                 errorEl.textContent = result.error.message;
@@ -244,6 +294,7 @@
             setMode(initialMode || 'login');
             emailEl.value = '';
             passwordEl.value = '';
+            confirmEl.value = '';
             errorEl.classList.add('d-none');
             errorEl.classList.remove('alert-success');
             errorEl.classList.add('alert-danger');
