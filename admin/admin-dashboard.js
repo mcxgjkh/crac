@@ -1,4 +1,4 @@
-// admin-dashboard.js – v4.9.8
+// admin-dashboard.js – v4.9.11
 (function() {
     var pageState = {};
 
@@ -566,7 +566,8 @@
                                     else if (callLen >= 5) callsignPart = callsign.substring(3, 5);
                                     else callsignPart = callsign;
                                 }
-                                var link = '../images/QSL/webp/' + cardNumberPart + (callsignPart ? callsignPart : '') + '.webp';
+                                var version = row.updated_at ? encodeURIComponent(row.updated_at) : Date.now();
+                                var link = '../images/QSL/webp/' + cardNumberPart + (callsignPart ? callsignPart : '') + '.webp?v=' + version;
                                 return '<td><a href="' + link + '" target="_blank" class="qsl-link">查看</a></td>';
                             } else {
                                 var val = row[key];
@@ -673,9 +674,10 @@
             }
 
             // 决定旧图的 URL：如果只有 1 条记录，说明该后三位唯一，图不带后缀
-            function getOldImageUrl(lastThree, callsign, isUnique) {
-                if (isUnique) return '../images/QSL/webp/' + lastThree + '.webp';
-                return '../images/QSL/webp/' + lastThree + getCallSignSuffix(callsign) + '.webp';
+            function getOldImageUrl(lastThree, callsign, isUnique, version) {
+                var suffix = isUnique ? '' : getCallSignSuffix(callsign);
+                var v = version ? '?v=' + encodeURIComponent(version) : '?v=' + Date.now();
+                return '../images/QSL/webp/' + lastThree + suffix + '.webp' + v;
             }
 
             function previewImage(src) {
@@ -829,7 +831,7 @@
                 html += '<div style="display:flex;flex-wrap:wrap;gap:16px;justify-content:center;">';
 
                 oldRecords.forEach(function(rec, idx) {
-                    var imgUrl = getOldImageUrl(lastThree, rec.call_sign, isUnique);
+                    var imgUrl = getOldImageUrl(lastThree, rec.call_sign, isUnique, rec.updated_at);
                     html += '<div style="border:1px solid var(--border-color);border-radius:12px;padding:12px;width:180px;background:var(--card-bg);" data-idx="old_' + idx + '">';
                     html += '<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px;">';
                     html += '<label style="display:flex;align-items:center;gap:6px;color:var(--text-primary);font-size:0.85rem;"><input type="checkbox" checked class="keep-checkbox" data-type="old" data-id="' + rec.id + '" data-index="' + idx + '"> 保留</label>';
@@ -909,50 +911,74 @@
                     var processOverlay = document.createElement('div');
                     processOverlay.className = 'confirm-overlay';
                     processOverlay.style.zIndex = '10030';
-                    processOverlay.innerHTML = '<div class="confirm-dialog" style="padding:20px;text-align:center;color:var(--text-primary);">处理中，请稍候...</div>';
+                    processOverlay.innerHTML = '<div class="confirm-dialog" style="padding:20px;text-align:center;color:var(--text-primary);min-width:340px;">' +
+                        '<div id="processStep" style="margin-bottom:8px;">准备中...</div>' +
+                        '<div id="processError" style="color:#ef4444;font-size:0.85rem;display:none;word-break:break-all;"></div>' +
+                        '</div>';
                     document.body.appendChild(processOverlay);
+
+                    function setStep(txt) {
+                        var el = document.getElementById('processStep');
+                        if (el) el.textContent = txt;
+                    }
 
                     try {
                         var { data: { session } } = await sb.auth.getSession();
                         var token = session?.access_token;
 
                         // 1. 删除未保留的旧记录
+                        setStep('正在删除未保留的旧记录...');
                         for (var i = 0; i < oldRecords.length; i++) {
                             var rec = oldRecords[i];
                             if (keepOldIds.indexOf(rec.id) === -1) {
                                 var oldSuffix = isUnique ? '' : getCallSignSuffix(rec.call_sign);
                                 var oldFilename = lastThree + oldSuffix + '.webp';
-                                await fetch('https://pxhiobmdzntnxwpwtgpx.supabase.co/functions/v1/github-upload', {
+
+                                // 先删 GitHub 文件；若文件不存在，DELETE 也返回成功
+                                var delResp = await fetch('https://pxhiobmdzntnxwpwtgpx.supabase.co/functions/v1/github-upload', {
                                     method: 'DELETE',
                                     headers: { Authorization: 'Bearer ' + token, 'Content-Type': 'application/json' },
                                     body: JSON.stringify({ filename: oldFilename })
                                 });
-                                await sb.from('qsl_cards').delete().eq('id', rec.id);
+                                if (!delResp.ok) {
+                                    var delErr = await delResp.json().catch(function() { return {}; });
+                                    throw new Error('删除图片 ' + oldFilename + ' 失败: ' + (delErr.error || delResp.status));
+                                }
+
+                                // 再删数据库记录
+                                var delDb = await sb.from('qsl_cards').delete().eq('id', rec.id);
+                                if (delDb.error) {
+                                    throw new Error('删除数据库记录 id=' + rec.id + ' 失败: ' + delDb.error.message);
+                                }
                             }
                         }
 
                         // 2. 处理新记录
                         if (keepNew) {
+                            setStep('正在上传新记录...');
                             var newSuffix = '';
                             var hasNoSuffixOld = oldRecords.some(function(rec) {
                                 return keepOldIds.indexOf(rec.id) !== -1 && getCallSignSuffix(rec.call_sign) === '';
                             });
                             if (hasNoSuffixOld) newSuffix = getCallSignSuffix(newRecord.callSign);
                             var newFilename = lastThree + newSuffix + '.webp';
+
                             var formData = new FormData();
                             formData.append('file', newImageBlob, newFilename);
                             formData.append('cardNumber', newRecord.cardNumber);
                             formData.append('filename', newFilename);
+
                             var uploadResp = await fetch('https://pxhiobmdzntnxwpwtgpx.supabase.co/functions/v1/github-upload', {
                                 method: 'POST',
                                 headers: { Authorization: 'Bearer ' + token },
                                 body: formData,
                             });
                             if (!uploadResp.ok) {
-                                var err = await uploadResp.json();
-                                throw new Error('新图片上传失败: ' + (err.error || '未知错误'));
+                                var uploadErr = await uploadResp.json().catch(function() { return {}; });
+                                throw new Error('新图片上传失败: ' + (uploadErr.error || uploadResp.status));
                             }
-                            await sb.from('qsl_cards').insert({
+
+                            var insertResp = await sb.from('qsl_cards').insert({
                                 card_number: newRecord.cardNumber,
                                 qso_time: newRecord.qsoTime,
                                 call_sign: newRecord.callSign,
@@ -960,9 +986,13 @@
                                 card_class: newRecord.cardClass,
                                 generation: newRecord.generation
                             });
+                            if (insertResp.error) {
+                                throw new Error('插入新记录失败: ' + insertResp.error.message);
+                            }
                         }
 
                         // 3. 更新保留的旧记录
+                        setStep('正在更新保留的旧记录...');
                         for (var j = 0; j < oldRecords.length; j++) {
                             var rec = oldRecords[j];
                             if (keepOldIds.indexOf(rec.id) !== -1) {
@@ -983,14 +1013,22 @@
                                         formData2.append('file', newImageBlob, oldFilename2);
                                         formData2.append('cardNumber', rec.card_number);
                                         formData2.append('filename', oldFilename2);
-                                        await fetch('https://pxhiobmdzntnxwpwtgpx.supabase.co/functions/v1/github-upload', {
+
+                                        var upResp = await fetch('https://pxhiobmdzntnxwpwtgpx.supabase.co/functions/v1/github-upload', {
                                             method: 'POST',
                                             headers: { Authorization: 'Bearer ' + token },
                                             body: formData2,
                                         });
+                                        if (!upResp.ok) {
+                                            var upErr = await upResp.json().catch(function() { return {}; });
+                                            throw new Error('更新图片 ' + oldFilename2 + ' 失败: ' + (upErr.error || upResp.status));
+                                        }
                                     }
                                     if (Object.keys(updateData).length > 0) {
-                                        await sb.from('qsl_cards').update(updateData).eq('id', rec.id);
+                                        var updateResp = await sb.from('qsl_cards').update(updateData).eq('id', rec.id);
+                                        if (updateResp.error) {
+                                            throw new Error('更新数据库记录 id=' + rec.id + ' 失败: ' + updateResp.error.message);
+                                        }
                                     }
                                 }
                             }
@@ -1000,8 +1038,15 @@
                         close(true);
                         loadTableData(sb, 'qsl_cards', pageState['qsl_cards']?.page || 1, 50);
                     } catch (err) {
-                        processOverlay.remove();
-                        showMessageDialog('处理失败: ' + err.message, '错误');
+                        var errEl = document.getElementById('processError');
+                        if (errEl) {
+                            errEl.style.display = 'block';
+                            errEl.textContent = err.message;
+                        }
+                        var stepEl = document.getElementById('processStep');
+                        if (stepEl) stepEl.textContent = '操作失败';
+                        console.error('QSL 处理失败:', err);
+                        setTimeout(function() { processOverlay.remove(); }, 5000);
                     }
                 });
             }
