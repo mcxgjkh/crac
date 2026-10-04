@@ -651,6 +651,7 @@
                 modal.classList.add('active');
                 document.body.style.overflow = 'hidden';
             }
+
             function hideModal() {
                 modal.classList.remove('active');
                 document.body.style.overflow = '';
@@ -660,12 +661,35 @@
                 if (fileInput) fileInput.value = '';
             }
 
+            function getCallSignSuffix(callsign) {
+                if (!callsign) return '';
+                var len = callsign.length;
+                if (len >= 6) return callsign.substring(3, 6);
+                if (len >= 5) return callsign.substring(3, 5);
+                return callsign;
+            }
+
+            function getQslImageUrl(lastThree, callsign) {
+                var suffix = getCallSignSuffix(callsign);
+                return '../images/QSL/webp/' + lastThree + suffix + '.webp';
+            }
+
+            function previewImage(src) {
+                var overlay = document.createElement('div');
+                overlay.className = 'img-preview-overlay';
+                overlay.style.cssText = 'position:fixed;inset:0;background:rgba(0,0,0,0.85);z-index:10000;display:flex;align-items:center;justify-content:center;cursor:pointer;';
+                var img = document.createElement('img');
+                img.src = src;
+                img.style.cssText = 'max-width:90vw;max-height:90vh;object-fit:contain;';
+                overlay.appendChild(img);
+                document.body.appendChild(overlay);
+                overlay.onclick = function() { overlay.remove(); };
+            }
+
             addBtn.addEventListener('click', showModal);
             if (closeBtn) closeBtn.addEventListener('click', hideModal);
             if (cancelBtn) cancelBtn.addEventListener('click', hideModal);
-            modal.addEventListener('click', function(e) {
-                if (e.target === modal) hideModal();
-            });
+            modal.addEventListener('click', function(e) { if (e.target === modal) hideModal(); });
 
             form.addEventListener('submit', async function(e) {
                 e.preventDefault();
@@ -700,96 +724,91 @@
                     return;
                 }
 
-                // 检查管理员权限
-                var { data: roleData, error: roleError } = await sb
-                    .from('user_roles')
-                    .select('role')
-                    .eq('user_id', user.id)
-                    .maybeSingle();
+                var { data: roleData, error: roleError } = await sb.from('user_roles').select('role').eq('user_id', user.id).maybeSingle();
                 if (roleError || !roleData || roleData.role !== 'admin') {
                     errorEl.textContent = '权限不足，仅管理员可添加';
                     errorEl.style.display = 'block';
                     return;
                 }
 
+                var lastThree = cardNumber.length === 12 ? cardNumber.slice(-3) : (cardNumber.length === 11 ? cardNumber.slice(-2) : cardNumber.slice(-3));
+
+                // 查重
+                var { data: existingRecords, error: queryError } = await sb
+                    .from('qsl_cards')
+                    .select('*')
+                    .like('card_number', '%' + lastThree);
+
+                if (queryError) {
+                    errorEl.textContent = '查询数据库失败: ' + queryError.message;
+                    errorEl.style.display = 'block';
+                    return;
+                }
+
+                if (!existingRecords || existingRecords.length === 0) {
+                    // 无重复，正常上传
+                    await doNormalUpload(sb, cardNumber, qsoTime, callSign, cardType, cardClass, generation, imageFile, lastThree);
+                } else {
+                    // 有重复，弹出对比窗口
+                    var newImageBlob = await compressToWebp(imageFile);
+                    showDuplicateDialog(sb, existingRecords, { cardNumber, qsoTime, callSign, cardType, cardClass, generation }, newImageBlob, lastThree, hideModal);
+                }
+            });
+
+            async function compressToWebp(imageFile) {
+                return new Promise((resolve, reject) => {
+                    const reader = new FileReader();
+                    reader.onload = (e) => {
+                        const img = new Image();
+                        img.onload = () => {
+                            const canvas = document.createElement('canvas');
+                            canvas.width = img.width;
+                            canvas.height = img.height;
+                            const ctx = canvas.getContext('2d');
+                            ctx.drawImage(img, 0, 0);
+                            canvas.toBlob((blob) => {
+                                if (blob) resolve(blob);
+                                else reject(new Error('WebP 转换失败'));
+                            }, 'image/webp', 0.5);
+                        };
+                        img.onerror = reject;
+                        img.src = e.target.result;
+                    };
+                    reader.onerror = reject;
+                    reader.readAsDataURL(imageFile);
+                });
+            }
+
+            async function doNormalUpload(sb, cardNumber, qsoTime, callSign, cardType, cardClass, generation, imageFile, lastThree) {
                 var submitBtn = document.getElementById('submitQslBtn');
                 submitBtn.disabled = true;
                 submitBtn.textContent = '提交中...';
-
                 try {
                     var imageUrl = null;
-                    // 上传图片
                     if (imageFile) {
-                        // 转换并压缩为 WebP (50% quality)
-                        const webpBlob = await new Promise((resolve, reject) => {
-                            const reader = new FileReader();
-                            reader.onload = (e) => {
-                                const img = new Image();
-                                img.onload = () => {
-                                    const canvas = document.createElement('canvas');
-                                    canvas.width = img.width;
-                                    canvas.height = img.height;
-                                    const ctx = canvas.getContext('2d');
-                                    ctx.drawImage(img, 0, 0);
-                                    canvas.toBlob((blob) => {
-                                        if (blob) resolve(blob);
-                                        else reject(new Error('WebP 转换失败'));
-                                    }, 'image/webp', 0.5);
-                                };
-                                img.onerror = reject;
-                                img.src = e.target.result;
-                            };
-                            reader.onerror = reject;
-                            reader.readAsDataURL(imageFile);
-                        });
-
-                        const formData = new FormData();
-                        formData.append('file', webpBlob);
+                        var webpBlob = await compressToWebp(imageFile);
+                        var { data: { session } } = await sb.auth.getSession();
+                        var token = session?.access_token;
+                        var formData = new FormData();
+                        formData.append('file', webpBlob, lastThree + '.webp');
                         formData.append('cardNumber', cardNumber);
-
-                        // 获取当前用户和 token
-                        const { data: { user }, error: userError } = await sb.auth.getUser();
-                        if (userError || !user) {
-                            throw new Error('获取用户信息失败，请重新登录');
-                        }
-                        const { data: { session } } = await sb.auth.getSession();
-                        const token = session?.access_token;
-                        if (!token) throw new Error('未登录或会话已过期');
-
-                        const uploadResp = await fetch('https://pxhiobmdzntnxwpwtgpx.supabase.co/functions/v1/github-upload', {
+                        var uploadResp = await fetch('https://pxhiobmdzntnxwpwtgpx.supabase.co/functions/v1/github-upload', {
                             method: 'POST',
                             headers: { Authorization: 'Bearer ' + token },
                             body: formData,
                         });
-
                         if (!uploadResp.ok) {
-                            const err = await uploadResp.json();
+                            var err = await uploadResp.json();
                             throw new Error('图片上传失败: ' + (err.error || '未知错误'));
                         }
-                        const uploadResult = await uploadResp.json();
-                        if (!uploadResult.success) throw new Error('上传失败: ' + (uploadResult.error || ''));
+                        var uploadResult = await uploadResp.json();
                         imageUrl = uploadResult.url;
                     }
-
-                    var insertData = {
-                        card_number: cardNumber,
-                        qso_time: qsoTime,
-                        call_sign: callSign,
-                        card_type: cardType,
-                        card_class: cardClass,
-                        generation: generation,
-                    };
-
+                    var insertData = { card_number: cardNumber, qso_time: qsoTime, call_sign: callSign, card_type: cardType, card_class: cardClass, generation: generation };
                     var { error: insertError } = await sb.from('qsl_cards').insert(insertData);
                     if (insertError) throw new Error('插入失败: ' + insertError.message);
-
                     hideModal();
-                    // 刷新表格
-                    var tableName = 'qsl_cards';
-                    var state = pageState[tableName];
-                    var currentPage = state ? state.page : 1;
-                    var pageSize = state ? state.pageSize : 50;
-                    loadTableData(sb, tableName, currentPage, pageSize);
+                    loadTableData(sb, 'qsl_cards', pageState['qsl_cards']?.page || 1, 50);
                 } catch (err) {
                     errorEl.textContent = err.message || '添加失败，请重试';
                     errorEl.style.display = 'block';
@@ -797,7 +816,205 @@
                     submitBtn.disabled = false;
                     submitBtn.textContent = '添加';
                 }
-            });
+            }
+
+            async function showDuplicateDialog(sb, oldRecords, newRecord, newImageBlob, lastThree, onDone) {
+                var overlay = document.createElement('div');
+                overlay.className = 'confirm-overlay';
+                overlay.style.zIndex = '10001';
+
+                var content = document.createElement('div');
+                content.className = 'confirm-dialog';
+                content.style.maxWidth = '900px';
+                content.style.width = '95%';
+
+                var html = '<div class="confirm-header"><span>编号重复，请选择保留方式</span><button class="confirm-close" title="关闭">×</button></div>';
+                html += '<div style="padding:20px;max-height:70vh;overflow-y:auto;">';
+                html += '<p style="margin-bottom:16px;color:var(--text-secondary);font-size:0.9rem;">发现数据库中已存在该编号的记录，请选择保留哪些记录。勾选表示保留，取消勾选表示删除。对于保留的旧记录，可以选择更新方式。</p>';
+
+                html += '<div style="display:flex;flex-wrap:wrap;gap:16px;justify-content:center;">';
+
+                // 旧记录
+                oldRecords.forEach(function(rec, idx) {
+                    var imgUrl = getQslImageUrl(lastThree, rec.call_sign);
+                    html += '<div style="border:1px solid var(--border-color);border-radius:12px;padding:12px;width:180px;background:var(--card-bg);" data-idx="old_' + idx + '">';
+                    html += '<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px;">';
+                    html += '<label style="display:flex;align-items:center;gap:6px;color:var(--text-primary);font-size:0.85rem;"><input type="checkbox" checked class="keep-checkbox" data-type="old" data-id="' + rec.id + '" data-index="' + idx + '"> 保留</label>';
+                    html += '<span style="font-size:0.75rem;color:var(--text-secondary);">旧记录</span>';
+                    html += '</div>';
+                    html += '<img src="' + imgUrl + '" style="width:100%;height:120px;object-fit:cover;border-radius:8px;cursor:pointer;margin-bottom:8px;" class="qsl-preview-img" data-src="' + imgUrl + '">';
+                    html += '<div style="font-size:0.8rem;color:var(--text-secondary);">呼号: ' + escapeHtml(rec.call_sign || '-') + '</div>';
+                    html += '<div style="font-size:0.8rem;color:var(--text-secondary);">时间: ' + escapeHtml(rec.qso_time || '-') + '</div>';
+                    html += '<select class="update-mode" data-index="' + idx + '" style="margin-top:8px;width:100%;padding:4px;border-radius:4px;background:var(--card-bg);color:var(--text-primary);border:1px solid var(--border-color);font-size:0.75rem;display:none;">';
+                    html += '<option value="all">都更新</option><option value="image">仅更新图片</option><option value="info">仅更新信息</option><option value="none">不更新</option>';
+                    html += '</select>';
+                    html += '</div>';
+                });
+
+                // 新记录
+                var newImgUrl = URL.createObjectURL(newImageBlob);
+                html += '<div style="border:1px solid var(--primary-color);border-radius:12px;padding:12px;width:180px;background:rgba(var(--primary-rgb),0.05);">';
+                html += '<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px;">';
+                html += '<label style="display:flex;align-items:center;gap:6px;color:var(--text-primary);font-size:0.85rem;"><input type="checkbox" checked class="keep-checkbox" data-type="new"> 保留</label>';
+                html += '<span style="font-size:0.75rem;color:var(--primary-color);">新记录</span>';
+                html += '</div>';
+                html += '<img src="' + newImgUrl + '" style="width:100%;height:120px;object-fit:cover;border-radius:8px;cursor:pointer;margin-bottom:8px;" class="qsl-preview-img" data-src="' + newImgUrl + '">';
+                html += '<div style="font-size:0.8rem;color:var(--text-secondary);">呼号: ' + escapeHtml(newRecord.callSign || '-') + '</div>';
+                html += '<div style="font-size:0.8rem;color:var(--text-secondary);">时间: ' + escapeHtml(newRecord.qsoTime || '-') + '</div>';
+                html += '</div>';
+
+                html += '</div></div>';
+                html += '<div class="confirm-footer"><button class="confirm-btn confirm-cancel">取消</button><button class="confirm-btn confirm-ok" style="background:var(--primary-color);">确定</button></div>';
+
+                content.innerHTML = html;
+                overlay.appendChild(content);
+                document.body.appendChild(overlay);
+
+                content.querySelectorAll('.qsl-preview-img').forEach(function(img) {
+                    img.addEventListener('click', function() { previewImage(this.dataset.src); });
+                });
+
+                content.querySelectorAll('.keep-checkbox').forEach(function(cb) {
+                    cb.addEventListener('change', function() {
+                        var type = this.dataset.type;
+                        if (type === 'old') {
+                            var idx = this.dataset.index;
+                            var sel = content.querySelector('.update-mode[data-index="' + idx + '"]');
+                            if (sel) sel.style.display = this.checked ? 'block' : 'none';
+                        }
+                    });
+                });
+
+                function close(result) {
+                    URL.revokeObjectURL(newImgUrl);
+                    overlay.remove();
+                    if (result) onDone();
+                }
+
+                content.querySelector('.confirm-close').addEventListener('click', function() { close(false); });
+                content.querySelector('.confirm-cancel').addEventListener('click', function() { close(false); });
+                overlay.addEventListener('click', function(e) { if (e.target === overlay) close(false); });
+
+                content.querySelector('.confirm-ok').addEventListener('click', async function() {
+                    var keepOldIds = [];
+                    var updateModes = {};
+                    content.querySelectorAll('.keep-checkbox[data-type="old"]:checked').forEach(function(cb) {
+                        keepOldIds.push(parseInt(cb.dataset.id));
+                        var sel = content.querySelector('.update-mode[data-index="' + cb.dataset.index + '"]');
+                        updateModes[cb.dataset.id] = sel ? sel.value : 'none';
+                    });
+                    var keepNew = content.querySelector('.keep-checkbox[data-type="new"]').checked;
+
+                    var confirmMsg = '确认执行以下操作？\n';
+                    if (keepOldIds.length > 0) confirmMsg += '保留 ' + keepOldIds.length + ' 条旧记录\n';
+                    if (keepNew) confirmMsg += '保留新记录\n';
+                    if (keepOldIds.length === 0 && !keepNew) confirmMsg += '不保留任何记录（全部删除）\n';
+
+                    var confirmed = await showConfirmDialog(confirmMsg);
+                    if (!confirmed) return;
+
+                    var processOverlay = document.createElement('div');
+                    processOverlay.className = 'confirm-overlay';
+                    processOverlay.style.zIndex = '10002';
+                    processOverlay.innerHTML = '<div class="confirm-dialog" style="padding:20px;text-align:center;color:var(--text-primary);">处理中，请稍候...</div>';
+                    document.body.appendChild(processOverlay);
+
+                    try {
+                        var { data: { session } } = await sb.auth.getSession();
+                        var token = session?.access_token;
+
+                        // 1. 处理未保留的旧记录（删除）
+                        for (var i = 0; i < oldRecords.length; i++) {
+                            var rec = oldRecords[i];
+                            if (keepOldIds.indexOf(rec.id) === -1) {
+                                var oldSuffix = getCallSignSuffix(rec.call_sign);
+                                var oldFilename = lastThree + oldSuffix + '.webp';
+                                await fetch('https://pxhiobmdzntnxwpwtgpx.supabase.co/functions/v1/github-upload', {
+                                    method: 'DELETE',
+                                    headers: { Authorization: 'Bearer ' + token, 'Content-Type': 'application/json' },
+                                    body: JSON.stringify({ filename: oldFilename })
+                                });
+                                await sb.from('qsl_cards').delete().eq('id', rec.id);
+                            }
+                        }
+
+                        // 2. 处理新记录
+                        if (keepNew) {
+                            // 检查是否需要带后缀（如果保留的旧记录中存在不带后缀的 000.webp）
+                            var newSuffix = '';
+                            var hasNoSuffixOld = oldRecords.some(function(rec) {
+                                return keepOldIds.indexOf(rec.id) !== -1 && getCallSignSuffix(rec.call_sign) === '';
+                            });
+                            if (hasNoSuffixOld) {
+                                newSuffix = getCallSignSuffix(newRecord.callSign);
+                            }
+                            var newFilename = lastThree + newSuffix + '.webp';
+                            var formData = new FormData();
+                            formData.append('file', newImageBlob, newFilename);
+                            formData.append('cardNumber', newRecord.cardNumber);
+                            formData.append('filename', newFilename);
+                            var uploadResp = await fetch('https://pxhiobmdzntnxwpwtgpx.supabase.co/functions/v1/github-upload', {
+                                method: 'POST',
+                                headers: { Authorization: 'Bearer ' + token },
+                                body: formData,
+                            });
+                            if (!uploadResp.ok) {
+                                var err = await uploadResp.json();
+                                throw new Error('新图片上传失败: ' + (err.error || '未知错误'));
+                            }
+                            await sb.from('qsl_cards').insert({
+                                card_number: newRecord.cardNumber,
+                                qso_time: newRecord.qsoTime,
+                                call_sign: newRecord.callSign,
+                                card_type: newRecord.cardType,
+                                card_class: newRecord.cardClass,
+                                generation: newRecord.generation
+                            });
+                        }
+
+                        // 3. 处理保留的旧记录（更新）
+                        for (var j = 0; j < oldRecords.length; j++) {
+                            var rec = oldRecords[j];
+                            if (keepOldIds.indexOf(rec.id) !== -1) {
+                                var mode = updateModes[rec.id];
+                                if (mode && mode !== 'none') {
+                                    var updateData = {};
+                                    if (mode === 'all' || mode === 'info') {
+                                        updateData.qso_time = newRecord.qsoTime;
+                                        updateData.call_sign = newRecord.callSign;
+                                        updateData.card_type = newRecord.cardType;
+                                        updateData.card_class = newRecord.cardClass;
+                                        updateData.generation = newRecord.generation;
+                                    }
+                                    if (mode === 'all' || mode === 'image') {
+                                        var oldSuffix2 = getCallSignSuffix(rec.call_sign);
+                                        var oldFilename2 = lastThree + oldSuffix2 + '.webp';
+                                        var formData2 = new FormData();
+                                        formData2.append('file', newImageBlob, oldFilename2);
+                                        formData2.append('cardNumber', rec.card_number);
+                                        formData2.append('filename', oldFilename2);
+                                        await fetch('https://pxhiobmdzntnxwpwtgpx.supabase.co/functions/v1/github-upload', {
+                                            method: 'POST',
+                                            headers: { Authorization: 'Bearer ' + token },
+                                            body: formData2,
+                                        });
+                                    }
+                                    if (Object.keys(updateData).length > 0) {
+                                        await sb.from('qsl_cards').update(updateData).eq('id', rec.id);
+                                    }
+                                }
+                            }
+                        }
+
+                        processOverlay.remove();
+                        close(true);
+                        loadTableData(sb, 'qsl_cards', pageState['qsl_cards']?.page || 1, 50);
+                    } catch (err) {
+                        processOverlay.remove();
+                        showMessageDialog('处理失败: ' + err.message, '错误');
+                    }
+                });
+            }
         })();
     });
 })();
