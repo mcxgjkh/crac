@@ -293,5 +293,15 @@
     "md5": "f104b37eb8b45bbde1fc834da8b54b94",
     "sha256": "95deb324246339368501548d41e779c3e3e236ab14a2da711101ca2f606baee1",
     "protected": false
+  },
+  {
+    "name": "龙族5.mobi",
+    "size": 2145021,
+    "modified": "2026-10-13 14:05:27",
+    "url": "./download/龙族5.mobi",
+    "ext": "mobi",
+    "md5": "8dbc358780b52c82828289aff4604685",
+    "sha256": "dfc0a7bb6a291aed7b2c679d7dc7209631f1dd037b95c1f380ecfb81a8948d54",
+    "protected": false
   }
 ]
