@@ -23,7 +23,6 @@
             background-color: #f9f9f9;
         }
 
-        /* 顶部导航 */
         .top-bar {
             background-color: #f8f9fa;
             font-size: 0.9rem;
@@ -36,7 +35,6 @@
             margin: 0 10px;
         }
 
-        /* 主导航 */
         .navbar {
             background-color: white;
             box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
@@ -68,7 +66,6 @@
             background-color: var(--primary-blue);
         }
 
-        /* 页面标题 */
         .page-header {
             padding: 80px 0 50px;
             background: linear-gradient(135deg, var(--primary-blue) 0%, var(--secondary-blue) 100%);
@@ -96,7 +93,6 @@
             color: rgba(255, 255, 255, 0.8);
         }
 
-        /* 主要内容区域 */
         .main-content {
             padding: 20px 0 40px;
         }
@@ -119,7 +115,6 @@
             background-color: var(--primary-blue);
         }
 
-        /* 侧边栏 */
         .sidebar {
             background: white;
             border-radius: 8px;
@@ -158,7 +153,6 @@
             background-color: var(--primary-blue);
         }
 
-        /* 下载列表 */
         .downloads-container {
             background: white;
             border-radius: 8px;
@@ -166,7 +160,6 @@
             padding: 25px;
         }
 
-        /* 搜索框 */
         .search-box {
             display: flex;
             gap: 12px;
@@ -262,7 +255,6 @@
             background-color: var(--secondary-blue);
         }
 
-        /* 分页 */
         .pagination {
             margin-top: 30px;
             justify-content: center;
@@ -277,14 +269,12 @@
             border-color: var(--primary-blue);
         }
 
-        /* 加载/无结果提示 */
         .loading-placeholder, .no-results {
             text-align: center;
             padding: 40px;
             color: #6c757d;
         }
 
-        /* 页脚 */
         footer {
             background-color: var(--dark-gray);
             color: white;
@@ -359,7 +349,6 @@
             -webkit-text-stroke: 1px var(--ani-color);
         }
 
-        /* Cookies 遮罩层 */
         .cookies-overlay_cookies {
             position: fixed;
             top: 0;
@@ -373,7 +362,6 @@
             z-index: 9999;
         }
 
-        /* Cookies 卡片样式 */
         .card_cookies {
             width: 300px;
             height: 220px;
@@ -468,18 +456,11 @@
         }
 
         @keyframes ani {
-            0% {
-                background-position: 0%;
-            }
-            50% {
-                background-position: 400%;
-            }
-            100% {
-                background-position: 0%;
-            }
+            0% { background-position: 0%; }
+            50% { background-position: 400%; }
+            100% { background-position: 0%; }
         }
 
-        /* 主题切换开关 */
         .theme-switch {
             position: absolute;
             right: 65px;
@@ -689,202 +670,51 @@
             right: 5px;
         }
 
-        /* 白天/黑夜模式标签 */
-        .dark-theme .day_mode {
-            color: #aaa;
-        }
+        .dark-theme .day_mode { color: #aaa; }
+        .dark-theme .night_mode { color: #64b5f6; font-weight: bold; }
+        .day_mode { color: #64b5f6; font-weight: bold; }
 
-        .dark-theme .night_mode {
-            color: #64b5f6;
-            font-weight: bold;
-        }
+        .dark-theme { background-color: #121212; color: #e0e0e0; }
+        .dark-theme .top-bar { background-color: #1e1e1e; color: #e0e0e0; }
+        .dark-theme .top-bar a { color: #b0b0b0; }
+        .dark-theme .navbar { background-color: #1e1e1e; box-shadow: 0 2px 10px rgba(0, 0, 0, 0.3); }
+        .dark-theme .nav-link { color: #e0e0e0 !important; }
+        .dark-theme .nav-link:hover { color: #64b5f6 !important; }
+        .dark-theme .nav-link:hover::after { background-color: #64b5f6; }
+        .dark-theme .page-header { background: linear-gradient(135deg, #0d3b6e 0%, #082444 100%); color: white; }
+        .dark-theme .breadcrumb a { color: rgba(255, 255, 255, 0.8); }
+        .dark-theme .breadcrumb-item_a { color: white; }
+        .dark-theme .download_h1 { color: white; }
+        .dark-theme .main-content { background-color: #121212; }
+        .dark-theme .section-title { color: #64b5f6; }
+        .dark-theme .section-title::after { background-color: #64b5f6; }
+        .dark-theme .sidebar { background: #1e1e1e; box-shadow: 0 2px 12px rgba(0, 0, 0, 0.3); }
+        .dark-theme .category-list a { color: #b0b0b0; }
+        .dark-theme .category-list a:hover, .dark-theme .category-list a.active { background-color: #2a2a2a; color: #64b5f6; }
+        .dark-theme .category-list .badge { background-color: #64b5f6; }
+        .dark-theme .list-group-item { background-color: #1e1e1e; border-color: #333; color: #e0e0e0; }
+        .dark-theme .list-group-item:hover { background-color: #2a2a2a; }
+        .dark-theme .text-muted { color: #aaa !important; }
+        .dark-theme .downloads-container { background: #1e1e1e; box-shadow: 0 2px 12px rgba(0, 0, 0, 0.3); }
+        .dark-theme .search-box input { background-color: #2a2a2a; border-color: #444; color: #e0e0e0; }
+        .dark-theme .search-box input::placeholder { color: #888; }
+        .dark-theme .search-box button { background: #2a5a8a; }
+        .dark-theme .download-item { border-bottom: 1px solid #333; }
+        .dark-theme .download-item:hover { background-color: #2a2a2a; }
+        .dark-theme .file-icon { color: #64b5f6; }
+        .dark-theme .file-meta { color: #aaa; }
+        .dark-theme .download-btn { background-color: #2a5a8a; color: #e0e0e0; }
+        .dark-theme .download-btn:hover { background-color: #3a6a9a; }
+        .dark-theme .page-link { background-color: #1e1e1e; border-color: #444; color: #bbb; }
+        .dark-theme .page-item.active .page-link { background-color: #2a5a8a; border-color: #2a5a8a; color: #e0e0e0; }
+        .dark-theme .page-link:hover { background-color: #333; border-color: #555; color: #64b5f6; }
+        .dark-theme footer { background-color: #0a0a0a; }
+        .dark-theme footer h5 { color: #fff; }
+        .dark-theme footer a { color: #aaa; }
+        .dark-theme footer a:hover { color: #fff; }
+        .dark-theme .footer-bottom { border-top: 1px solid #333; }
+        .dark-theme .button_BH6RKW { --stroke-color: #ffffff7c; }
 
-        .day_mode {
-            color: #64b5f6;
-            font-weight: bold;
-        }
-
-        /* 暗色模式样式 */
-        .dark-theme {
-            background-color: #121212;
-            color: #e0e0e0;
-        }
-
-        .dark-theme .top-bar {
-            background-color: #1e1e1e;
-            color: #e0e0e0;
-        }
-
-        .dark-theme .top-bar a {
-            color: #b0b0b0;
-        }
-
-        .dark-theme .navbar {
-            background-color: #1e1e1e;
-            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.3);
-        }
-
-        .dark-theme .nav-link {
-            color: #e0e0e0 !important;
-        }
-
-        .dark-theme .nav-link:hover {
-            color: #64b5f6 !important;
-        }
-
-        .dark-theme .nav-link:hover::after {
-            background-color: #64b5f6;
-        }
-
-        .dark-theme .page-header {
-            background: linear-gradient(135deg, #0d3b6e 0%, #082444 100%);
-            color: white;
-        }
-
-        .dark-theme .breadcrumb a {
-            color: rgba(255, 255, 255, 0.8);
-        }
-
-        .dark-theme .breadcrumb-item_a {
-            color: white;
-        }
-
-        .dark-theme .download_h1 {
-            color: white;
-        }
-
-        .dark-theme .main-content {
-            background-color: #121212;
-        }
-
-        .dark-theme .section-title {
-            color: #64b5f6;
-        }
-
-        .dark-theme .section-title::after {
-            background-color: #64b5f6;
-        }
-
-        .dark-theme .sidebar {
-            background: #1e1e1e;
-            box-shadow: 0 2px 12px rgba(0, 0, 0, 0.3);
-        }
-
-        .dark-theme .category-list a {
-            color: #b0b0b0;
-        }
-
-        .dark-theme .category-list a:hover,
-        .dark-theme .category-list a.active {
-            background-color: #2a2a2a;
-            color: #64b5f6;
-        }
-
-        .dark-theme .category-list .badge {
-            background-color: #64b5f6;
-        }
-
-        .dark-theme .list-group-item {
-            background-color: #1e1e1e;
-            border-color: #333;
-            color: #e0e0e0;
-        }
-
-        .dark-theme .list-group-item:hover {
-            background-color: #2a2a2a;
-        }
-
-        .dark-theme .text-muted {
-            color: #aaa !important;
-        }
-
-        .dark-theme .downloads-container {
-            background: #1e1e1e;
-            box-shadow: 0 2px 12px rgba(0, 0, 0, 0.3);
-        }
-
-        .dark-theme .search-box input {
-            background-color: #2a2a2a;
-            border-color: #444;
-            color: #e0e0e0;
-        }
-
-        .dark-theme .search-box input::placeholder {
-            color: #888;
-        }
-
-        .dark-theme .search-box button {
-            background: #2a5a8a;
-        }
-
-        .dark-theme .download-item {
-            border-bottom: 1px solid #333;
-        }
-
-        .dark-theme .download-item:hover {
-            background-color: #2a2a2a;
-        }
-
-        .dark-theme .file-icon {
-            color: #64b5f6;
-        }
-
-        .dark-theme .file-meta {
-            color: #aaa;
-        }
-
-        .dark-theme .download-btn {
-            background-color: #2a5a8a;
-            color: #e0e0e0;
-        }
-
-        .dark-theme .download-btn:hover {
-            background-color: #3a6a9a;
-        }
-
-        .dark-theme .page-link {
-            background-color: #1e1e1e;
-            border-color: #444;
-            color: #bbb;
-        }
-
-        .dark-theme .page-item.active .page-link {
-            background-color: #2a5a8a;
-            border-color: #2a5a8a;
-            color: #e0e0e0;
-        }
-
-        .dark-theme .page-link:hover {
-            background-color: #333;
-            border-color: #555;
-            color: #64b5f6;
-        }
-
-        .dark-theme footer {
-            background-color: #0a0a0a;
-        }
-
-        .dark-theme footer h5 {
-            color: #fff;
-        }
-
-        .dark-theme footer a {
-            color: #aaa;
-        }
-
-        .dark-theme footer a:hover {
-            color: #fff;
-        }
-
-        .dark-theme .footer-bottom {
-            border-top: 1px solid #333;
-        }
-
-        .dark-theme .button_BH6RKW {
-            --stroke-color: #ffffff7c;
-        }
-
-        /* 时间同步弹窗样式 */
         .time-sync-overlay {
             position: fixed;
             top: 0;
@@ -909,109 +739,27 @@
             text-align: center;
         }
 
-        .time-sync-icon {
-            font-size: 3rem;
-            color: #4a90e2;
-            margin-bottom: 20px;
-        }
+        .time-sync-icon { font-size: 3rem; color: #4a90e2; margin-bottom: 20px; }
+        .time-sync-title { font-size: 1.5rem; font-weight: bold; color: #333; margin-bottom: 15px; }
+        .time-sync-description { color: #666; line-height: 1.6; margin-bottom: 25px; text-align: left; }
+        .time-sync-features { background-color: #f8f9fa; border-radius: 8px; padding: 15px; margin-bottom: 25px; text-align: left; }
+        .time-sync-feature { display: flex; align-items: center; margin-bottom: 10px; }
+        .time-sync-feature:last-child { margin-bottom: 0; }
+        .feature-icon { color: #4a90e2; margin-right: 10px; font-size: 1.2rem; }
+        .time-sync-buttons { display: flex; gap: 15px; }
+        .time-sync-btn { flex: 1; padding: 12px 20px; border: none; border-radius: 6px; font-weight: bold; cursor: pointer; transition: all 0.3s; }
+        .time-sync-agree { background-color: #4a90e2; color: white; }
+        .time-sync-agree:hover { background-color: #3a80d2; }
+        .time-sync-decline { background-color: #f1f1f1; color: #333; }
+        .time-sync-decline:hover { background-color: #e1e1e1; }
+        .time-sync-note { font-size: 0.85rem; color: #888; margin-top: 15px; }
 
-        .time-sync-title {
-            font-size: 1.5rem;
-            font-weight: bold;
-            color: #333;
-            margin-bottom: 15px;
-        }
-
-        .time-sync-description {
-            color: #666;
-            line-height: 1.6;
-            margin-bottom: 25px;
-            text-align: left;
-        }
-
-        .time-sync-features {
-            background-color: #f8f9fa;
-            border-radius: 8px;
-            padding: 15px;
-            margin-bottom: 25px;
-            text-align: left;
-        }
-
-        .time-sync-feature {
-            display: flex;
-            align-items: center;
-            margin-bottom: 10px;
-        }
-
-        .time-sync-feature:last-child {
-            margin-bottom: 0;
-        }
-
-        .feature-icon {
-            color: #4a90e2;
-            margin-right: 10px;
-            font-size: 1.2rem;
-        }
-
-        .time-sync-buttons {
-            display: flex;
-            gap: 15px;
-        }
-
-        .time-sync-btn {
-            flex: 1;
-            padding: 12px 20px;
-            border: none;
-            border-radius: 6px;
-            font-weight: bold;
-            cursor: pointer;
-            transition: all 0.3s;
-        }
-
-        .time-sync-agree {
-            background-color: #4a90e2;
-            color: white;
-        }
-
-        .time-sync-agree:hover {
-            background-color: #3a80d2;
-        }
-
-        .time-sync-decline {
-            background-color: #f1f1f1;
-            color: #333;
-        }
-
-        .time-sync-decline:hover {
-            background-color: #e1e1e1;
-        }
-
-        .time-sync-note {
-            font-size: 0.85rem;
-            color: #888;
-            margin-top: 15px;
-        }
-
-        /* 高亮搜索词 */
-        .highlight {
-            background-color: #ffeb3b;
-            color: #000;
-            padding: 0 2px;
-            border-radius: 3px;
-        }
-        .dark-theme .highlight {
-            background-color: #f9a825;
-            color: #000;
-        }
-
-        .dark-theme .navbar-toggler-icon {
-            filter: invert(1);
-        }
+        .highlight { background-color: #ffeb3b; color: #000; padding: 0 2px; border-radius: 3px; }
+        .dark-theme .highlight { background-color: #f9a825; color: #000; }
+        .dark-theme .navbar-toggler-icon { filter: invert(1); }
 
         @media (max-width: 768px) {
-            .theme-switch {
-                right: 5px;
-            }
+            .theme-switch { right: 5px; }
         }
 
         .hash-overlay {
@@ -1067,7 +815,6 @@
         </div>
     </noscript>
 
-    <!-- 时间同步同意弹窗 -->
     <div class="time-sync-overlay" id="timeSyncOverlay" style="display: none;">
         <div class="time-sync-card">
             <div class="time-sync-icon"><i class="fas fa-sync-alt"></i></div>
@@ -1098,7 +845,6 @@
         </div>
     </div>
 
-    <!-- 顶部信息栏 -->
     <div class="top-bar">
         <div class="container">
             <div class="d-flex justify-content-between">
@@ -1108,7 +854,7 @@
                         <input type="checkbox" class="theme-switch__checkbox">
                         <div class="theme-switch__container">
                             <div class="theme-switch__clouds"></div>
-                                <div class="theme-switch__stars-container">
+                            <div class="theme-switch__stars-container">
                                 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 144 55" fill="none">
                                     <path fill-rule="evenodd" clip-rule="evenodd" d="M135.831 3.00688C135.055 3.85027 134.111 4.29946 133 4.35447C134.111 4.40947 135.055 4.85867 135.831 5.71123C136.607 6.55462 136.996 7.56303 136.996 8.72727C136.996 7.95722 137.172 7.25134 137.525 6.59129C137.886 5.93124 138.372 5.39954 138.98 5.00535C139.598 4.60199 140.268 4.39114 141 4.35447C139.88 4.2903 138.936 3.85027 138.16 3.00688C137.384 2.16348 136.996 1.16425 136.996 0C136.996 1.16425 136.607 2.16348 135.831 3.00688ZM31 23.3545C32.1114 23.2995 33.0551 22.8503 33.8313 22.0069C34.6075 21.1635 34.9956 20.1642 34.9956 19C34.9956 20.1642 35.3837 21.1635 36.1599 22.0069C36.9361 22.8503 37.8798 23.2903 39 23.3545C38.2679 23.3911 37.5976 23.602 36.9802 24.0053C36.3716 24.3995 35.8864 24.9312 35.5248 25.5913C35.172 26.2513 34.9956 26.9572 34.9956 27.7273C34.9956 26.563 34.6075 25.5546 33.8313 24.7112C33.0551 23.8587 32.1114 23.4095 31 23.3545ZM0 36.3545C1.11136 36.2995 2.05513 35.8503 2.83131 35.0069C3.6075 34.1635 3.99559 33.1642 3.99559 32C3.99559 33.1642 4.38368 34.1635 5.15987 35.0069C5.93605 35.8503 6.87982 36.2903 8 36.3545C7.26792 36.3911 6.59757 36.602 5.98015 37.0053C5.37155 37.3995 4.88644 37.9312 4.52481 38.5913C4.172 39.2513 3.99559 39.9572 3.99559 40.7273C3.99559 39.563 3.6075 38.5546 2.83131 37.7112C2.05513 36.8587 1.11136 36.4095 0 36.3545ZM56.8313 24.0069C56.0551 24.8503 55.1114 25.2995 54 25.3545C55.1114 25.4095 56.0551 25.8587 56.8313 26.7112C57.6075 27.5546 57.9956 28.563 57.9956 29.7273C57.9956 28.9572 58.172 28.2513 58.5248 27.5913C58.8864 26.9312 59.3716 26.3995 59.9802 26.0053C60.5976 25.602 61.2679 25.3911 62 25.3545C60.8798 25.2903 59.9361 24.8503 59.1599 24.0069C58.3837 23.1635 57.9956 22.1642 57.9956 21C57.9956 22.1642 57.6075 23.1635 56.8313 24.0069ZM81 25.3545C82.1114 25.2995 83.0551 24.8503 83.8313 24.0069C84.6075 23.1635 84.9956 22.1642 84.9956 21C84.9956 22.1642 85.3837 23.1635 86.1599 24.0069C86.9361 24.8503 87.8798 25.2903 89 25.3545C88.2679 25.3911 87.5976 25.602 86.9802 26.0053C86.3716 26.3995 85.8864 26.9312 85.5248 27.5913C85.172 28.2513 84.9956 28.9572 84.9956 29.7273C84.9956 28.563 84.6075 27.5546 83.8313 26.7112C83.0551 25.8587 82.1114 25.4095 81 25.3545ZM136 36.3545C137.111 36.2995 138.055 35.8503 138.831 35.0069C139.607 34.1635 139.996 33.1642 139.996 32C139.996 33.1642 140.384 34.1635 141.16 35.0069C141.936 35.8503 142.88 36.2903 144 36.3545C143.268 36.3911 142.598 36.602 141.98 37.0053C141.372 37.3995 140.886 37.9312 140.525 38.5913C140.172 39.2513 139.996 39.9572 139.996 40.7273C139.996 39.563 139.607 38.5546 138.831 37.7112C138.055 36.8587 137.111 36.4095 136 36.3545ZM101.831 49.0069C101.055 49.8503 100.111 50.2995 99 50.3545C100.111 50.4095 101.055 50.8587 101.831 51.7112C102.607 52.5546 102.996 53.563 102.996 54.7273C102.996 53.9572 103.172 53.2513 103.525 52.5913C103.886 51.9312 104.372 51.3995 104.98 51.0053C105.598 50.602 106.268 50.3911 107 50.3545C105.88 50.2903 104.936 49.8503 104.16 49.0069C103.384 48.1635 102.996 47.1642 102.996 46C102.996 47.1642 102.607 48.1635 101.831 49.0069Z" fill="currentColor"></path>
                                 </svg>
@@ -1116,9 +862,9 @@
                             <div class="theme-switch__circle-container">
                                 <div class="theme-switch__sun-moon-container">
                                     <div class="theme-switch__moon">
-                                    <div class="theme-switch__spot"></div>
-                                    <div class="theme-switch__spot"></div>
-                                    <div class="theme-switch__spot"></div>
+                                        <div class="theme-switch__spot"></div>
+                                        <div class="theme-switch__spot"></div>
+                                        <div class="theme-switch__spot"></div>
                                     </div>
                                 </div>
                             </div>
@@ -1129,7 +875,6 @@
         </div>
     </div>
 
-    <!-- 主导航 -->
     <nav class="navbar navbar-expand-lg sticky-top">
         <div class="container">
             <a href="https://bh6rkw.dpdns.org">
@@ -1154,7 +899,6 @@
         </div>
     </nav>
 
-    <!-- 页面标题 -->
     <div class="page-header">
         <div class="container">
             <h1 class="download_h1">资料下载</h1>
@@ -1162,11 +906,9 @@
         </div>
     </div>
 
-    <!-- 主要内容 -->
     <div class="main-content">
         <div class="container">
             <div class="row">
-                <!-- 侧边栏 -->
                 <div class="col-lg-3">
                     <div class="sidebar">
                         <h4 class="section-title mt-4">热门下载</h4>
@@ -1176,7 +918,6 @@
                     </div>
                 </div>
 
-                <!-- 下载列表容器 -->
                 <div class="col-lg-9">
                     <div class="downloads-container">
                         <div class="search-box">
@@ -1195,7 +936,6 @@
         </div>
     </div>
 
-    <!-- 页脚 -->
     <footer>
         <div class="container">
             <div class="row">
@@ -1209,25 +949,20 @@
 
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
-    <script src="/supabase-auth.js?v=1.4.9"></script>
+    <script src="/supabase-auth.js?v=1.5.0"></script>
 <script>
 /* =====================================================================
-   资料下载页 —— 全 ES5 兼容版本
-   适配：Kindle 实验浏览器 / 智能手表 / 老旧 WebKit 内核
-   要点：
-     1) 不使用 async/await、箭头函数、模板字符串、可选链、展开运算符
-     2) 用 XMLHttpRequest 替代 fetch 加载 files.json
-     3) 所有可选依赖（supabase / URLSearchParams / sessionStorage）都做特性检测
-     4) 无论任何环节出错，都会有兜底提示，绝不会一直"转圈"
+   资料下载页 —— ES5 兼容版本
+   LFS 文件：XHR + JWT + Blob 下载（管理员可用）
+   普通文件：直链跳转
    ===================================================================== */
 (function () {
     'use strict';
 
-    /* =========================== 基础工具 =========================== */
+    var LFS_THRESHOLD = 5 * 1024 * 1024;
+    var EDGE_BASE = 'https://pxhiobmdzntnxwpwtgpx.supabase.co/functions/v1/download-log';
 
-    function byId(id) {
-        return document.getElementById(id);
-    }
+    function byId(id) { return document.getElementById(id); }
 
     function escapeHtml(str) {
         if (str === null || str === undefined) str = '';
@@ -1239,71 +974,53 @@
             .replace(/'/g, '&#39;');
     }
 
-    /* 统一事件绑定（兼容 attachEvent） */
     function addEvent(el, type, fn) {
         if (!el) return;
-        if (el.addEventListener) {
-            el.addEventListener(type, fn, false);
-        } else if (el.attachEvent) {
-            el.attachEvent('on' + type, fn);
-        }
+        if (el.addEventListener) el.addEventListener(type, fn, false);
+        else if (el.attachEvent) el.attachEvent('on' + type, fn);
     }
 
-    /* 阻止默认行为（兼容旧内核） */
     function preventDefault(e) {
         if (!e) return;
         if (e.preventDefault) e.preventDefault();
         else e.returnValue = false;
     }
 
-    /* 手写 closest（旧内核没有 Element.closest） */
     function closestWithClass(el, cls) {
         while (el && el.nodeType === 1) {
             var cn = el.className;
-            if (typeof cn === 'string' && (' ' + cn + ' ').indexOf(' ' + cls + ' ') > -1) {
-                return el;
-            }
+            if (typeof cn === 'string' && (' ' + cn + ' ').indexOf(' ' + cls + ' ') > -1) return el;
             el = el.parentNode;
         }
         return null;
     }
 
-    /* 取 URL 参数（兼容没有 URLSearchParams 的浏览器） */
     function getQueryParam(name) {
         try {
             if (typeof window.URLSearchParams !== 'undefined') {
                 return new window.URLSearchParams(window.location.search).get(name);
             }
-        } catch (e) { /* 忽略 */ }
+        } catch (e) { }
         var m = String(window.location.search || '').match(new RegExp('[?&]' + name + '=([^&]*)'));
         return m ? decodeURIComponent(m[1]) : null;
     }
 
-    /* sessionStorage 安全读写（部分隐私模式下会抛异常） */
-    function safeSessionGet(k) {
-        try { return window.sessionStorage.getItem(k); } catch (e) { return null; }
-    }
-    function safeSessionSet(k, v) {
-        try { window.sessionStorage.setItem(k, v); } catch (e) { /* 忽略 */ }
-    }
+    function safeSessionGet(k) { try { return window.sessionStorage.getItem(k); } catch (e) { return null; } }
+    function safeSessionSet(k, v) { try { window.sessionStorage.setItem(k, v); } catch (e) { } }
 
-    /* 安全的日期解析（旧内核不认 "2024-01-01 12:00:00"） */
     function parseDateSafe(s) {
         if (!s) return NaN;
-        var t = String(s).replace(' ', 'T');
-        var v = Date.parse(t);
+        var v = Date.parse(String(s).replace(' ', 'T'));
         if (!isNaN(v)) return v;
         return Date.parse(s);
     }
-
-    /* =========================== 状态 =========================== */
 
     var allFiles = [];
     var currentPage = 1;
     var pageSize = 10;
     var currentSearch = '';
     var isDataLoaded = false;
-    var currentUserRole = null;   // 'admin' 或 null
+    var currentUserRole = null;
     var initialized = false;
 
     var fileListContainer = null;
@@ -1312,118 +1029,60 @@
     var searchBtn = null;
     var hotContainer = null;
 
-    /* =========================== 网络请求 =========================== */
-
-    /**
-     * 用 XMLHttpRequest 加载 JSON（比 fetch 兼容性好得多）
-     */
     function requestJSON(url, onSuccess, onError) {
         var finished = false;
-
         function ok(d) { if (finished) return; finished = true; onSuccess(d); }
         function fail(err) { if (finished) return; finished = true; onError(err); }
-
         var xhr;
-        try {
-            xhr = new XMLHttpRequest();
-        } catch (e) {
-            fail(e);
-            return;
-        }
-
+        try { xhr = new XMLHttpRequest(); } catch (e) { fail(e); return; }
         try {
             xhr.open('GET', url, true);
             if ('timeout' in xhr) xhr.timeout = 15000;
-
             xhr.onreadystatechange = function () {
                 if (xhr.readyState !== 4) return;
-
                 var status = xhr.status;
-                // status === 0 常见于本地 file:// 或某些代理环境
                 if (status === 0 || (status >= 200 && status < 300)) {
                     var text = xhr.responseText;
                     if (!text) { fail(new Error('响应内容为空')); return; }
                     var data;
-                    try {
-                        data = JSON.parse(text);
-                    } catch (pe) {
-                        fail(pe);
-                        return;
-                    }
+                    try { data = JSON.parse(text); } catch (pe) { fail(pe); return; }
                     ok(data);
                 } else {
                     fail(new Error('HTTP ' + status));
                 }
             };
-
             xhr.onerror = function () { fail(new Error('网络错误')); };
-            if ('ontimeout' in xhr) {
-                xhr.ontimeout = function () { fail(new Error('请求超时')); };
-            }
-
+            if ('ontimeout' in xhr) xhr.ontimeout = function () { fail(new Error('请求超时')); };
             xhr.send(null);
-        } catch (e2) {
-            fail(e2);
-        }
+        } catch (e2) { fail(e2); }
     }
 
-    /* =========================== 用户角色 =========================== */
-
-    /**
-     * 获取当前用户角色。
-     * 关键点：无论 supabase 是否可用，都必须在有限时间内回调，
-     *        不能因为第三方脚本卡住而阻塞整个文件列表渲染。
-     */
     function getUserRole(callback) {
         var finished = false;
-
-        function done(role) {
-            if (finished) return;
-            finished = true;
-            callback(role);
-        }
-
-        // 兜底超时：最多等 2.5 秒
+        function done(role) { if (finished) return; finished = true; callback(role); }
         window.setTimeout(function () { done(null); }, 2500);
-
         try {
             var sb = window.__supabaseClient;
-            if (!sb || !sb.auth || typeof sb.auth.getSession !== 'function') {
-                done(null);
-                return;
-            }
-
+            if (!sb || !sb.auth || typeof sb.auth.getSession !== 'function') { done(null); return; }
             sb.auth.getSession().then(function (session) {
                 var user = session && session.data && session.data.session && session.data.session.user;
                 if (!user) { done(null); return; }
-
                 try {
-                    sb.from('user_roles')
-                        .select('role')
-                        .eq('user_id', user.id)
-                        .maybeSingle()
+                    sb.from('user_roles').select('role').eq('user_id', user.id).maybeSingle()
                         .then(function (res) {
                             if (res && res.error) { done(null); return; }
                             done((res && res.data && res.data.role) || null);
                         })['catch'](function () { done(null); });
-                } catch (e) {
-                    done(null);
-                }
+                } catch (e) { done(null); }
             })['catch'](function () { done(null); });
-
-        } catch (e) {
-            done(null);
-        }
+        } catch (e) { done(null); }
     }
-
-    /* =========================== 下载日志 =========================== */
 
     function logDownload(filename) {
         try {
             var sb = window.__supabaseClient;
             if (!sb || !sb.functions || typeof sb.functions.invoke !== 'function') return;
             if (!sb.auth || typeof sb.auth.getSession !== 'function') return;
-
             sb.auth.getSession().then(function (session) {
                 var token = session && session.data && session.data.session && session.data.session.access_token;
                 var headers = token ? { Authorization: 'Bearer ' + token } : {};
@@ -1439,8 +1098,6 @@
             if (window.console && console.warn) console.warn('日志记录异常:', e);
         }
     }
-
-    /* =========================== 展示辅助 =========================== */
 
     function getFileIcon(filename) {
         var name = String(filename || '');
@@ -1462,20 +1119,86 @@
         return (n / (1024 * 1024)).toFixed(1) + ' MB';
     }
 
-    /* 生成代理下载地址 */
     function buildDownloadUrl(name, isLfs) {
-        return 'https://pxhiobmdzntnxwpwtgpx.supabase.co/functions/v1/download-log?filename=' +
-            encodeURIComponent(name) + '&lfs=' + (isLfs ? 'true' : 'false');
+        return EDGE_BASE + '?filename=' + encodeURIComponent(name) + '&lfs=' + (isLfs ? 'true' : 'false');
     }
 
     function isLfsFile(file) {
+        if (!file) return false;
         if (file.lfs === true) return true;
         var n = Number(file.size);
-        return !isNaN(n) && n > 20 * 1024 * 1024;
+        return !isNaN(n) && n > LFS_THRESHOLD;
     }
 
-    /* =========================== 哈希弹窗 =========================== */
+    /* ===== LFS 下载：XHR 带 JWT，拿 blob 后保存 ===== */
+    function downloadLfsFile(filename, url, onError) {
+        var sb = window.__supabaseClient;
+        if (!sb || !sb.auth || typeof sb.auth.getSession !== 'function') {
+            onError('请先登录管理员账号后再下载 LFS 文件');
+            return;
+        }
+        var URL_OBJ = window.URL || window.webkitURL;
+        if (!URL_OBJ || typeof URL_OBJ.createObjectURL !== 'function') {
+            onError('当前浏览器不支持此下载方式，请更换浏览器');
+            return;
+        }
+        sb.auth.getSession().then(function (session) {
+            var token = session && session.data && session.data.session && session.data.session.access_token;
+            if (!token) {
+                onError('请先登录管理员账号后再下载 LFS 文件');
+                return;
+            }
+            var xhr = new XMLHttpRequest();
+            xhr.open('GET', url, true);
+            xhr.setRequestHeader('Authorization', 'Bearer ' + token);
+            if ('responseType' in xhr) {
+                try { xhr.responseType = 'blob'; } catch (e) { }
+            }
+            xhr.onreadystatechange = function () {
+                if (xhr.readyState !== 4) return;
+                if (xhr.status === 0 || (xhr.status >= 200 && xhr.status < 300)) {
+                    var blob = xhr.response;
+                    if (!blob || typeof blob.size !== 'number') {
+                        onError('下载失败：响应为空');
+                        return;
+                    }
+                    try {
+                        var objectUrl = URL_OBJ.createObjectURL(blob);
+                        var a = document.createElement('a');
+                        a.href = objectUrl;
+                        a.download = filename || 'download';
+                        a.style.display = 'none';
+                        document.body.appendChild(a);
+                        a.click();
+                        document.body.removeChild(a);
+                        window.setTimeout(function () {
+                            try { URL_OBJ.revokeObjectURL(objectUrl); } catch (e) { }
+                        }, 2000);
+                    } catch (e) {
+                        onError('保存文件失败');
+                    }
+                } else {
+                    onError('下载失败 (HTTP ' + xhr.status + ')');
+                }
+            };
+            xhr.onerror = function () { onError('网络错误'); };
+            xhr.send(null);
+        })['catch'](function () {
+            onError('获取登录状态失败');
+        });
+    }
 
+    function doDownload(info) {
+        if (info.isLfs) {
+            downloadLfsFile(info.name, info.url, function (msg) {
+                if (window.alert) alert(msg);
+            });
+        } else {
+            window.location.href = info.url;
+        }
+    }
+
+    /* ===== 哈希弹窗 ===== */
     function showHashModal(info) {
         var overlay = byId('hashOverlay');
         if (!overlay) return;
@@ -1485,21 +1208,11 @@
         var shaEl = byId('hashSha256');
         var md5El = byId('hashMd5');
 
-        if (info.sha256) {
-            shaEl.textContent = info.sha256;
-            shaEl.className = 'hash-value';
-        } else {
-            shaEl.textContent = '(无)';
-            shaEl.className = 'hash-value empty';
-        }
+        if (info.sha256) { shaEl.textContent = info.sha256; shaEl.className = 'hash-value'; }
+        else { shaEl.textContent = '(无)'; shaEl.className = 'hash-value empty'; }
 
-        if (info.md5) {
-            md5El.textContent = info.md5;
-            md5El.className = 'hash-value';
-        } else {
-            md5El.textContent = '(无)';
-            md5El.className = 'hash-value empty';
-        }
+        if (info.md5) { md5El.textContent = info.md5; md5El.className = 'hash-value'; }
+        else { md5El.textContent = '(无)'; md5El.className = 'hash-value empty'; }
 
         overlay.style.display = 'flex';
 
@@ -1516,7 +1229,6 @@
         function onDl() {
             overlay.style.display = 'none';
             cleanup();
-
             logDownload(info.name);
 
             if (info.protected) {
@@ -1525,27 +1237,19 @@
                     return;
                 }
                 var pwd = window.prompt('该文件需要密码才能下载，请输入密码：');
-                if (pwd === info.password) {
-                    window.location.href = info.url;
-                } else if (pwd !== null) {
-                    if (window.alert) alert('密码错误，无权下载！');
-                }
+                if (pwd === info.password) doDownload(info);
+                else if (pwd !== null) { if (window.alert) alert('密码错误，无权下载！'); }
             } else {
-                window.location.href = info.url;
+                doDownload(info);
             }
         }
 
-        function onClose() {
-            overlay.style.display = 'none';
-            cleanup();
-        }
-
+        function onClose() { overlay.style.display = 'none'; cleanup(); }
         function onKey(e) {
             e = e || window.event;
             var key = e.key || e.keyCode;
             if (key === 'Escape' || key === 'Esc' || key === 27) onClose();
         }
-
         function onOverlay(e) {
             e = e || window.event;
             var tgt = e.target || e.srcElement;
@@ -1558,11 +1262,9 @@
         addEvent(overlay, 'click', onOverlay);
     }
 
-    /* =========================== 列表渲染 =========================== */
-
+    /* ===== 列表渲染 ===== */
     function buildItemHtml(file) {
         var name = String(file.name === null || file.name === undefined ? '' : file.name);
-
         var dot = name.lastIndexOf('.');
         var ext = dot > -1 ? name.substring(dot + 1).toUpperCase() : '未知';
 
@@ -1573,16 +1275,15 @@
         var sha256 = file.sha256 || '';
         var md5 = file.md5 || '';
         var downloadUrl = buildDownloadUrl(name, isLfs);
-
         var sizeDisplay = (file.size && file.size !== '-') ? formatFileSize(file.size) : '未知大小';
 
-        // 所有属性值都做转义，避免文件名里带引号时 HTML 结构被破坏
         var attrs = ' data-name="' + escapeHtml(name) + '"'
                   + ' data-sha256="' + escapeHtml(sha256) + '"'
                   + ' data-md5="' + escapeHtml(md5) + '"'
                   + ' data-url="' + escapeHtml(downloadUrl) + '"'
                   + ' data-protected="' + (isProtected ? 'true' : 'false') + '"'
-                  + ' data-password="' + escapeHtml(file.password || '') + '"';
+                  + ' data-password="' + escapeHtml(file.password || '') + '"'
+                  + ' data-is-lfs="' + (isLfs ? 'true' : 'false') + '"';
 
         var hashBtnHtml = '';
         if (sha256 || md5) {
@@ -1643,27 +1344,19 @@
         if (pageItems.length === 0) {
             if (currentSearch) {
                 fileListContainer.innerHTML =
-                    '<div class="no-results">'
-                  +   '<i class="fas fa-search fa-3x mb-3"></i>'
-                  +   '<h5>未找到匹配的资料</h5>'
-                  +   '<p>尝试其他关键词</p>'
-                  + '</div>';
+                    '<div class="no-results"><i class="fas fa-search fa-3x mb-3"></i>'
+                  + '<h5>未找到匹配的资料</h5><p>尝试其他关键词</p></div>';
             } else {
                 fileListContainer.innerHTML =
-                    '<div class="no-results">'
-                  +   '<i class="fas fa-folder-open fa-3x mb-3"></i>'
-                  +   '<h5>没有找到任何文件</h5>'
-                  +   '<p>请确保已上传 files.json 且文件列表非空。</p>'
-                  + '</div>';
+                    '<div class="no-results"><i class="fas fa-folder-open fa-3x mb-3"></i>'
+                  + '<h5>没有找到任何文件</h5><p>请确保已上传 files.json 且文件列表非空。</p></div>';
             }
             renderPagination(0);
             return;
         }
 
         var html = '';
-        for (i = 0; i < pageItems.length; i++) {
-            html += buildItemHtml(pageItems[i]);
-        }
+        for (i = 0; i < pageItems.length; i++) html += buildItemHtml(pageItems[i]);
         fileListContainer.innerHTML = html;
 
         renderPagination(totalPages);
@@ -1671,22 +1364,15 @@
 
     function renderPagination(totalPages) {
         if (!paginationUl) return;
-
-        if (totalPages <= 1) {
-            paginationUl.innerHTML = '';
-            return;
-        }
+        if (totalPages <= 1) { paginationUl.innerHTML = ''; return; }
 
         var html = '';
-
         html += '<li class="page-item' + (currentPage === 1 ? ' disabled' : '') + '">'
               +   '<a class="page-link" href="#" data-page="prev">&laquo;</a></li>';
-
         for (var i = 1; i <= totalPages; i++) {
             html += '<li class="page-item' + (i === currentPage ? ' active' : '') + '">'
                   +   '<a class="page-link" href="#" data-page="' + i + '">' + i + '</a></li>';
         }
-
         html += '<li class="page-item' + (currentPage === totalPages ? ' disabled' : '') + '">'
               +   '<a class="page-link" href="#" data-page="next">&raquo;</a></li>';
 
@@ -1698,11 +1384,9 @@
                 addEvent(link, 'click', function (ev) {
                     preventDefault(ev);
                     var pv = link.getAttribute('data-page');
-                    if (pv === 'prev') {
-                        if (currentPage > 1) currentPage--;
-                    } else if (pv === 'next') {
-                        if (currentPage < totalPages) currentPage++;
-                    } else {
+                    if (pv === 'prev') { if (currentPage > 1) currentPage--; }
+                    else if (pv === 'next') { if (currentPage < totalPages) currentPage++; }
+                    else {
                         var n = parseInt(pv, 10);
                         if (!isNaN(n)) currentPage = n;
                     }
@@ -1713,11 +1397,8 @@
         }
     }
 
-    /* =========================== 热门下载 =========================== */
-
     function updateHotDownloads(files) {
         if (!hotContainer) return;
-
         if (!files || !files.length) {
             hotContainer.innerHTML = '<div class="list-group-item">暂无文件</div>';
             return;
@@ -1758,7 +1439,8 @@
                       + ' data-url="' + escapeHtml(downloadUrl) + '"'
                       + ' data-name="' + escapeHtml(name) + '"'
                       + ' data-protected="' + (isProtected ? 'true' : 'false') + '"'
-                      + ' data-password="' + escapeHtml(f.password || '') + '">'
+                      + ' data-password="' + escapeHtml(f.password || '') + '"'
+                      + ' data-is-lfs="' + (isLfs ? 'true' : 'false') + '">'
                       +   '<div class="d-flex w-100 justify-content-between">'
                       +     '<h6 class="mb-1">' + escapeHtml(shortName) + badges + '</h6>'
                       +     '<small>' + escapeHtml(datePart) + '</small>'
@@ -1782,7 +1464,6 @@
 
     function bindHotEvents() {
         if (!hotContainer) return;
-
         var items = hotContainer.getElementsByTagName('a');
         for (var i = 0; i < items.length; i++) {
             (function (el) {
@@ -1795,24 +1476,28 @@
                     var isProtected = el.getAttribute('data-protected') === 'true';
                     var requiredPassword = el.getAttribute('data-password') || '';
                     var name = el.getAttribute('data-name') || '';
+                    var isLfs = el.getAttribute('data-is-lfs') === 'true';
 
                     logDownload(name);
 
-                    if (!isProtected) {
-                        window.location.href = url;
-                        return false;
+                    if (isProtected) {
+                        if (typeof window.prompt !== 'function') {
+                            if (window.alert) alert('该文件需要密码，但当前浏览器不支持输入框。');
+                            return false;
+                        }
+                        var userPwd = window.prompt('该文件需要密码才能下载，请输入密码：');
+                        if (userPwd !== requiredPassword) {
+                            if (userPwd !== null) { if (window.alert) alert('密码错误，无权下载！'); }
+                            return false;
+                        }
                     }
 
-                    if (typeof window.prompt !== 'function') {
-                        if (window.alert) alert('该文件需要密码，但当前浏览器不支持输入框。');
-                        return false;
-                    }
-
-                    var userPwd = window.prompt('该文件需要密码才能下载，请输入密码：');
-                    if (userPwd === requiredPassword) {
+                    if (isLfs) {
+                        downloadLfsFile(name, url, function (msg) {
+                            if (window.alert) alert(msg);
+                        });
+                    } else {
                         window.location.href = url;
-                    } else if (userPwd !== null) {
-                        if (window.alert) alert('密码错误，无权下载！');
                     }
                     return false;
                 });
@@ -1820,14 +1505,11 @@
         }
     }
 
-    /* =========================== 点击事件委托 =========================== */
-
     function handleDownloadClick(e) {
         e = e || window.event;
         var target = e.target || e.srcElement;
         if (!target) return;
 
-        // 哈希按钮
         var hashBtn = closestWithClass(target, 'btn-hash');
         if (hashBtn) {
             preventDefault(e);
@@ -1837,12 +1519,12 @@
                 md5: hashBtn.getAttribute('data-md5') || '',
                 url: hashBtn.getAttribute('data-url') || '',
                 protected: hashBtn.getAttribute('data-protected') === 'true',
-                password: hashBtn.getAttribute('data-password') || ''
+                password: hashBtn.getAttribute('data-password') || '',
+                isLfs: hashBtn.getAttribute('data-is-lfs') === 'true'
             });
             return;
         }
 
-        // 下载按钮
         var btn = closestWithClass(target, 'download-btn');
         if (btn) {
             preventDefault(e);
@@ -1852,13 +1534,12 @@
                 md5: btn.getAttribute('data-md5') || '',
                 url: btn.getAttribute('data-url') || '',
                 protected: btn.getAttribute('data-protected') === 'true',
-                password: btn.getAttribute('data-password') || ''
+                password: btn.getAttribute('data-password') || '',
+                isLfs: btn.getAttribute('data-is-lfs') === 'true'
             });
             return;
         }
     }
-
-    /* =========================== 搜索 =========================== */
 
     function onSearch() {
         if (!searchInput) return;
@@ -1867,42 +1548,27 @@
         renderFileList();
     }
 
-    /* =========================== 错误展示 =========================== */
-
     function showLoadError(msg) {
         isDataLoaded = true;
         if (fileListContainer) {
             fileListContainer.innerHTML =
-                '<div class="no-results">'
-              +   '<i class="fas fa-exclamation-triangle fa-3x mb-3"></i>'
-              +   '<h5>' + escapeHtml(msg) + '</h5>'
-              +   '<p>请确保 /download/files.json 存在且格式正确。</p>'
-              + '</div>';
+                '<div class="no-results"><i class="fas fa-exclamation-triangle fa-3x mb-3"></i>'
+              + '<h5>' + escapeHtml(msg) + '</h5>'
+              + '<p>请确保 /download/files.json 存在且格式正确。</p></div>';
         }
-        if (hotContainer) {
-            hotContainer.innerHTML = '<div class="list-group-item">数据加载失败</div>';
-        }
+        if (hotContainer) hotContainer.innerHTML = '<div class="list-group-item">数据加载失败</div>';
     }
 
-    /* =========================== 主加载流程 =========================== */
-
     function loadFileList() {
-        // 看门狗：10 秒内如果还没渲染完成，强制显示错误，绝不让用户一直看转圈
         var watchdog = window.setTimeout(function () {
-            if (!isDataLoaded) {
-                showLoadError('无法加载文件列表（超时）');
-            }
+            if (!isDataLoaded) showLoadError('无法加载文件列表（超时）');
         }, 10000);
 
         getUserRole(function (role) {
             currentUserRole = role;
-            if (window.console && console.log) {
-                console.log('当前用户角色:', currentUserRole);
-            }
+            if (window.console && console.log) console.log('当前用户角色:', currentUserRole);
 
-            // 随机 cache buster，避免旧设备缓存旧的 files.json
-            var cb = (new Date()).getTime().toString(16)
-                   + Math.floor(Math.random() * 0xFFFFFFF).toString(16);
+            var cb = (new Date()).getTime().toString(16) + Math.floor(Math.random() * 0xFFFFFFF).toString(16);
             var url = '/download/files.json?v=' + cb;
 
             requestJSON(url, function (data) {
@@ -1931,8 +1597,6 @@
         });
     }
 
-    /* =========================== 主题 / 时间同步 =========================== */
-
     function initThemeAndTime() {
         var themeSwitch = document.querySelector('.theme-switch__checkbox');
         var timeSyncOverlay = byId('timeSyncOverlay');
@@ -1944,9 +1608,7 @@
 
         function switchToDarkTheme() {
             if (document.body.classList) document.body.classList.add('dark-theme');
-            else if (document.body.className.indexOf('dark-theme') === -1) {
-                document.body.className += ' dark-theme';
-            }
+            else if (document.body.className.indexOf('dark-theme') === -1) document.body.className += ' dark-theme';
             updateModeLabels('night');
         }
 
@@ -1960,17 +1622,12 @@
             var dayLabel = document.querySelector('.day_mode');
             var nightLabel = document.querySelector('.night_mode');
             if (!dayLabel || !nightLabel) return;
-
             if (mode === 'day') {
-                dayLabel.style.color = '#64b5f6';
-                dayLabel.style.fontWeight = 'bold';
-                nightLabel.style.color = '#aaa';
-                nightLabel.style.fontWeight = 'normal';
+                dayLabel.style.color = '#64b5f6'; dayLabel.style.fontWeight = 'bold';
+                nightLabel.style.color = '#aaa'; nightLabel.style.fontWeight = 'normal';
             } else {
-                dayLabel.style.color = '#aaa';
-                dayLabel.style.fontWeight = 'normal';
-                nightLabel.style.color = '#64b5f6';
-                nightLabel.style.fontWeight = 'bold';
+                dayLabel.style.color = '#aaa'; dayLabel.style.fontWeight = 'normal';
+                nightLabel.style.color = '#64b5f6'; nightLabel.style.fontWeight = 'bold';
             }
         }
 
@@ -1992,38 +1649,22 @@
 
         function setThemeByOnlineTime() {
             if (userManuallySwitched) return;
-
-            // 没有 fetch 就老老实实用本地时间
-            if (typeof window.fetch !== 'function') {
-                useLocalTime();
-                return;
-            }
-
+            if (typeof window.fetch !== 'function') { useLocalTime(); return; }
             try {
                 window.fetch('https://worldtimeapi.org/api/ip')
                     .then(function (res) { return res.json(); })
                     .then(function (data) {
                         var hour;
-                        if (data && data.unixtime) {
-                            hour = new Date(data.unixtime * 1000).getHours();
-                        } else if (data && data.datetime) {
-                            hour = new Date(data.datetime).getHours();
-                        }
+                        if (data && data.unixtime) hour = new Date(data.unixtime * 1000).getHours();
+                        else if (data && data.datetime) hour = new Date(data.datetime).getHours();
                         if (isNaN(hour)) { useLocalTime(); return; }
                         applyHour(hour);
                     })['catch'](function () { useLocalTime(); });
-            } catch (e) {
-                useLocalTime();
-            }
+            } catch (e) { useLocalTime(); }
         }
 
-        function showOverlay() {
-            if (timeSyncOverlay) timeSyncOverlay.style.display = 'flex';
-        }
-
-        function hideOverlay() {
-            if (timeSyncOverlay) timeSyncOverlay.style.display = 'none';
-        }
+        function showOverlay() { if (timeSyncOverlay) timeSyncOverlay.style.display = 'flex'; }
+        function hideOverlay() { if (timeSyncOverlay) timeSyncOverlay.style.display = 'none'; }
 
         function handleTimeSyncChoice(choice) {
             if (choice === 'agree') {
@@ -2036,25 +1677,16 @@
             } else {
                 safeSessionSet('timeSyncChoice', 'decline');
                 useLocalTime();
-                if (timeSyncIntervalId) {
-                    window.clearInterval(timeSyncIntervalId);
-                    timeSyncIntervalId = null;
-                }
+                if (timeSyncIntervalId) { window.clearInterval(timeSyncIntervalId); timeSyncIntervalId = null; }
             }
             hideOverlay();
         }
 
         function checkStoredChoice() {
             var urlChoice = getQueryParam('timeSync');
-            if (urlChoice === 'agree' || urlChoice === 'decline') {
-                handleTimeSyncChoice(urlChoice);
-                return true;
-            }
+            if (urlChoice === 'agree' || urlChoice === 'decline') { handleTimeSyncChoice(urlChoice); return true; }
             var stored = safeSessionGet('timeSyncChoice');
-            if (stored === 'agree' || stored === 'decline') {
-                handleTimeSyncChoice(stored);
-                return true;
-            }
+            if (stored === 'agree' || stored === 'decline') { handleTimeSyncChoice(stored); return true; }
             return false;
         }
 
@@ -2062,7 +1694,6 @@
         addEvent(declineBtn, 'click', function () { handleTimeSyncChoice('decline'); });
 
         if (!checkStoredChoice()) {
-            // 不支持 fetch 的老设备不弹窗，直接用本地时间，避免弹窗挡住页面
             if (typeof window.fetch === 'function') {
                 showOverlay();
             } else {
@@ -2080,8 +1711,6 @@
         }
     }
 
-    /* =========================== 初始化 =========================== */
-
     function init() {
         if (initialized) return;
         initialized = true;
@@ -2092,9 +1721,7 @@
         searchBtn = byId('searchButton');
         hotContainer = byId('hotDownloadsList');
 
-        // 事件委托只绑一次，绑定在容器上，后面 innerHTML 变化不受影响
         addEvent(fileListContainer, 'click', handleDownloadClick);
-
         addEvent(searchBtn, 'click', onSearch);
         addEvent(searchInput, 'keypress', function (e) {
             e = e || window.event;
@@ -2110,7 +1737,6 @@
         window.setTimeout(init, 0);
     } else {
         addEvent(document, 'DOMContentLoaded', init);
-        // 双保险：某些老内核不触发 DOMContentLoaded
         addEvent(window, 'load', init);
     }
 
