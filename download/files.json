@@ -303,5 +303,16 @@
     "md5": "8dbc358780b52c82828289aff4604685",
     "sha256": "dfc0a7bb6a291aed7b2c679d7dc7209631f1dd037b95c1f380ecfb81a8948d54",
     "protected": false
+  },
+  {
+    "name": "crac_logo.ico",
+    "size": 1117022,
+    "modified": "2026-10-31 13:58:21",
+    "url": "./download/crac_logo.ico",
+    "ext": "ico",
+    "md5": "63658c8dbd5463b361dc3f65dbea0a92",
+    "sha256": "f8c1b045f8b9f4c8513e0ac708ccc164c14642eecb7826227dd6640a1b2072a3",
+    "protected": false,
+    "lfs": false
   }
 ]
