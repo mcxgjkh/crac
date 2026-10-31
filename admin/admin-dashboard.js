@@ -496,11 +496,17 @@
 
         var offset = (page - 1) * pageSize;
         var query = sb.from(tableName).select('*', { count: 'exact' });
-        if (tableName === 'qsl_cards') {
-            query = query.order('id', { ascending: true });
-        } else {
-            query = query.order('id', { ascending: false });
-        }
+
+        var orderFieldMap = {
+            'qsl_cards': { field: 'id', ascending: true },
+            'exam_pending': { field: 'updated_at', ascending: false },
+            'exam_progress': { field: 'updated_at', ascending: false },
+            'exam_sessions': { field: 'updated_at', ascending: false },
+            'login_logs': { field: 'logged_at', ascending: false }
+        };
+
+        var orderConf = orderFieldMap[tableName] || { field: 'updated_at', ascending: false };
+        query = query.order(orderConf.field, { ascending: orderConf.ascending });
         query.range(offset, offset + pageSize - 1)
             .then(function(result) {
                 if (result.error) {
